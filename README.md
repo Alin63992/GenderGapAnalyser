@@ -3,7 +3,7 @@ A program
 written in Java for my bachelor's degree thesis
 that downloads a dataset of men's and women's salaries from the United States,
 from the U.S. Department of Labor's website,
-and that analyses the salaries, creates graphs and predictions,
+and that analyses the salaries, creates graphs and predictions using data mining and simple regression,
 generates a PDF report that contains an evolution graph, the interpretations of the evolutions and a table with all the data used, and can mail the PDF report to the user's email address.<br>
 It uses JavaFX in order to have a GUI that's not cluttered and that's easy and pleasant to use.
 
