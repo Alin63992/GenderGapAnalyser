@@ -103,6 +103,7 @@ public class Main extends Application implements Initializable {
     protected static String outgoingAccountPassword = "";
     private AnimatedThemeSwitcher switchTheme;
 
+
     //Function used to set the currently open window to be used in the future
     public static void setCurrentStage(Stage s) {
         Main.currentStage = s;
