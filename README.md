@@ -10,6 +10,12 @@ It uses JavaFX in order to have a GUI that's not cluttered and that's easy and p
 ### Changelog
 <ul>
 <li>
+<u>12.07.2023</u><br>
+- Translated in French and Romanian the prompt
+asking the user for their email and password to send the report to their own email address and through it.
+</li>
+<br>
+<li>
 <u>09.07.2023</u><br>
 - Git specific: removed all the commits for security purposes, and moved this project to a public repository.
 </li>

@@ -1,6 +1,9 @@
 package com.gendergapanalyser.gendergapanalyser;
 
-import animatefx.animation.*;
+import animatefx.animation.FadeIn;
+import animatefx.animation.FadeOut;
+import animatefx.animation.ZoomIn;
+import animatefx.animation.ZoomOut;
 import eu.iamgio.animated.transition.AnimatedSwitcher;
 import eu.iamgio.animated.transition.AnimatedThemeSwitcher;
 import eu.iamgio.animated.transition.Animation;

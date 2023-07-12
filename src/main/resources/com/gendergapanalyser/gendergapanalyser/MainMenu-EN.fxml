@@ -245,7 +245,7 @@
       <AnchorPane fx:id="missingOutgoingCredentialsPrompt" prefHeight="790.0" prefWidth="1100.0" visible="false">
          <children>
             <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="313.0" layoutX="207.0" layoutY="239.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="prompts" width="686.0" />
-            <Text layoutX="216.0" layoutY="265.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="labels" text="The outgoing mail account credentials are missing from the program, and an Outlook account is needed to send the PDF report through e-mail. Please enter your Outlook account credentials to send the report to your own e-mail address. It will show up as &quot;Note to self&quot;, and the credentials will be forgotten after attempting to send the e-mail." textAlignment="CENTER" wrappingWidth="668.0">
+            <Text layoutX="216.0" layoutY="265.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="labels" text="A Microsoft Outlook account is needed to send the PDF report through e-mail. Please enter your Outlook credentials to send the report to your own e-mail address. It will show up in your inbox as &quot;Note to self&quot;, and the credentials will be forgotten after attempting to send the e-mail." textAlignment="CENTER" wrappingWidth="668.0">
                <font>
                   <Font name="Calibri Light" size="20.0" />
                </font>
