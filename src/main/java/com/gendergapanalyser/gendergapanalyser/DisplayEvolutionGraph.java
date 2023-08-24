@@ -1,11 +1,10 @@
 package com.gendergapanalyser.gendergapanalyser;
 
-import animatefx.animation.FadeOut;
-import animatefx.animation.FadeOutLeft;
-import animatefx.animation.SlideInRight;
+import animatefx.animation.*;
 import eu.iamgio.animated.transition.AnimatedSwitcher;
 import eu.iamgio.animated.transition.AnimatedThemeSwitcher;
 import eu.iamgio.animated.transition.Animation;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -21,22 +20,34 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
+import javafx.util.Duration;
 import org.controlsfx.control.RangeSlider;
 
 import java.io.*;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class DisplayEvolutionGraph implements Initializable {
     @FXML
+    private Hyperlink voidLink;
+    @FXML
     private AnchorPane titleBar;
     @FXML
     private ChoiceBox<String> languagePicker;
+    @FXML
+    private ChoiceBox<String> currencyPicker;
+    @FXML
+    private ImageView lightModeButtonGlyph;
+    @FXML
+    private ImageView darkModeButtonGlyph;
     @FXML
     private ChoiceBox<String> changeGraph;
     @FXML
@@ -57,6 +68,16 @@ public class DisplayEvolutionGraph implements Initializable {
     private ToggleButton includePredictionsToggle;
     @FXML
     private HBox predictionControls;
+    @FXML
+    private Rectangle darkOverlay;
+    @FXML
+    private ImageView loadingCircleImageView;
+    @FXML
+    private AnchorPane backgroundOperations;
+    @FXML
+    private AnimatedSwitcher darkOverlayAnimator;
+    @FXML
+    private AnimatedSwitcher promptAnimator;
     private AnimatedThemeSwitcher switchTheme;
     private final String[] choices_EN = {"Men's and women's wages", "Men's wages", "Women's wages", "Gender wage gap"};
     private final String[] choices_FR = {"Salaires des femmes et d'hommes", "Salaires d'hommes", "Salaires des femmes", "Différence de la paye"};
@@ -124,7 +145,7 @@ public class DisplayEvolutionGraph implements Initializable {
     public void toggleDisplayMode() throws IOException {
         Main.displayMode = Main.displayMode.equals("Light") ? "Dark" : "Light";
         BufferedWriter buildUserSettings = new BufferedWriter(new FileWriter("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
-        buildUserSettings.write("DisplayMode=" + Main.displayMode + "\nLanguage=" + Main.language);
+        buildUserSettings.write("DisplayMode=" + Main.displayMode + "\nLanguage=" + Main.language + "\nCurrency=" + Main.currency + "\nExchangeRateLastUpdated=" + Main.exchangeRateLastUpdated.get(Calendar.DAY_OF_MONTH) + "." + Main.exchangeRateLastUpdated.get(Calendar.MONTH) + "." + Main.exchangeRateLastUpdated.get(Calendar.YEAR) + "\nExchangeRateToEUR=" + Main.exchangeRateEUR + "\nExchangeRateToRON=" + Main.exchangeRateRON);
         buildUserSettings.close();
         if (Main.processData.predictionsGenerated) {
             Main.processData.createSalaryGraphWithPredictionsForEverybody();
@@ -135,6 +156,15 @@ public class DisplayEvolutionGraph implements Initializable {
         if (!minimumRangeInput.getText().equals(Main.processData.dataset[0][1]) || !maximumRangeInput.getText().equals(Main.processData.dataset[Main.processData.dataset.length - 1][1]))
             Main.processData.createSalaryGraphWithinRangeForEverybody(Integer.parseInt(minimumRangeInput.getText()), Integer.parseInt(maximumRangeInput.getText()));
         Main.getCurrentStage().getScene().getStylesheets().setAll(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
+        if (Main.displayMode.equals("Dark")) {
+            darkModeButtonGlyph.setFitHeight(50);
+            lightModeButtonGlyph.setFitHeight(35);
+        }
+        else {
+            lightModeButtonGlyph.setFitHeight(50);
+            darkModeButtonGlyph.setFitHeight(35);
+        }
+        voidLink.requestFocus();
         FileInputStream graph = null;
         if (changeGraph.getSelectionModel().getSelectedIndex() == 0 && showPayGapToggle.isSelected()) {
             if (includePredictionsToggle.isSelected())
@@ -263,6 +293,16 @@ public class DisplayEvolutionGraph implements Initializable {
         salaries.setPrefHeight(salariesView.getPrefHeight());
         salaries.getColumns().addAll(gender, year, salary);
         salaries.setItems(data);
+        Callback existingCellFactorySalaries = salary.getCellFactory();
+        salary.setCellFactory(c -> {
+            TableCell cell = (TableCell) existingCellFactorySalaries.call(c);
+            Tooltip t = new Tooltip();
+            t.setFont(new Font("Calibri", 13));
+            t.setShowDelay(Duration.millis(200));
+            t.textProperty().bind(cell.itemProperty().asString());
+            cell.setTooltip(t);
+            return cell;
+        });
         salariesView.getChildren().clear();
         salariesView.getChildren().add(salaries);
 
@@ -282,6 +322,16 @@ public class DisplayEvolutionGraph implements Initializable {
         gaps.setPrefHeight(payGapsView.getPrefHeight());
         gaps.getColumns().addAll(yearGapTable, payGap);
         gaps.setItems(payGapsList);
+        Callback existingCellFactoryPayGaps = payGap.getCellFactory();
+        payGap.setCellFactory(c -> {
+            TableCell cell = (TableCell) existingCellFactoryPayGaps.call(c);
+            Tooltip t = new Tooltip();
+            t.setFont(new Font("Calibri", 13));
+            t.setShowDelay(Duration.millis(200));
+            t.textProperty().bind(cell.itemProperty().asString());
+            cell.setTooltip(t);
+            return cell;
+        });
         payGapsView.getChildren().clear();
         payGapsView.getChildren().add(gaps);
 
@@ -431,6 +481,7 @@ public class DisplayEvolutionGraph implements Initializable {
                 maximumRangeInput.setText(String.valueOf((int) rangeSlider.getLowValue() + 1));
                 rangeSlider.setHighValue(rangeSlider.getLowValue() + 1);
             }
+
             if (!minimumRangeInput.getText().equals(Main.processData.dataset[0][1]) || !maximumRangeInput.getText().equals(Main.processData.predictionsGenerated ? Main.processData.datasetWithPredictions[Main.processData.datasetWithPredictions.length - 1][1] : Main.processData.dataset[Main.processData.dataset.length - 1][1])) {
                 if (Main.processData.predictionsGenerated && includePredictionsToggle.isSelected())
                     Main.processData.createSalaryGraphWithinRangeWithPredictionsForEverybody(Integer.parseInt(minimumRangeInput.getText()), Integer.parseInt(maximumRangeInput.getText()));
@@ -483,6 +534,10 @@ public class DisplayEvolutionGraph implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        promptAnimator.setIn(new Animation(new ZoomIn()).setSpeed(3));
+        promptAnimator.setOut(new Animation(new ZoomOut()).setSpeed(10));
+        darkOverlayAnimator.setIn(new Animation(new FadeIn()).setSpeed(3));
+        darkOverlayAnimator.setOut(new Animation(new ZoomOut()).setSpeed(10));
         titleBar.setOnMousePressed(event -> {
             Main.dragX = Main.getCurrentStage().getX() - event.getScreenX();
             Main.dragY = Main.getCurrentStage().getY() - event.getScreenY();
@@ -494,28 +549,128 @@ public class DisplayEvolutionGraph implements Initializable {
         //Setting up the language picker
         languagePicker.setItems(FXCollections.observableArrayList(Main.languages));
         switch (Main.language) {
-            case "EN" -> languagePicker.setValue(Main.languages[0]);
-            case "FR" -> languagePicker.setValue(Main.languages[1]);
-            case "RO" -> languagePicker.setValue(Main.languages[2]);
+            case "EN" -> {
+                languagePicker.setValue(Main.languages[0]);
+                currencyPicker.setValue(Main.currencies[0]);
+            }
+            case "FR" -> {
+                languagePicker.setValue(Main.languages[1]);
+                currencyPicker.setValue(Main.currencies[1]);
+            }
+            case "RO" -> {
+                languagePicker.setValue(Main.languages[2]);
+                currencyPicker.setValue(Main.currencies[2]);
+            }
         }
+        //When selecting another language from the language picker...
         languagePicker.getSelectionModel().selectedIndexProperty().addListener(((observable, oldValue, newValue) -> {
-            try {
-                Main.language = Main.languagesShort[newValue.intValue()];
-                BufferedWriter buildUserSettings = new BufferedWriter(new FileWriter("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
-                buildUserSettings.write("DisplayMode=" + Main.displayMode + "\nLanguage=" + Main.language);
-                buildUserSettings.close();
-                if (Main.processData.predictionsGenerated) Main.processData.createSalaryGraphWithPredictionsForEverybody();
-                Main.processData.createSalaryGraphForEverybody();
+            //Updating the language with the newly picked one and the currency to the one associated with the language
+            Main.language = Main.languagesShort[newValue.intValue()];
+            Main.currency = Main.currencies[newValue.intValue()];
+            //Setting the boolean variable used by DataProcessing.createPDF method to true so that the method generates a new PDF document in a new language
+            Main.changedLanguage = true;
+            //Setting the boolean variable used by DataProcessing.createPDF method to true so that the method generates a new PDF document with the new currency
+            Main.changedCurrency = true;
+            Runnable rebuildResources = () -> {
+                try {
+                    BufferedWriter buildUserSettings = new BufferedWriter(new FileWriter("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
+                    buildUserSettings.write("DisplayMode=" + Main.displayMode + "\nLanguage=" + Main.language + "\nCurrency=" + Main.currency + "\nExchangeRateLastUpdated=" + Main.exchangeRateLastUpdated.get(Calendar.DAY_OF_MONTH) + "." + Main.exchangeRateLastUpdated.get(Calendar.MONTH) + "." + Main.exchangeRateLastUpdated.get(Calendar.YEAR) + "\nExchangeRateToEUR=" + Main.exchangeRateEUR + "\nExchangeRateToRON=" + Main.exchangeRateRON);
+                    buildUserSettings.close();
+                    //Creating the usable dataset again so that it uses the new currency
+                    Main.processData.prepareData();
+                    //Recreating predictions graphs so that they use the newly set currency
+                    if (Main.processData.predictionsGenerated) {
+                        Main.processData.predictEvolutions(Main.predictionValue);
+                        Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                    }
+                    Main.processData.createSalaryGraphForEverybody();
+                } catch (IOException ignored) {}
+                //Recreating analyses in the new currency
                 Main.processData.performAnalysis();
-                Main.processData.changedLanguage = true;
-                Main.getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("DisplayEvolutionGraph-" + Main.languagesShort[newValue.intValue()] + ".fxml")).load()));
-                Main.getCurrentStage().getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
-                //Changing the title of the current stage
-                Main.getCurrentStage().setTitle(Main.language.equals("EN") ? "Evolution Graph" : Main.language.equals("FR") ? "Graphe d'Évolution" : "Grafic de Evoluție");
-                switchTheme = new AnimatedThemeSwitcher(Main.getCurrentStage().getScene(), new Animation(new FadeOut()).setSpeed(2.5));
-                switchTheme.init();
-            } catch (IOException ignored) {}
+                Platform.runLater(() -> {
+                    try {
+                        Main.getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("DisplayEvolutionGraph-" + Main.languagesShort[newValue.intValue()] + ".fxml")).load()));
+                    } catch (IOException ignored) {}
+                    Main.getCurrentStage().getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
+                    //Changing the title of the current stage
+                    Main.getCurrentStage().setTitle(Main.language.equals("EN") ? "Evolution Graph" : Main.language.equals("FR") ? "Graphe d'Évolution" : "Grafic de Evoluție");
+                    switchTheme = new AnimatedThemeSwitcher(Main.getCurrentStage().getScene(), new Animation(new FadeOut()).setSpeed(2.5));
+                    switchTheme.init();
+                });
+            };
+            promptAnimator.setChild(new Pane(backgroundOperations));
+            darkOverlayAnimator.setChild(new Pane(darkOverlay));
+            try {
+                loadingCircleImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/loading-" + Main.displayMode + ".gif")));
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            backgroundOperations.setVisible(true);
+            darkOverlay.setVisible(true);
+            new Thread(rebuildResources).start();
         }));
+
+        //Setting up the currency picker
+        currencyPicker.setItems(FXCollections.observableArrayList(Main.currencies));
+        switch (Main.currency) {
+            case "USD" -> currencyPicker.setValue(Main.currencies[0]);
+            case "EUR" -> currencyPicker.setValue(Main.currencies[1]);
+            case "RON" -> currencyPicker.setValue(Main.currencies[2]);
+        }
+        //When selecting another language from the currency picker...
+        currencyPicker.getSelectionModel().selectedIndexProperty().addListener(((observable, oldValue, newValue) -> {
+            //Updating the currency with the newly picked one
+            Main.currency = Main.currencies[newValue.intValue()];
+            //Setting the boolean variable used by DataProcessing.createPDF method to true so that the method generates a new PDF document with the new currency
+            Main.changedCurrency = true;
+            Runnable rebuildResources = () -> {
+                try {
+                    BufferedWriter buildUserSettings = new BufferedWriter(new FileWriter("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
+                    buildUserSettings.write("DisplayMode=" + Main.displayMode + "\nLanguage=" + Main.language + "\nCurrency=" + Main.currency + "\nExchangeRateLastUpdated=" + Main.exchangeRateLastUpdated.get(Calendar.DAY_OF_MONTH) + "." + Main.exchangeRateLastUpdated.get(Calendar.MONTH) + "." + Main.exchangeRateLastUpdated.get(Calendar.YEAR) + "\nExchangeRateToEUR=" + Main.exchangeRateEUR + "\nExchangeRateToRON=" + Main.exchangeRateRON);
+                    buildUserSettings.close();
+                    //Creating the usable dataset again so that it uses the new currency
+                    Main.processData.prepareData();
+                    //Recreating predictions graphs so that they use the newly set currency
+                    if (Main.processData.predictionsGenerated) {
+                        Main.processData.predictEvolutions(Main.predictionValue);
+                        Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                    }
+                    Main.processData.createSalaryGraphForEverybody();
+                } catch (IOException ignored) {}
+                //Recreating analyses in the new currency
+                Main.processData.performAnalysis();
+                Platform.runLater(() -> {
+                    try {
+                        Main.getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("DisplayEvolutionGraph-" + Main.language + ".fxml")).load()));
+                    } catch (IOException ignored) {}
+                    Main.getCurrentStage().getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
+                    //Changing the title of the current stage
+                    Main.getCurrentStage().setTitle(Main.language.equals("EN") ? "Evolution Graph" : Main.language.equals("FR") ? "Graphe d'Évolution" : "Grafic de Evoluție");
+                    switchTheme = new AnimatedThemeSwitcher(Main.getCurrentStage().getScene(), new Animation(new FadeOut()).setSpeed(2.5));
+                    switchTheme.init();
+                });
+            };
+            promptAnimator.setChild(new Pane(backgroundOperations));
+            darkOverlayAnimator.setChild(new Pane(darkOverlay));
+            try {
+                loadingCircleImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/loading-" + Main.displayMode + ".gif")));
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            backgroundOperations.setVisible(true);
+            darkOverlay.setVisible(true);
+            new Thread(rebuildResources).start();
+        }));
+
+        //Setting up the theme toggle
+        if (Main.displayMode.equals("Dark")) {
+            darkModeButtonGlyph.setFitHeight(50);
+            lightModeButtonGlyph.setFitHeight(35);
+        }
+        else {
+            lightModeButtonGlyph.setFitHeight(50);
+            darkModeButtonGlyph.setFitHeight(35);
+        }
 
         //Preparing the chart display
         try {
@@ -565,10 +720,20 @@ public class DisplayEvolutionGraph implements Initializable {
         salary.setCellValueFactory((Callback<TableColumn.CellDataFeatures<String[], String>, ObservableValue>) param -> new SimpleStringProperty(Main.processData.formatSalary(param.getValue()[2])));
         gender.setPrefWidth(salariesView.getPrefWidth() / 3 - 6);
         year.setPrefWidth(salariesView.getPrefWidth() / 3 - 6);
-        salary.setMinWidth(salariesView.getPrefWidth() / 3 - 6);
+        salary.setPrefWidth(salariesView.getPrefWidth() / 3 - 6);
         salaries.setPrefHeight(salariesView.getPrefHeight());
         salaries.getColumns().addAll(gender, year, salary);
         salaries.setItems(data);
+        Callback existingCellFactorySalaries = salary.getCellFactory();
+        salary.setCellFactory(c -> {
+            TableCell cell = (TableCell) existingCellFactorySalaries.call(c);
+            Tooltip t = new Tooltip();
+            t.setFont(new Font("Calibri", 13));
+            t.setShowDelay(Duration.millis(200));
+            t.textProperty().bind(cell.itemProperty().asString());
+            cell.setTooltip(t);
+            return cell;
+        });
         salariesView.getChildren().add(salaries);
 
         //Preparing the pay gaps table the same way as the salary table
@@ -587,6 +752,16 @@ public class DisplayEvolutionGraph implements Initializable {
         gaps.setPrefHeight(payGapsView.getPrefHeight());
         gaps.getColumns().addAll(yearGapTable, payGap);
         gaps.setItems(payGapsList);
+        Callback existingCellFactoryPayGaps = payGap.getCellFactory();
+        payGap.setCellFactory(c -> {
+            TableCell cell = (TableCell) existingCellFactoryPayGaps.call(c);
+            Tooltip t = new Tooltip();
+            t.setFont(new Font("Calibri", 13));
+            t.setShowDelay(Duration.millis(200));
+            t.textProperty().bind(cell.itemProperty().asString());
+            cell.setTooltip(t);
+            return cell;
+        });
         payGapsView.getChildren().add(gaps);
 
         //Populating the graph choice box and setting specific changes based on the current choice
@@ -726,14 +901,6 @@ public class DisplayEvolutionGraph implements Initializable {
                 maximumRangeInput.setText(String.valueOf((int) rangeSlider.getLowValue() + 1));
             }
         }));
-        /*minimumRangeInput.setOnKeyReleased(action -> {
-            if (action.getCode() == KeyCode.ENTER)
-                processRange.fire();
-        });
-        maximumRangeInput.setOnKeyReleased(action -> {
-            if (action.getCode() == KeyCode.ENTER)
-                processRange.fire();
-        });*/
 
         //If the user generated predictions, we enable the prediction controls. If not, we disable them. We also select the include predictions checkbox and execute the togglePredictions function
         predictionControls.setDisable(!Main.processData.predictionsGenerated);

@@ -10,6 +10,28 @@ It uses JavaFX in order to have a GUI that's not cluttered and that's easy and p
 ### Changelog
 <ul>
 <li>
+<u>24.08.2023</u> - big update day!<br>
+- Fixed the bug that was preventing the app from starting.<br>
+- Added a new splash screen with the app icon, the app title in English/French/Romanian (according to the user's preferred language) and a spinning wheel animation. The splash screen follows the user's preferred theme. The app now appears on the screen faster while it processes the dataset and prepares everything in the background, so it won't take long to display after starting it on slower systems, and there's something displayed while the data and resources are being prepared.<br>
+- Two new currencies are available in the app: the Euro (EUR) and the Romanian New Leu (RON). The user can choose in which one of the 3 available currencies to view th graphs, stats and interpretations, and the app will either use the original values - which come in the United States Dollar (USD) - or convert the USD values in the currency the user chose in the picker. The exchange rates are provided by <a href="https://www.exchangerate-api.com/">ExchangeRate-API</a>. When the user changes the app language, the currency also changes to the currency tied to that language (English - USD; French - EUR; Romanian - RON), and can be easily changed through the picker.<br>
+- Added a link on the main menu screen that opens a popup describing the sources of data (statistics and exchange rates). Each has a link that opens the webpage of the source in the OS' default browser, and the latest data obtained from that source.<br>
+- Fixed the theme switching animation not playing after the app reloads the main menu or switches back to it when the new dataset finishes downloading and was processed.<br>
+- Made the theme toggles accessible when a popup is displayed on the screen.<br>
+- Made the title of the PDF report to display the earliest and latest year of statistics taken from the dataset, so the year 1960 (lower limit of salary statistics available on 24.08.2023) isn't hardcoded anymore. That way, if a dataset with statistics before 1960 is found, the title of the PDF doesn't still display 1960.<br>
+- Fixed sending the PDF report through e-mail when the app does contain internally the e-mail address and password the e-mail should be sent from. Now, the app won't ask for the destination e-mail when first attempting to send it, and then saying that there is no source credentials and asking the user for their e-mail address and password when trying to send the e-mail again afterwards. Instead, it only asks for the destination e-mail address at each send attempt.<br>
+- A wait popup is displayed when changing the currency or the language of the app, since the dataset is reprocessed with the new currency and the graphs and predictions are regenerated. That way, the app doesn't freeze on slower systems.<br>
+- The app is now more colourful! Replaced in-code emojis with pictures of the actual emojis (used by Microsoft across its products), obtained with <a href="https://emojipedia.org/">Emojipedia</a>. That way, the icons of the buttons on the main screen have colour. Also, the arrows in the navigation links are now full emojis and look better, the theme toggle has colourful icons and the colour of the button doesn't change anymore, but the icons of the buttons each get bigger to indicate the current theme. On the interpretations screen, the slim emojis were replaced by full emojis for men and women, and the gender gap icon is now the app's icon. Finally, the colours of the titles were changed to match the outline colour of their respective icon.<br>
+- Small code restructuration.
+</li>
+<br>
+<li>
+<u>19.07.2023</u><br>
+- <s>Added a currency dropdown that converts all the salaries in the dataset from USD to EUR and RON. It uses data from the <a href="https://www.exchangerate-api.com/">ExchangeRate API</a>.</s> <u>Update 24.08.2023: </u>Turns out that this feature wasn't actually implemented and a broken build of the app was uploaded to Git.<br>
+- Slight cosmetic changes. <br>
+- Removed commented and unused code.
+</li>
+<br>
+<li>
 <u>12.07.2023</u><br>
 - Translated in French and Romanian the prompt
 asking the user for their email and password to send the report to their own email address and through it.

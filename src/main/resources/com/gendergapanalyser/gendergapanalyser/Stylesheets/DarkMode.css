@@ -6,6 +6,10 @@
     -fx-fill: #3b3b3bb8;
 }
 
+.hyperlink:visited {
+    -fx-text-fill: #0096c9;
+}
+
 .redButtons {
     -fx-background-color: #47474700;
     -fx-text-fill: red;
@@ -44,6 +48,10 @@
     -fx-fill: white;
 }
 
+#splashLabel {
+    -fx-text-fill: white;
+}
+
 .separators {
     -fx-stroke: white;
 }
@@ -59,16 +67,13 @@
 }
 
 #darkModeButton {
-    -fx-background-color: #3030ff;
-    -fx-text-fill: white;
+    -fx-background-color: #47474700;
 }
 #darkModeButton:hover {
-    -fx-background-color: #6868ff;
-    -fx-text-fill: white;
+    -fx-background-color: #444444;
 }
 #darkModeButton:focused {
-    -fx-background-color: #6868ff;
-    -fx-text-fill: white;
+    -fx-background-color: #444444;
 }
 
 .main-buttons {
@@ -104,8 +109,13 @@
 .scroll-bar:vertical {
     -fx-background-color: transparent;
 }
-
 .scroll-bar:vertical .thumb {
+    -fx-background-color: #3a383a;
+}
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+.scroll-bar:horizontal .thumb {
     -fx-background-color: #3a383a;
 }
 

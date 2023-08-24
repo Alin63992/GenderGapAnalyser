@@ -10,6 +10,8 @@ import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 import java.awt.*;
 import java.io.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.text.Normalizer;
 import java.util.List;
@@ -38,7 +40,6 @@ public class DataProcessing {
     //Boolean used to know which data to display on the graph page
     protected boolean predictionsGenerated = false;
     protected boolean PDFGeneratedWithPredictions = false;
-    protected boolean changedLanguage = false;
 
     //Constructor
     public DataProcessing() throws IOException {}
@@ -52,8 +53,8 @@ public class DataProcessing {
         int positionPayGapSet = 0;
         String line;
         //Initializing the variables where the salaries of men and women will be sored per year, used when building the wage gap array and to manage the multiple values for the years 2013 & 2017
-        int manSalary = 0;
-        int womanSalary = 0;
+        double manSalary = 0;
+        double womanSalary = 0;
 
         //Unpacking the dataset
         //Looping through the file, selecting all the lines that contain the salary for the total population by gender, not accounting the ethnicity and race, and storing them in a temporary array
@@ -93,39 +94,64 @@ public class DataProcessing {
                 else if (statistic[0].equals("Women") && womanSalary != 0 && Integer.parseInt(statistic[2]) > womanSalary) {
                     dataset[positionDataset][0] = statistic[0];
                     dataset[positionDataset][1] = statistic[1];
-                    dataset[positionDataset][2] = statistic[2];
+                    if (Main.currency.equals("EUR"))
+                        dataset[positionDataset][2] = String.valueOf(new BigDecimal(statistic[2]).setScale(4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(Main.exchangeRateEUR)).doubleValue());
+                    else if (Main.currency.equals("RON"))
+                        dataset[positionDataset][2] = String.valueOf(new BigDecimal(statistic[2]).setScale(4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(Main.exchangeRateRON)).doubleValue());
+                    else
+                        dataset[positionDataset][2] = statistic[2];
                     womanSalary = 0;
                     positionDataset++;
                 } else if (statistic[0].equals("Women") && womanSalary != 0 && Integer.parseInt(statistic[2]) <= womanSalary) {
                     dataset[positionDataset][0] = statistic[0];
                     dataset[positionDataset][1] = statistic[1];
-                    dataset[positionDataset][2] = String.valueOf(womanSalary);
+                    if (Main.currency.equals("EUR"))
+                        dataset[positionDataset][2] = String.valueOf(new BigDecimal(womanSalary).setScale(4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(Main.exchangeRateEUR)).doubleValue());
+                    else if (Main.currency.equals("RON"))
+                        dataset[positionDataset][2] = String.valueOf(new BigDecimal(womanSalary).setScale(4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(Main.exchangeRateRON)).doubleValue());
+                    else
+                        dataset[positionDataset][2] = String.valueOf((int) womanSalary);
                     womanSalary = 0;
                     positionDataset++;
                 } else if (statistic[0].equals("Men") && manSalary != 0 && Integer.parseInt(statistic[2]) > manSalary) {
                     dataset[positionDataset][0] = statistic[0];
                     dataset[positionDataset][1] = statistic[1];
-                    dataset[positionDataset][2] = statistic[2];
+                    if (Main.currency.equals("EUR"))
+                        dataset[positionDataset][2] = String.valueOf(new BigDecimal(statistic[2]).setScale(4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(Main.exchangeRateEUR)).doubleValue());
+                    else if (Main.currency.equals("RON"))
+                        dataset[positionDataset][2] = String.valueOf(new BigDecimal(statistic[2]).setScale(4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(Main.exchangeRateRON)).doubleValue());
+                    else
+                        dataset[positionDataset][2] = statistic[2];
                     manSalary = 0;
                     positionDataset++;
                 } else if (statistic[0].equals("Men") && manSalary != 0 && Integer.parseInt(statistic[2]) <= manSalary) {
                     dataset[positionDataset][0] = statistic[0];
                     dataset[positionDataset][1] = statistic[1];
-                    dataset[positionDataset][2] = String.valueOf(manSalary);
+                    if (Main.currency.equals("EUR"))
+                        dataset[positionDataset][2] = String.valueOf(new BigDecimal(manSalary).setScale(4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(Main.exchangeRateEUR)).doubleValue());
+                    else if (Main.currency.equals("RON"))
+                        dataset[positionDataset][2] = String.valueOf(new BigDecimal(manSalary).setScale(4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(Main.exchangeRateRON)).doubleValue());
+                    else
+                        dataset[positionDataset][2] = String.valueOf((int) manSalary);
                     manSalary = 0;
                     positionDataset++;
                 }
             } else {
                 dataset[positionDataset][0] = statistic[0];
                 dataset[positionDataset][1] = statistic[1];
-                dataset[positionDataset][2] = statistic[2];
+                if (Main.currency.equals("EUR"))
+                    dataset[positionDataset][2] = String.valueOf(new BigDecimal(statistic[2]).setScale(4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(Main.exchangeRateEUR)).doubleValue());
+                else if (Main.currency.equals("RON"))
+                    dataset[positionDataset][2] = String.valueOf(new BigDecimal(statistic[2]).setScale(4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(Main.exchangeRateRON)).doubleValue());
+                else
+                    dataset[positionDataset][2] = statistic[2];
                 positionDataset++;
             }
         }
         for (String[] statistic : dataset) {
             //Populating the gender pay gap map
-            if (statistic[0].equals("Women")) womanSalary = Integer.parseInt(statistic[2]);
-            else if (statistic[0].equals("Men")) manSalary = Integer.parseInt(statistic[2]);
+            if (statistic[0].equals("Women")) womanSalary = Double.parseDouble(statistic[2]);
+            else if (statistic[0].equals("Men")) manSalary = Double.parseDouble(statistic[2]);
             if (womanSalary != 0 && manSalary != 0) {
                 genderPayGap[positionPayGapSet][0] = statistic[1];
                 genderPayGap[positionPayGapSet][1] = String.valueOf(Math.abs(womanSalary - manSalary));
@@ -150,21 +176,21 @@ public class DataProcessing {
     public void performAnalysis() {
         //Arrays where the years, their respective salaries and their computed differences are stored
         List<Integer> years = new ArrayList<>();
-        List<Integer> womenSalaries = new ArrayList<>();
-        List<Integer> menSalaries = new ArrayList<>();
-        List<Integer> payGapsArray = new ArrayList<>();
+        List<Double> womenSalaries = new ArrayList<>();
+        List<Double> menSalaries = new ArrayList<>();
+        List<Double> payGapsArray = new ArrayList<>();
         //Arrays used to store the record highest salaries and the years when they happened
-        int[] peakWomen = new int[2];
-        int[] peakMen = new int[2];
+        double[] peakWomen = new double[2];
+        double[] peakMen = new double[2];
         //Arrays used to store the years when the salaries kept rising for a minimum of 3 years
         ArrayList<Integer> risingYearsWomen = new ArrayList<>();
         ArrayList<Integer> risingYearsMen = new ArrayList<>();
         //Arrays used to store the sums when the salaries kept rising for a minimum of 3 years
-        ArrayList<Integer> risingSalariesWomen = new ArrayList<>();
-        ArrayList<Integer> risingSalariesMen = new ArrayList<>();
+        ArrayList<Double> risingSalariesWomen = new ArrayList<>();
+        ArrayList<Double> risingSalariesMen = new ArrayList<>();
         //Arrays used to store the years and the sums when the pay gap kept decreasing for a minimum of 3 years
         ArrayList<Integer> dippingYearsPayGap = new ArrayList<>();
-        ArrayList<Integer> dippingSumsPayGap = new ArrayList<>();
+        ArrayList<Double> dippingSumsPayGap = new ArrayList<>();
         //Counters used to check if a period is made up of minimum 3 years or not
         int countRisingYearsWomen = 0;
         int countRisingYearsMen = 0;
@@ -172,7 +198,7 @@ public class DataProcessing {
         //Counter used to count how long is an evolution period
         int countEvolutionPeriod = 0;
         //Variable where the average pay rise per year will be stored
-        int avgPayRise = 0;
+        double avgPayRise = 0;
         //Variable where the last year of each period of evolution is temporarily stored
         int tempLastYear = 0;
         //Variable where each period of evolution is temporarily stored
@@ -186,7 +212,7 @@ public class DataProcessing {
             wageGapAnalysisWithPredictions = Main.language.equals("EN") ? "The lowest pay gap was of " : Main.language.equals("FR") ? "La plus petite différence de la paye était de " : "Cea mai mică diferență între salarii a fost de ";
 
             //Sorting the dataset by salaries, lowest to highest, for the peaks
-            Arrays.sort(datasetWithPredictions, Comparator.comparingInt(salary -> Integer.parseInt(salary[2])));
+            Arrays.sort(datasetWithPredictions, Comparator.comparingDouble(salary -> Double.parseDouble(salary[2])));
 
             //Iterating through the dataset in reverse order
             for (int i = datasetWithPredictions.length - 1; i > 0; i--) {
@@ -208,11 +234,11 @@ public class DataProcessing {
             Arrays.sort(datasetWithPredictions, Comparator.comparingInt(year -> Integer.parseInt(year[1])));
 
             //Sorting the pay gap set by sum, lowest to highest
-            Arrays.sort(genderPayGapWithPredictions, Comparator.comparingInt(gap -> Integer.parseInt(gap[1])));
+            Arrays.sort(genderPayGapWithPredictions, Comparator.comparingDouble(gap -> Double.parseDouble(gap[1])));
 
             //Completing the gender analyses with the peaks, then starting to specify the evolution timeframes
-            womenAnalysisWithPredictions += formatSalary(String.valueOf(peakWomen[1])) + (Main.language.equals("EN") ? " in the year " : Main.language.equals("FR") ? " dans l'an " : " în anul ") + peakWomen[0] + (Main.language.equals("EN") ? ".\nTimeframes when the salaries kept rising:\n• " : Main.language.equals("FR") ? ".\nPériodes quand les salaires étaient en croissance:\n• " : ".\nPerioade în care salariile au fost în creștere:\n• ");
-            menAnalysisWithPredictions += formatSalary(String.valueOf(peakMen[1])) + (Main.language.equals("EN") ? " in the year " : Main.language.equals("FR") ? " dans l'an " : " în anul ") + peakMen[0] + (Main.language.equals("EN") ? ".\nTimeframes when the salaries kept rising:\n• " : Main.language.equals("FR") ? ".\nPériodes quand les salaires étaient en croissance:\n• " : ".\nPerioade în care salariile au fost în creștere:\n• ");
+            womenAnalysisWithPredictions += formatSalary(String.valueOf(peakWomen[1])) + (Main.language.equals("EN") ? " in the year " : Main.language.equals("FR") ? " dans l'an " : " în anul ") + (int) peakWomen[0] + (Main.language.equals("EN") ? ".\nTimeframes when the salaries kept rising:\n• " : Main.language.equals("FR") ? ".\nPériodes quand les salaires étaient en croissance:\n• " : ".\nPerioade în care salariile au fost în creștere:\n• ");
+            menAnalysisWithPredictions += formatSalary(String.valueOf(peakMen[1])) + (Main.language.equals("EN") ? " in the year " : Main.language.equals("FR") ? " dans l'an " : " în anul ") + (int) peakMen[0] + (Main.language.equals("EN") ? ".\nTimeframes when the salaries kept rising:\n• " : Main.language.equals("FR") ? ".\nPériodes quand les salaires étaient en croissance:\n• " : ".\nPerioade în care salariile au fost în creștere:\n• ");
             wageGapAnalysisWithPredictions += formatSalary(genderPayGapWithPredictions[0][1]) + (Main.language.equals("EN") ? " in the year " : Main.language.equals("FR") ? " dans l'an " : " în anul ") + genderPayGapWithPredictions[0][0] + (Main.language.equals("EN") ? ".\nTimeframes when the wage gap kept closing:\n• " : Main.language.equals("FR") ? ".\nPériodes quand la différence de la paye était en décroissance:\n• " : ".\nPerioade în care diferența între salarii a fost în scădere:\n• ");
 
             //Sorting the pay gap set by years, lowest to highest
@@ -224,21 +250,21 @@ public class DataProcessing {
             menAnalysis = Main.language.equals("EN") ? "The peak salary was at " : Main.language.equals("FR") ? "Le plus grand salaire était de " : "Cel mai mare salariu a fost de ";
             wageGapAnalysis = Main.language.equals("EN") ? "The lowest pay gap was of " : Main.language.equals("FR") ? "La plus petite différence de la paye était de " : "Cea mai mică diferență între salarii a fost de ";
             //Sorting the dataset by salaries, lowest to highest, for the peaks
-            Arrays.sort(dataset, Comparator.comparingInt(salary -> Integer.parseInt(salary[2])));
+            Arrays.sort(dataset, Comparator.comparingDouble(salary -> Double.parseDouble(salary[2])));
 
             //Iterating through the dataset in reverse order
             for (int i = dataset.length - 1; i > 0; i--) {
                 //If the first positions of both of the peak arrays, which would be the years, are not 0, then the peaks were saved, and we're done iterating
-                if (peakWomen[0] != 0 && peakMen[0] != 0)
+                if (peakWomen[0] != 0.0 && peakMen[0] != 0.0)
                     break;
 
                 //If they are 0, then the peaks weren't found and saved yet, so we proceed with the lookup and memorization
-                if (peakWomen[0] == 0 && dataset[i][0].equals("Women")) {
-                    peakWomen[0] = Integer.parseInt(dataset[i][1]);
-                    peakWomen[1] = Integer.parseInt(dataset[i][2]);
-                } else if (peakMen[0] == 0 && dataset[i][0].equals("Men")) {
-                    peakMen[0] = Integer.parseInt(dataset[i][1]);
-                    peakMen[1] = Integer.parseInt(dataset[i][2]);
+                if (peakWomen[0] == 0.0 && dataset[i][0].equals("Women")) {
+                    peakWomen[0] = Double.parseDouble(dataset[i][1]);
+                    peakWomen[1] = Double.parseDouble(dataset[i][2]);
+                } else if (peakMen[0] == 0.0 && dataset[i][0].equals("Men")) {
+                    peakMen[0] = Double.parseDouble(dataset[i][1]);
+                    peakMen[1] = Double.parseDouble(dataset[i][2]);
                 }
             }
 
@@ -246,11 +272,11 @@ public class DataProcessing {
             Arrays.sort(dataset, Comparator.comparingInt(year -> Integer.parseInt(year[1])));
 
             //Sorting the pay gap set by sum, lowest to highest
-            Arrays.sort(genderPayGap, Comparator.comparingInt(gap -> Integer.parseInt(gap[1])));
+            Arrays.sort(genderPayGap, Comparator.comparingDouble(gap -> Double.parseDouble(gap[1])));
 
             //Completing the gender analyses with the peaks, then starting to specify the evolution timeframes
-            womenAnalysis += formatSalary(String.valueOf(peakWomen[1])) + (Main.language.equals("EN") ? " in the year " : Main.language.equals("FR") ? " dans l'an " : " în anul ") + peakWomen[0] + (Main.language.equals("EN") ? ".\nTimeframes when the salaries kept rising:\n• " : Main.language.equals("FR") ? ".\nPériodes quand les salaires étaient en croissance:\n• " : ".\nPerioade în care salariile au fost în creștere:\n• ");
-            menAnalysis += formatSalary(String.valueOf(peakMen[1])) + (Main.language.equals("EN") ? " in the year " : Main.language.equals("FR") ? " dans l'an " : " în anul ") + peakMen[0] + (Main.language.equals("EN") ? ".\nTimeframes when the salaries kept rising:\n• " : Main.language.equals("FR") ? ".\nPériodes quand les salaires étaient en croissance:\n• " : ".\nPerioade în care salariile au fost în creștere:\n• ");
+            womenAnalysis += formatSalary(String.valueOf(peakWomen[1])) + (Main.language.equals("EN") ? " in the year " : Main.language.equals("FR") ? " dans l'an " : " în anul ") + (int) peakWomen[0] + (Main.language.equals("EN") ? ".\nTimeframes when the salaries kept rising:\n• " : Main.language.equals("FR") ? ".\nPériodes quand les salaires étaient en croissance:\n• " : ".\nPerioade în care salariile au fost în creștere:\n• ");
+            menAnalysis += formatSalary(String.valueOf(peakMen[1])) + (Main.language.equals("EN") ? " in the year " : Main.language.equals("FR") ? " dans l'an " : " în anul ") + (int) peakMen[0] + (Main.language.equals("EN") ? ".\nTimeframes when the salaries kept rising:\n• " : Main.language.equals("FR") ? ".\nPériodes quand les salaires étaient en croissance:\n• " : ".\nPerioade în care salariile au fost în creștere:\n• ");
             wageGapAnalysis += formatSalary(genderPayGap[0][1]) + (Main.language.equals("EN") ? " in the year " : Main.language.equals("FR") ? " dans l'an " : " în anul ") + genderPayGap[0][0] + (Main.language.equals("EN") ? ".\nTimeframes when the wage gap kept closing:\n• " : Main.language.equals("FR") ? ".\nPériodes quand la différence de la paye était en décroissance:\n• " : ".\nPerioade în care diferența între salarii a fost în scădere:\n• ");
 
             //Sorting the pay gap set by years, lowest to highest
@@ -260,20 +286,20 @@ public class DataProcessing {
         //Separating the dataset in years, men's salaries and women's salaries
         for (String[] stats : predictionsGenerated ? datasetWithPredictions : dataset) {
             if (!years.contains(Integer.parseInt(stats[1]))) years.add(Integer.parseInt(stats[1]));
-            if (stats[0].equals("Women")) womenSalaries.add(Integer.parseInt(stats[2]));
-            else menSalaries.add(Integer.parseInt(stats[2]));
+            if (stats[0].equals("Women")) womenSalaries.add(Double.parseDouble(stats[2]));
+            else menSalaries.add(Double.parseDouble(stats[2]));
         }
         for (String[] gap : predictionsGenerated ? genderPayGapWithPredictions : genderPayGap) {
-            payGapsArray.add(Integer.parseInt(gap[1]));
+            payGapsArray.add(Double.parseDouble(gap[1]));
         }
 
         //Adding a -1 in all the rising and dipping arrays to help with initial comparison
         risingYearsWomen.add(-1);
         risingYearsMen.add(-1);
         dippingYearsPayGap.add(-1);
-        risingSalariesWomen.add(-1);
-        risingSalariesMen.add(-1);
-        dippingSumsPayGap.add(-1);
+        risingSalariesWomen.add(-1.0);
+        risingSalariesMen.add(-1.0);
+        dippingSumsPayGap.add(-1.0);
 
         //Iterating through the salary arrays and memorizing the periods of 3 or more years when the salaries continuously rose
         for (int i = 0; i < years.size(); i++) {
@@ -289,7 +315,7 @@ public class DataProcessing {
             }
             //If the current salary is smaller than the last salary added to the array that stores women's evolution periods' salaries and the current evolution period is of 3 or more years, then we end the current evolution period by adding the end marker (that being -1) and resetting the counter that counts how long the current women's evolution period is
             else if (womenSalaries.get(i) < risingSalariesWomen.get(risingSalariesWomen.size() - 1) && countRisingYearsWomen >= 3) {
-                risingSalariesWomen.add(-1);
+                risingSalariesWomen.add(-1.0);
                 risingYearsWomen.add(-1);
                 countRisingYearsWomen = 0;
             }
@@ -313,7 +339,7 @@ public class DataProcessing {
                 risingYearsMen.add(years.get(i));
                 countRisingYearsMen++;
             } else if (menSalaries.get(i) < risingSalariesMen.get(risingSalariesMen.size() - 1) && countRisingYearsMen >= 3) {
-                risingSalariesMen.add(-1);
+                risingSalariesMen.add(-1.0);
                 risingYearsMen.add(-1);
                 countRisingYearsMen = 0;
             } else if (menSalaries.get(i) < risingSalariesMen.get(risingSalariesMen.size() - 1) && countRisingYearsMen < 3) {
@@ -333,7 +359,7 @@ public class DataProcessing {
                 dippingYearsPayGap.add(years.get(i));
                 countDippingYearsPayGap++;
             } else if (payGapsArray.get(i) > dippingSumsPayGap.get(dippingSumsPayGap.size() - 1) && countDippingYearsPayGap >= 3) {
-                dippingSumsPayGap.add(-1);
+                dippingSumsPayGap.add(-1.0);
                 dippingYearsPayGap.add(-1);
                 countDippingYearsPayGap = 0;
             } else if (payGapsArray.get(i) > dippingSumsPayGap.get(dippingSumsPayGap.size() - 1) && countDippingYearsPayGap < 3) {
@@ -359,7 +385,7 @@ public class DataProcessing {
         //Cleaning the incomplete evolution periods in the rising and dipping arrays, if there are any, or completing them if the iterations are done before the end marker being added
         if (countRisingYearsWomen >= 3) {
             risingYearsWomen.add(-1);
-            risingSalariesWomen.add(-1);
+            risingSalariesWomen.add(-1.0);
         } else {
             while (risingYearsWomen.get(risingYearsWomen.size() - 1) != -1) {
                 risingYearsWomen.remove(risingYearsWomen.size() - 1);
@@ -368,7 +394,7 @@ public class DataProcessing {
         }
         if (countRisingYearsMen >= 3) {
             risingYearsMen.add(-1);
-            risingSalariesMen.add(-1);
+            risingSalariesMen.add(-1.0);
         } else {
             while (risingYearsMen.get(risingYearsMen.size() - 1) != -1) {
                 risingYearsMen.remove(risingYearsMen.size() - 1);
@@ -377,7 +403,7 @@ public class DataProcessing {
         }
         if (countDippingYearsPayGap >= 3) {
             dippingYearsPayGap.add(-1);
-            dippingSumsPayGap.add(-1);
+            dippingSumsPayGap.add(-1.0);
         } else {
             while (dippingYearsPayGap.get(dippingYearsPayGap.size() - 1) != -1) {
                 dippingYearsPayGap.remove(dippingYearsPayGap.size() - 1);
@@ -584,22 +610,66 @@ public class DataProcessing {
     public String formatSalary(String rawSalary) {
         //String where the formatted number (containing the periods before every group of 3 digits) will be stored
         String formattedSalaryString = "";
-        //If the salary is only 2 digits long, we leave it as-is, but attach a $ sign to its beginning
-        if (rawSalary.length() == 1 || rawSalary.length() == 2)
-            return '$' + rawSalary;
-        //Iterating over the initial salary string, every group of 3 digits (when possible), from the end of the string to the start
-        for (int i = rawSalary.length(); i > 0; i -= 3) {
-            //If we are at the end of the salary string, we attach the last group of 3 digits to the formatted salary string
-            if (i == rawSalary.length())
-                formattedSalaryString = rawSalary.substring(i - 3);
-            //If we are anywhere else in the string, and we have more than the first one or 2 digits left (if that is the case), we attach the 3-digit group that the digit at the current position is part of, with a period, to the formatted salary string. If the current 3-digit group is the first 3-digit group of the unformatted salary, the loop finishes
-            else if (i > 2)
-                formattedSalaryString = rawSalary.substring(i - 3, i) + '.' + formattedSalaryString;
-            //If the first one or 2 digits (if that is the case) are left to be attached, we attach them with a period to the formatted salary string
-            else
-                formattedSalaryString = rawSalary.substring(0, i) + '.' + formattedSalaryString;
+        if (Main.currency.equals("USD")) {
+            if (rawSalary.contains(".")) rawSalary = String.valueOf((int) Double.parseDouble(rawSalary));
+            //If the salary is only 2 digits long, we leave it as-is, but attach a $ sign to its beginning
+            if (rawSalary.length() == 1 || rawSalary.length() == 2)
+                return '$' + rawSalary;
+            //Iterating over the initial salary string, every group of 3 digits (when possible), from the end of the string to the start
+            for (int i = rawSalary.length(); i > 0; i -= 3) {
+                //If we are at the end of the salary string, we attach the last group of 3 digits to the formatted salary string
+                if (i == rawSalary.length())
+                    formattedSalaryString = rawSalary.substring(i - 3);
+                    //If we are anywhere else in the string,
+                    // and we have more than the first one or 2 digits left (if that is the case),
+                    // we attach the 3-digit group that the digit at the current position is part of,
+                    // with a period, to the formatted salary string.
+                    // If the current 3-digit group is the first 3-digit group of the unformatted salary,
+                    // the loop finishes
+                else if (i > 2)
+                    formattedSalaryString = rawSalary.substring(i - 3, i) + ',' + formattedSalaryString;
+                    //If the first one or 2 digits (if that is the case) are left to be attached, we attach them with a period to the formatted salary string
+                else
+                    formattedSalaryString = rawSalary.substring(0, i) + ',' + formattedSalaryString;
+            }
         }
-        //We return the formatted salary string with a $ sign attached to its beginning
+        else {
+            rawSalary = String.valueOf(new BigDecimal(rawSalary).setScale(4, RoundingMode.HALF_UP));
+            //If the salary is only 2 digits long, we leave it as-is, but attach a $ sign to its beginning
+            if (Double.parseDouble(rawSalary) >= 0.0 && Double.parseDouble(rawSalary) <= 99.9) {
+                switch (Main.currency) {
+                    case "EUR" -> {
+                        return rawSalary + "€";
+                    }
+                    case "RON" -> {
+                        return rawSalary + " RON";
+                    }
+                }
+            }
+            //Iterating over the initial salary string, every group of 3 digits (when possible), from the end of the string to the start
+            for (int i = rawSalary.split("\\.")[0].length(); i > 0; i -= 3) {
+                //If we are at the end of the salary string, we attach the last group of 3 digits to the formatted salary string
+                if (i == rawSalary.split("\\.")[0].length())
+                    formattedSalaryString = rawSalary.split("\\.")[0].substring(i - 3);
+                    //If we are anywhere else in the string,
+                    // and we have more than the first one or 2 digits left (if that is the case),
+                    // we attach the 3-digit group that the digit at the current position is part of,
+                    // with a period, to the formatted salary string.
+                    // If the current 3-digit group is the first 3-digit group of the unformatted salary,
+                    // the loop finishes
+                else if (i > 2)
+                    formattedSalaryString = rawSalary.split("\\.")[0].substring(i - 3, i) + ',' + formattedSalaryString;
+                    //If the first one or 2 digits (if that is the case) are left to be attached, we attach them with a period to the formatted salary string
+                else
+                    formattedSalaryString = rawSalary.split("\\.")[0].substring(0, i) + ',' + formattedSalaryString;
+            }
+            formattedSalaryString += '.' + (rawSalary.split("\\.")[1].equals("0000") ? "0" : rawSalary.split("\\.")[1]);
+        }
+        //We return the formatted salary string with the currency's sign attached to it
+        if (Main.currency.equals("EUR"))
+            return formattedSalaryString + '€';
+        else if (Main.currency.equals("RON"))
+            return formattedSalaryString + " RON";
         return '$' + formattedSalaryString;
     }
 
@@ -718,6 +788,7 @@ public class DataProcessing {
         int biggestSalaryMen = Collections.max(menSalaries).intValue();
         int smallestPayGap = Collections.min(payGapsArray).intValue();
         int biggestPayGap = Collections.max(payGapsArray).intValue();
+        double YAxisUpperBound = 0.0;
         //Transforming the above variables into string for easier manipulation later
         String smallestSalaryEverybodyString = String.valueOf(smallestSalaryEverybody);
         String biggestSalaryEverybodyString = String.valueOf(biggestSalaryEverybody);
@@ -727,32 +798,33 @@ public class DataProcessing {
         String biggestSalaryMenString = String.valueOf(biggestSalaryMen);
         String smallestPayGapString = String.valueOf(smallestPayGap);
         String biggestPayGapString = String.valueOf(biggestPayGap);
+
         //Generating the plot with all the salaries
         Plot allGendersPlot = Plot.plot(Plot.plotOpts().title(Main.language.equals("EN") ? "Wage Evolution in the United States" : Main.language.equals("FR") ? "Évolution des Salaires dans les États Unis" : "Evoluția Salariilor în Statele Unite").legend(Plot.LegendFormat.BOTTOM)).
                 xAxis(Main.language.equals("EN") ? "Year" : "An", Plot.axisOpts().range(smallestYear, biggestYear)).
-                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryEverybodyString.length() == 1 ? 0 : smallestSalaryEverybody - Integer.parseInt(smallestSalaryEverybodyString.substring(1)), biggestSalaryEverybodyString.length() == 1 ? 10 : biggestSalaryEverybody + Math.pow(10, biggestSalaryEverybodyString.length() - 1) - Integer.parseInt(biggestSalaryEverybodyString.substring(1)))).
+                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryEverybodyString.length() == 1 ? 0 : smallestSalaryEverybody - Integer.parseInt(smallestSalaryEverybodyString.substring(1)), biggestSalaryEverybodyString.length() == 1 ? 10 : Math.ceil(biggestSalaryEverybody / Math.pow(10, biggestSalaryEverybodyString.length() - 2)) * Math.pow(10, biggestSalaryEverybodyString.length() - 2) + (Math.pow(10, biggestSalaryEverybodyString.length() - 2) / 2))).
                 series(Main.language.equals("EN") ? "Men's wages" : Main.language.equals("FR") ? "Salaires d'hommes" : "Salariile bărbaților", Plot.data().xy(years, menSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.red).color(Color.red)).
                 series(Main.language.equals("EN") ? "Women's wages" : Main.language.equals("FR") ? "Salaires des femmes" : "Salariile femeilor", Plot.data().xy(years, womenSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.green).color(Color.green));
         Plot allGendersPlotWithGap = Plot.plot(Plot.plotOpts().title(Main.language.equals("EN") ? "Wage and Wage Gap Evolution in the United States" : Main.language.equals("FR") ? "Évolution des Salaires et de la Différence de la Paye dans les États Unis" : "Evoluția Salariilor și a Diferenței între Salarii în Statele Unite").legend(Plot.LegendFormat.BOTTOM)).
                 xAxis(Main.language.equals("EN") ? "Year" : "An", Plot.axisOpts().range(smallestYear, biggestYear)).
-                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryEverybody < smallestPayGap && smallestSalaryEverybodyString.length() == 1 ? 0 : smallestPayGapString.length() == 1 ? 0 : smallestPayGap - Integer.parseInt(smallestPayGapString.substring(1)), biggestSalaryEverybodyString.length() == 1 ? 10 : biggestSalaryEverybody + Math.pow(10, biggestSalaryEverybodyString.length() - 1) - Integer.parseInt(biggestSalaryEverybodyString.substring(1)))).
+                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryEverybody < smallestPayGap && smallestSalaryEverybodyString.length() == 1 ? 0 : smallestPayGapString.length() == 1 ? 0 : smallestPayGap - Integer.parseInt(smallestPayGapString.substring(1)), biggestSalaryEverybodyString.length() == 1 ? 10 : Math.ceil(biggestSalaryEverybody / Math.pow(10, biggestSalaryEverybodyString.length() - 2)) * Math.pow(10, biggestSalaryEverybodyString.length() - 2) + (Math.pow(10, biggestSalaryEverybodyString.length() - 2) / 2))).
                 series(Main.language.equals("EN") ? "Men's wages" : Main.language.equals("FR") ? "Salaires d'hommes" : "Salariile bărbaților", Plot.data().xy(years, menSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.red).color(Color.red)).
                 series(Main.language.equals("EN") ? "Women's wages" : Main.language.equals("FR") ? "Salaires des femmes" : "Salariile femeilor", Plot.data().xy(years, womenSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.green).color(Color.green)).
                 series(Main.language.equals("EN") ? "Wage gap" : Main.language.equals("FR") ? "Différence de la paye" : "Diferența între salarii", Plot.data().xy(years, payGapsArray), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.magenta).color(Color.magenta));
         //Generating the plot with women's salaries
         Plot womenPlot = Plot.plot(Plot.plotOpts().title(Main.language.equals("EN") ? "Wage Evolution in the United States" : Main.language.equals("FR") ? "Évolution des Salaires dans les États Unis" : "Evoluția Salariilor în Statele Unite").legend(Plot.LegendFormat.BOTTOM)).
                 xAxis(Main.language.equals("EN") ? "Year" : "An", Plot.axisOpts().range(smallestYear, biggestYear)).
-                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryWomenString.length() == 1 ? 0 : smallestSalaryWomen - Integer.parseInt(smallestSalaryWomenString.substring(1)), biggestSalaryWomenString.length() == 1 ? 10 : biggestSalaryWomen + Math.pow(10, biggestSalaryWomenString.length() - 1) - Integer.parseInt(biggestSalaryWomenString.substring(1)))).
+                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryWomenString.length() == 1 ? 0 : smallestSalaryWomen - Integer.parseInt(smallestSalaryWomenString.substring(1)), biggestSalaryWomenString.length() == 1 ? 10 : Math.ceil(biggestSalaryWomen / Math.pow(10, biggestSalaryWomenString.length() - 2)) * Math.pow(10, biggestSalaryWomenString.length() - 2) + (Math.pow(10, biggestSalaryWomenString.length() - 2) / 2))).
                 series(Main.language.equals("EN") ? "Women's wages" : Main.language.equals("FR") ? "Salaires des femmes" : "Salariile femeilor", Plot.data().xy(years, womenSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.green).color(Color.green));
         //Generating the plot with men's salaries
         Plot menPlot = Plot.plot(Plot.plotOpts().title(Main.language.equals("EN") ? "Wage Evolution in the United States" : Main.language.equals("FR") ? "Évolution des Salaires dans les États Unis" : "Evoluția Salariilor în Statele Unite").legend(Plot.LegendFormat.BOTTOM)).
                 xAxis(Main.language.equals("EN") ? "Year" : "An", Plot.axisOpts().range(smallestYear, biggestYear)).
-                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryMenString.length() == 1 ? 0 : smallestSalaryMen - Integer.parseInt(smallestSalaryMenString.substring(1)), biggestSalaryMenString.length() == 1 ? 10 : biggestSalaryMen + Math.pow(10, biggestSalaryMenString.length() - 1) - Integer.parseInt(biggestSalaryMenString.substring(1)))).
+                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryMenString.length() == 1 ? 0 : smallestSalaryMen - Integer.parseInt(smallestSalaryMenString.substring(1)), biggestSalaryMenString.length() == 1 ? 10 : Math.ceil(biggestSalaryMen / Math.pow(10, biggestSalaryMenString.length() - 2)) * Math.pow(10, biggestSalaryMenString.length() - 2) + (Math.pow(10, biggestSalaryMenString.length() - 2) / 2))).
                 series(Main.language.equals("EN") ? "Men's wages" : Main.language.equals("FR") ? "Salaires d'hommes" : "Salariile bărbaților", Plot.data().xy(years, menSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.red).color(Color.red));
         //Generating the plot with the gender wage gaps
         Plot wageGapPlot = Plot.plot(Plot.plotOpts().title(Main.language.equals("EN") ? "Wage Evolution in the United States" : Main.language.equals("FR") ? "Évolution des Salaires dans les États Unis" : "Evoluția Salariilor în Statele Unite").legend(Plot.LegendFormat.BOTTOM)).
                 xAxis(Main.language.equals("EN") ? "Year" : "An", Plot.axisOpts().range(smallestYear, biggestYear)).
-                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestPayGapString.length() == 1 ? 0 : smallestPayGap - Integer.parseInt(smallestPayGapString.substring(1)), biggestPayGapString.length() == 1 ? 10 : biggestPayGap + Math.pow(10, biggestPayGapString.length() - 1) - Integer.parseInt(biggestPayGapString.substring(1)))).
+                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestPayGapString.length() == 1 ? 0 : smallestPayGap - Integer.parseInt(smallestPayGapString.substring(1)), biggestPayGapString.length() == 1 ? 10 : Math.ceil(biggestPayGap / Math.pow(10, biggestPayGapString.length() - 2)) * Math.pow(10, biggestPayGapString.length() - 2) + (Math.pow(10, biggestPayGapString.length() - 2) / 2))).
                 series(Main.language.equals("EN") ? "Wage gap" : Main.language.equals("FR") ? "Différence de la paye'" : "Diferența între salarii", Plot.data().xy(years, payGapsArray), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.magenta).color(Color.magenta));
         //Saving the plots to be used in the graph display screen
         allGendersPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders", "png");
@@ -806,29 +878,29 @@ public class DataProcessing {
         //Generating the plot with all the salaries
         Plot allGendersPlot = Plot.plot(Plot.plotOpts().title(Main.language.equals("EN") ? "Wage Evolution in the United States" : Main.language.equals("FR") ? "Évolution des Salaires dans les États Unis" : "Evoluția Salariilor în Statele Unite").legend(Plot.LegendFormat.BOTTOM)).
                 xAxis(Main.language.equals("EN") ? "Year" : "An", Plot.axisOpts().range(minimum, maximum)).
-                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryEverybodyString.length() == 1 ? 0 : smallestSalaryEverybody - Integer.parseInt(smallestSalaryEverybodyString.substring(1)), biggestSalaryEverybodyString.length() == 1 ? 10 : biggestSalaryEverybody + Math.pow(10, biggestSalaryEverybodyString.length() - 1) - Integer.parseInt(biggestSalaryEverybodyString.substring(1)))).
+                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryEverybodyString.length() == 1 ? 0 : smallestSalaryEverybody - Integer.parseInt(smallestSalaryEverybodyString.substring(1)), biggestSalaryEverybodyString.length() == 1 ? 10 : Math.ceil(biggestSalaryEverybody / Math.pow(10, biggestSalaryEverybodyString.length() - 2)) * Math.pow(10, biggestSalaryEverybodyString.length() - 2) + (Math.pow(10, biggestSalaryEverybodyString.length() - 2) / 2))).
                 series(Main.language.equals("EN") ? "Men's wages" : Main.language.equals("FR") ? "Salaires d'hommes" : "Salariile bărbaților", Plot.data().xy(years, menSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.red).color(Color.red)).
                 series(Main.language.equals("EN") ? "Women's wages" : Main.language.equals("FR") ? "Salaires des femmes" : "Salariile femeilor", Plot.data().xy(years, womenSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.green).color(Color.green));
         Plot allGendersPlotWithGap = Plot.plot(Plot.plotOpts().title(Main.language.equals("EN") ? "Wage and Wage Gap Evolution in the United States" : Main.language.equals("FR") ? "Évolution des Salaires et de la Différence de la Paye dans les États Unis" : "Evoluția Salariilor și a Diferenței între Salarii în Statele Unite").legend(Plot.LegendFormat.BOTTOM)).
                 xAxis(Main.language.equals("EN") ? "Year" : "An", Plot.axisOpts().range(minimum, maximum)).
-                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryEverybody < smallestPayGap && smallestSalaryEverybodyString.length() == 1 ? 0 : smallestPayGapString.length() == 1 ? 0 : smallestPayGap - Integer.parseInt(smallestPayGapString.substring(1)), biggestSalaryEverybodyString.length() == 1 ? 10 : biggestSalaryEverybody + Math.pow(10, biggestSalaryEverybodyString.length() - 1) - Integer.parseInt(biggestSalaryEverybodyString.substring(1)))).
+                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryEverybody < smallestPayGap && smallestSalaryEverybodyString.length() == 1 ? 0 : smallestPayGapString.length() == 1 ? 0 : smallestPayGap - Integer.parseInt(smallestPayGapString.substring(1)), biggestSalaryEverybodyString.length() == 1 ? 10 : Math.ceil(biggestSalaryEverybody / Math.pow(10, biggestSalaryEverybodyString.length() - 2)) * Math.pow(10, biggestSalaryEverybodyString.length() - 2) + (Math.pow(10, biggestSalaryEverybodyString.length() - 2) / 2))).
                 series(Main.language.equals("EN") ? "Men's wages" : Main.language.equals("FR") ? "Salaires d'hommes" : "Salariile bărbaților", Plot.data().xy(years, menSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.red).color(Color.red)).
                 series(Main.language.equals("EN") ? "Women's wages" : Main.language.equals("FR") ? "Salaires des femmes" : "Salariile femeilor", Plot.data().xy(years, womenSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.green).color(Color.green)).
                 series(Main.language.equals("EN") ? "Wage gap" : Main.language.equals("FR") ? "Différence de la paye" : "Diferența între salarii", Plot.data().xy(years, payGapsArray), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.magenta).color(Color.magenta));
         //Generating the plot with women's salaries
         Plot womenPlot = Plot.plot(Plot.plotOpts().title(Main.language.equals("EN") ? "Wage Evolution in the United States" : Main.language.equals("FR") ? "Évolution des Salaires dans les États Unis" : "Evoluția Salariilor în Statele Unite").legend(Plot.LegendFormat.BOTTOM)).
                 xAxis(Main.language.equals("EN") ? "Year" : "An", Plot.axisOpts().range(minimum, maximum)).
-                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryWomenString.length() == 1 ? 0 : smallestSalaryWomen - Integer.parseInt(smallestSalaryWomenString.substring(1)), biggestSalaryWomenString.length() == 1 ? 10 : biggestSalaryWomen + Math.pow(10, biggestSalaryWomenString.length() - 1) - Integer.parseInt(biggestSalaryWomenString.substring(1)))).
+                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryWomenString.length() == 1 ? 0 : smallestSalaryWomen - Integer.parseInt(smallestSalaryWomenString.substring(1)), biggestSalaryWomenString.length() == 1 ? 10 : Math.ceil(biggestSalaryWomen / Math.pow(10, biggestSalaryWomenString.length() - 2)) * Math.pow(10, biggestSalaryWomenString.length() - 2) + (Math.pow(10, biggestSalaryWomenString.length() - 2) / 2))).
                 series(Main.language.equals("EN") ? "Women's wages" : Main.language.equals("FR") ? "Salaires des femmes" : "Salariile femeilor", Plot.data().xy(years, womenSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.green).color(Color.green));
         //Generating the plot with men's salaries
         Plot menPlot = Plot.plot(Plot.plotOpts().title(Main.language.equals("EN") ? "Wage Evolution in the United States" : Main.language.equals("FR") ? "Évolution des Salaires dans les États Unis" : "Evoluția Salariilor în Statele Unite").legend(Plot.LegendFormat.BOTTOM)).
                 xAxis(Main.language.equals("EN") ? "Year" : "An", Plot.axisOpts().range(minimum, maximum)).
-                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryMenString.length() == 1 ? 0 : smallestSalaryMen - Integer.parseInt(smallestSalaryMenString.substring(1)), biggestSalaryMenString.length() == 1 ? 10 : biggestSalaryMen + Math.pow(10, biggestSalaryMenString.length() - 1) - Integer.parseInt(biggestSalaryMenString.substring(1)))).
+                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryMenString.length() == 1 ? 0 : smallestSalaryMen - Integer.parseInt(smallestSalaryMenString.substring(1)), biggestSalaryMenString.length() == 1 ? 10 : Math.ceil(biggestSalaryMen / Math.pow(10, biggestSalaryMenString.length() - 2)) * Math.pow(10, biggestSalaryMenString.length() - 2) + (Math.pow(10, biggestSalaryMenString.length() - 2) / 2))).
                 series(Main.language.equals("EN") ? "Men's wages" : Main.language.equals("FR") ? "Salaires d'hommes" : "Salariile bărbaților", Plot.data().xy(years, menSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.red).color(Color.red));
         //Generating the plot with the gender wage gaps
         Plot wageGapPlot = Plot.plot(Plot.plotOpts().title(Main.language.equals("EN") ? "Wage Gap Evolution in the United States" : Main.language.equals("FR") ? "Évolution de la Différence de la Paye dans les États Unis" : "Evoluția Diferenței între Salarii în Statele Unite").legend(Plot.LegendFormat.BOTTOM)).
                 xAxis(Main.language.equals("EN") ? "Year" : "An", Plot.axisOpts().range(minimum, maximum)).
-                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestPayGapString.length() == 1 ? 0 : smallestPayGap - Integer.parseInt(smallestPayGapString.substring(1)), biggestPayGapString.length() == 1 ? 10 : biggestPayGap + Math.pow(10, biggestPayGapString.length() - 1) - Integer.parseInt(biggestPayGapString.substring(1)))).
+                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestPayGapString.length() == 1 ? 0 : smallestPayGap - Integer.parseInt(smallestPayGapString.substring(1)), biggestPayGapString.length() == 1 ? 10 : Math.ceil(biggestPayGap / Math.pow(10, biggestPayGapString.length() - 2)) * Math.pow(10, biggestPayGapString.length() - 2) + (Math.pow(10, biggestPayGapString.length() - 2) / 2))).
                 series(Main.language.equals("EN") ? "Wage gap" : Main.language.equals("FR") ? "Différence de la paye'" : "Diferența între salarii", Plot.data().xy(years, payGapsArray), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.magenta).color(Color.magenta));
         //Saving the plots to be used in the graph display screen
         allGendersPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-range", "png");
@@ -881,29 +953,29 @@ public class DataProcessing {
         //Generating the plot with all the salaries
         Plot allGendersPlot = Plot.plot(Plot.plotOpts().title(Main.language.equals("EN") ? "Wage Evolution Prediction in the United States" : Main.language.equals("FR") ? "Prédiction d'Évolution des Salaires dans les États Unis" : "Predicția Evoluției Salariilor în Statele Unite").legend(Plot.LegendFormat.BOTTOM)).
                 xAxis(Main.language.equals("EN") ? "Year" : "An", Plot.axisOpts().range(smallestYear, biggestYear)).
-                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryEverybodyString.length() == 1 ? 0 : smallestSalaryEverybody - Integer.parseInt(smallestSalaryEverybodyString.substring(1)), biggestSalaryEverybodyString.length() == 1 ? 10 : biggestSalaryEverybody + Math.pow(10, biggestSalaryEverybodyString.length() - 1) - Integer.parseInt(biggestSalaryEverybodyString.substring(1)))).
+                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryEverybodyString.length() == 1 ? 0 : smallestSalaryEverybody - Integer.parseInt(smallestSalaryEverybodyString.substring(1)), biggestSalaryEverybodyString.length() == 1 ? 10 : Math.ceil(biggestSalaryEverybody / Math.pow(10, biggestSalaryEverybodyString.length() - 2)) * Math.pow(10, biggestSalaryEverybodyString.length() - 2) + (Math.pow(10, biggestSalaryEverybodyString.length() - 2) / 2))).
                 series(Main.language.equals("EN") ? "Men's wages" : Main.language.equals("FR") ? "Salaires d'hommes" : "Salariile bărbaților", Plot.data().xy(years, menSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.red).color(Color.red)).
                 series(Main.language.equals("EN") ? "Women's wages" : Main.language.equals("FR") ? "Salaires des femmes" : "Salariile femeilor", Plot.data().xy(years, womenSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.green).color(Color.green));
         Plot allGendersPlotWithGap = Plot.plot(Plot.plotOpts().title(Main.language.equals("EN") ? "Wage and Wage Gap Evolution Prediction in the United States" : Main.language.equals("FR") ? "Prédiction d'Évolution des Salaires et de la Différence de la Paye dans les États Unis" : "Predicția Evoluției Salariilor și a Diferenței între Salarii în Statele Unite").legend(Plot.LegendFormat.BOTTOM)).
                 xAxis(Main.language.equals("EN") ? "Year" : "An", Plot.axisOpts().range(smallestYear, biggestYear)).
-                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryEverybody < smallestPayGap && smallestSalaryEverybodyString.length() == 1 ? 0 : smallestPayGapString.length() == 1 ? 0 : smallestPayGap - Integer.parseInt(smallestPayGapString.substring(1)), biggestSalaryEverybodyString.length() == 1 ? 10 : biggestSalaryEverybody + Math.pow(10, biggestSalaryEverybodyString.length() - 1) - Integer.parseInt(biggestSalaryEverybodyString.substring(1)))).
+                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryEverybody < smallestPayGap && smallestSalaryEverybodyString.length() == 1 ? 0 : smallestPayGapString.length() == 1 ? 0 : smallestPayGap - Integer.parseInt(smallestPayGapString.substring(1)), biggestSalaryEverybodyString.length() == 1 ? 10 : Math.ceil(biggestSalaryEverybody / Math.pow(10, biggestSalaryEverybodyString.length() - 2)) * Math.pow(10, biggestSalaryEverybodyString.length() - 2) + (Math.pow(10, biggestSalaryEverybodyString.length() - 2) / 2))).
                 series(Main.language.equals("EN") ? "Men's wages" : Main.language.equals("FR") ? "Salaires d'hommes" : "Salariile bărbaților", Plot.data().xy(years, menSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.red).color(Color.red)).
                 series(Main.language.equals("EN") ? "Women's wages" : Main.language.equals("FR") ? "Salaires des femmes" : "Salariile femeilor", Plot.data().xy(years, womenSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.green).color(Color.green)).
                 series(Main.language.equals("EN") ? "Wage gap" : Main.language.equals("FR") ? "Différence de la paye" : "Diferența între salarii", Plot.data().xy(years, payGapsArray), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.magenta).color(Color.magenta));
         //Generating the plot with women's salaries
         Plot womenPlot = Plot.plot(Plot.plotOpts().title(Main.language.equals("EN") ? "Wage Evolution Prediction in the United States" : Main.language.equals("FR") ? "Prédiction d'Évolution des Salaires dans les États Unis" : "Predicția Evoluției Salariilor în Statele Unite").legend(Plot.LegendFormat.BOTTOM)).
                 xAxis(Main.language.equals("EN") ? "Year" : "An", Plot.axisOpts().range(smallestYear, biggestYear)).
-                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryWomenString.length() == 1 ? 0 : smallestSalaryWomen - Integer.parseInt(smallestSalaryWomenString.substring(1)), biggestSalaryWomenString.length() == 1 ? 10 : biggestSalaryWomen + Math.pow(10, biggestSalaryWomenString.length() - 1) - Integer.parseInt(biggestSalaryWomenString.substring(1)))).
+                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryWomenString.length() == 1 ? 0 : smallestSalaryWomen - Integer.parseInt(smallestSalaryWomenString.substring(1)), biggestSalaryWomenString.length() == 1 ? 10 : Math.ceil(biggestSalaryWomen / Math.pow(10, biggestSalaryWomenString.length() - 2)) * Math.pow(10, biggestSalaryWomenString.length() - 2) + (Math.pow(10, biggestSalaryWomenString.length() - 2) / 2))).
                 series(Main.language.equals("EN") ? "Women's wages" : Main.language.equals("FR") ? "Salaires des femmes" : "Salariile femeilor", Plot.data().xy(years, womenSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.green).color(Color.green));
         //Generating the plot with men's salaries
         Plot menPlot = Plot.plot(Plot.plotOpts().title(Main.language.equals("EN") ? "Wage Evolution Prediction in the United States" : Main.language.equals("FR") ? "Prédiction d'Évolution des Salaires dans les États Unis" : "Predicția Evoluției Salariilor în Statele Unite").legend(Plot.LegendFormat.BOTTOM)).
                 xAxis(Main.language.equals("EN") ? "Year" : "An", Plot.axisOpts().range(smallestYear, biggestYear)).
-                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryMenString.length() == 1 ? 0 : smallestSalaryMen - Integer.parseInt(smallestSalaryMenString.substring(1)), biggestSalaryMenString.length() == 1 ? 10 : biggestSalaryMen + Math.pow(10, biggestSalaryMenString.length() - 1) - Integer.parseInt(biggestSalaryMenString.substring(1)))).
+                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryMenString.length() == 1 ? 0 : smallestSalaryMen - Integer.parseInt(smallestSalaryMenString.substring(1)), biggestSalaryMenString.length() == 1 ? 10 : Math.ceil(biggestSalaryMen / Math.pow(10, biggestSalaryMenString.length() - 2)) * Math.pow(10, biggestSalaryMenString.length() - 2) + (Math.pow(10, biggestSalaryMenString.length() - 2) / 2))).
                 series(Main.language.equals("EN") ? "Men's wages" : Main.language.equals("FR") ? "Salaires d'hommes" : "Salariile bărbaților", Plot.data().xy(years, menSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.red).color(Color.red));
         //Generating the plot with the gender wage gaps
         Plot wageGapPlot = Plot.plot(Plot.plotOpts().title(Main.language.equals("EN") ? "Wage Gap Evolution Prediction in the United States" : Main.language.equals("FR") ? "Prédiction d'Évolution de la Différence de la Paye dans les États Unis" : "Predicția Evoluției Diferenței între Salarii în Statele Unite").legend(Plot.LegendFormat.BOTTOM)).
                 xAxis(Main.language.equals("EN") ? "Year" : "An", Plot.axisOpts().range(smallestYear, biggestYear)).
-                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestPayGapString.length() == 1 ? 0 : smallestPayGap - Integer.parseInt(smallestPayGapString.substring(1)), biggestPayGapString.length() == 1 ? 10 : biggestPayGap + Math.pow(10, biggestPayGapString.length() - 1) - Integer.parseInt(biggestPayGapString.substring(1)))).
+                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestPayGapString.length() == 1 ? 0 : smallestPayGap - Integer.parseInt(smallestPayGapString.substring(1)), biggestPayGapString.length() == 1 ? 10 : Math.ceil(biggestPayGap / Math.pow(10, biggestPayGapString.length() - 2)) * Math.pow(10, biggestPayGapString.length() - 2) + (Math.pow(10, biggestPayGapString.length() - 2) / 2))).
                 series(Main.language.equals("EN") ? "Wage gap" : Main.language.equals("FR") ? "Différence de la paye'" : "Diferența între salarii", Plot.data().xy(years, payGapsArray), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.magenta).color(Color.magenta));
         //Saving the plots to be used in the graph display screen
         allGendersPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-prediction", "png");
@@ -957,29 +1029,29 @@ public class DataProcessing {
         //Generating the plot with all the salaries
         Plot allGendersPlot = Plot.plot(Plot.plotOpts().title(Main.language.equals("EN") ? "Wage Evolution Prediction in the United States" : Main.language.equals("FR") ? "Prédiction d'Évolution des Salaires dans les États Unis" : "Predicția Evoluției Salariilor în Statele Unite").legend(Plot.LegendFormat.BOTTOM)).
                 xAxis(Main.language.equals("EN") ? "Year" : "An", Plot.axisOpts().range(minimum, maximum)).
-                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryEverybodyString.length() == 1 ? 0 : smallestSalaryEverybody - Integer.parseInt(smallestSalaryEverybodyString.substring(1)), biggestSalaryEverybodyString.length() == 1 ? 10 : biggestSalaryEverybody + Math.pow(10, biggestSalaryEverybodyString.length() - 1) - Integer.parseInt(biggestSalaryEverybodyString.substring(1)))).
+                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryEverybodyString.length() == 1 ? 0 : smallestSalaryEverybody - Integer.parseInt(smallestSalaryEverybodyString.substring(1)), biggestSalaryEverybodyString.length() == 1 ? 10 : Math.ceil(biggestSalaryEverybody / Math.pow(10, biggestSalaryEverybodyString.length() - 2)) * Math.pow(10, biggestSalaryEverybodyString.length() - 2) + (Math.pow(10, biggestSalaryEverybodyString.length() - 2) / 2))).
                 series(Main.language.equals("EN") ? "Men's wages" : Main.language.equals("FR") ? "Salaires d'hommes" : "Salariile bărbaților", Plot.data().xy(years, menSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.red).color(Color.red)).
                 series(Main.language.equals("EN") ? "Women's wages" : Main.language.equals("FR") ? "Salaires des femmes" : "Salariile femeilor", Plot.data().xy(years, womenSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.green).color(Color.green));
         Plot allGendersPlotWithGap = Plot.plot(Plot.plotOpts().title(Main.language.equals("EN") ? "Wage and Wage Gap Evolution Prediction in the United States" : Main.language.equals("FR") ? "Prédiction d'Évolution des Salaires et de la Différence de la Paye dans les États Unis" : "Predicția Evoluției Salariilor și a Diferenței între Salarii în Statele Unite").legend(Plot.LegendFormat.BOTTOM)).
                 xAxis(Main.language.equals("EN") ? "Year" : "An", Plot.axisOpts().range(minimum, maximum)).
-                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryEverybody < smallestPayGap && smallestSalaryEverybodyString.length() == 1 ? 0 : smallestPayGapString.length() == 1 ? 0 : smallestPayGap - Integer.parseInt(smallestPayGapString.substring(1)), biggestSalaryEverybodyString.length() == 1 ? 10 : biggestSalaryEverybody + Math.pow(10, biggestSalaryEverybodyString.length() - 1) - Integer.parseInt(biggestSalaryEverybodyString.substring(1)))).
+                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryEverybody < smallestPayGap && smallestSalaryEverybodyString.length() == 1 ? 0 : smallestPayGapString.length() == 1 ? 0 : smallestPayGap - Integer.parseInt(smallestPayGapString.substring(1)), biggestSalaryEverybodyString.length() == 1 ? 10 : Math.ceil(biggestSalaryEverybody / Math.pow(10, biggestSalaryEverybodyString.length() - 2)) * Math.pow(10, biggestSalaryEverybodyString.length() - 2) + (Math.pow(10, biggestSalaryEverybodyString.length() - 2) / 2))).
                 series(Main.language.equals("EN") ? "Men's wages" : Main.language.equals("FR") ? "Salaires d'hommes" : "Salariile bărbaților", Plot.data().xy(years, menSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.red).color(Color.red)).
                 series(Main.language.equals("EN") ? "Women's wages" : Main.language.equals("FR") ? "Salaires des femmes" : "Salariile femeilor", Plot.data().xy(years, womenSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.green).color(Color.green)).
                 series(Main.language.equals("EN") ? "Wage gap" : Main.language.equals("FR") ? "Différence de la paye" : "Diferența între salarii", Plot.data().xy(years, payGapsArray), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.magenta).color(Color.magenta));
         //Generating the plot with women's salaries
         Plot womenPlot = Plot.plot(Plot.plotOpts().title(Main.language.equals("EN") ? "Wage Evolution Prediction in the United States" : Main.language.equals("FR") ? "Prédiction d'Évolution des Salaires dans les États Unis" : "Predicția Evoluției Salariilor în Statele Unite").legend(Plot.LegendFormat.BOTTOM)).
                 xAxis(Main.language.equals("EN") ? "Year" : "An", Plot.axisOpts().range(minimum, maximum)).
-                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryWomenString.length() == 1 ? 0 : smallestSalaryWomen - Integer.parseInt(smallestSalaryWomenString.substring(1)), biggestSalaryWomenString.length() == 1 ? 10 : biggestSalaryWomen + Math.pow(10, biggestSalaryWomenString.length() - 1) - Integer.parseInt(biggestSalaryWomenString.substring(1)))).
+                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryWomenString.length() == 1 ? 0 : smallestSalaryWomen - Integer.parseInt(smallestSalaryWomenString.substring(1)), biggestSalaryWomenString.length() == 1 ? 10 : Math.ceil(biggestSalaryWomen / Math.pow(10, biggestSalaryWomenString.length() - 2)) * Math.pow(10, biggestSalaryWomenString.length() - 2) + (Math.pow(10, biggestSalaryWomenString.length() - 2) / 2))).
                 series(Main.language.equals("EN") ? "Women's wages" : Main.language.equals("FR") ? "Salaires des femmes" : "Salariile femeilor", Plot.data().xy(years, womenSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.green).color(Color.green));
         //Generating the plot with men's salaries
         Plot menPlot = Plot.plot(Plot.plotOpts().title(Main.language.equals("EN") ? "Wage Evolution Prediction in the United States" : Main.language.equals("FR") ? "Prédiction d'Évolution des Salaires dans les États Unis" : "Predicția Evoluției Salariilor în Statele Unite").legend(Plot.LegendFormat.BOTTOM)).
                 xAxis(Main.language.equals("EN") ? "Year" : "An", Plot.axisOpts().range(minimum, maximum)).
-                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryMenString.length() == 1 ? 0 : smallestSalaryMen - Integer.parseInt(smallestSalaryMenString.substring(1)), biggestSalaryMenString.length() == 1 ? 10 : biggestSalaryMen + Math.pow(10, biggestSalaryMenString.length() - 1) - Integer.parseInt(biggestSalaryMenString.substring(1)))).
+                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestSalaryMenString.length() == 1 ? 0 : smallestSalaryMen - Integer.parseInt(smallestSalaryMenString.substring(1)), biggestSalaryMenString.length() == 1 ? 10 : Math.ceil(biggestSalaryMen / Math.pow(10, biggestSalaryMenString.length() - 2)) * Math.pow(10, biggestSalaryMenString.length() - 2) + (Math.pow(10, biggestSalaryMenString.length() - 2) / 2))).
                 series(Main.language.equals("EN") ? "Men's wages" : Main.language.equals("FR") ? "Salaires d'hommes" : "Salariile bărbaților", Plot.data().xy(years, menSalaries), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.red).color(Color.red));
         //Generating the plot with the gender wage gaps
         Plot wageGapPlot = Plot.plot(Plot.plotOpts().title(Main.language.equals("EN") ? "Wage Gap Evolution Prediction in the United States" : Main.language.equals("FR") ? "Prédiction d'Évolution de la Différence de la Paye dans les États Unis" : "Predicția Evoluției Diferenței între Salarii în Statele Unite").legend(Plot.LegendFormat.BOTTOM)).
                 xAxis(Main.language.equals("EN") ? "Year" : "An", Plot.axisOpts().range(minimum, maximum)).
-                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestPayGapString.length() == 1 ? 0 : smallestPayGap - Integer.parseInt(smallestPayGapString.substring(1)), biggestPayGapString.length() == 1 ? 10 : biggestPayGap + Math.pow(10, biggestPayGapString.length() - 1) - Integer.parseInt(biggestPayGapString.substring(1)))).
+                yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestPayGapString.length() == 1 ? 0 : smallestPayGap - Integer.parseInt(smallestPayGapString.substring(1)), biggestPayGapString.length() == 1 ? 10 : Math.ceil(biggestPayGap / Math.pow(10, biggestPayGapString.length() - 2)) * Math.pow(10, biggestPayGapString.length() - 2) + (Math.pow(10, biggestPayGapString.length() - 2) / 2))).
                 series(Main.language.equals("EN") ? "Wage gap" : Main.language.equals("FR") ? "Différence de la paye'" : "Diferența între salarii", Plot.data().xy(years, payGapsArray), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.magenta).color(Color.magenta));
         //Saving the plots to be used in the graph display screen
         allGendersPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-prediction-range", "png");
@@ -1000,7 +1072,7 @@ public class DataProcessing {
         pdf.open();
 
         //Creating the title of the PDF that contains the range of years it covers (1960 to the last year of the dataset or the last predicted year), centering it on the line then adding it to the PDF
-        Paragraph title = new Paragraph((Main.language.equals("EN") ? "Gender Equality in the United States, since the year 1960 to " : Main.language.equals("FR") ? "Égalité entre les Genres dans les États Unis, depuis l'année 1960 jusqu'à " : "Egalitatea intre Genuri in Statele Unite, din anul 1960 pana in ") + (predictionsGenerated ? datasetWithPredictions[datasetWithPredictions.length - 1][1] : dataset[dataset.length - 1][1]), new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD, BaseColor.BLUE));
+        Paragraph title = new Paragraph((Main.language.equals("EN") ? "Gender Equality in the United States, since the year " + dataset[0][1] + " to " : Main.language.equals("FR") ? "Égalité entre les Genres dans les États Unis, depuis l'année " + dataset[0][1] + " jusqu'à " : "Egalitatea intre Genuri in Statele Unite, din anul " + dataset[0][1] + " pana in ") + (predictionsGenerated ? datasetWithPredictions[datasetWithPredictions.length - 1][1] : dataset[dataset.length - 1][1]), new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD, BaseColor.BLUE));
         title.setAlignment(Element.ALIGN_CENTER);
         pdf.add(title);
 
@@ -1144,6 +1216,6 @@ public class DataProcessing {
         pdf.close();
 
         PDFGeneratedWithPredictions = predictionsGenerated;
-        changedLanguage = false;
+        Main.changedLanguage = false;
     }
 }

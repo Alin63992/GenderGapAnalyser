@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="main" prefHeight="790.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gendergapanalyser.gendergapanalyser.SplashStart">
+   <children>
+      <Hyperlink style="-fx-padding: 0;">
+         <font>
+            <Font size="1.0" />
+         </font>
+      </Hyperlink>
+      <Button id="minimizeButton" layoutX="986.0" layoutY="25.0" mnemonicParsing="false" onAction="#minimizeWindow" prefHeight="50.0" prefWidth="50.0" text="—">
+         <font>
+            <Font name="System Bold" size="20.0" />
+         </font>
+      </Button>
+      <Button layoutX="1036.0" layoutY="25.0" mnemonicParsing="false" onAction="#exitApp" prefHeight="50.0" prefWidth="50.0" styleClass="redButtons" text="❌" textFill="RED">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Button>
+      <ImageView fx:id="appIconImageView" fitHeight="150.0" fitWidth="200.0" layoutX="254.0" layoutY="215.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@Glyphs/AppIcon.png" />
+         </image>
+      </ImageView>
+      <Label id="splashLabel" fx:id="splashLabel" layoutX="475.0" layoutY="215.0" prefHeight="150.0" prefWidth="513.0" text="Gender Gap Analyser" wrapText="true">
+         <font>
+            <Font size="40.0" />
+         </font>
+      </Label>
+      <ImageView fx:id="loadingCircleImageView" fitHeight="150.0" fitWidth="150.0" layoutX="475.0" layoutY="425.0" pickOnBounds="true" preserveRatio="true" />
+   </children>
+</AnchorPane>

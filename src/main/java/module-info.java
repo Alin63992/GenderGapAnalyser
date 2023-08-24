@@ -12,6 +12,7 @@ module com.gendergapanalyser.gendergapanalyser {
     requires org.controlsfx.controls;
     requires AnimateFX;
     requires eu.iamgio.animated;
+    requires com.google.gson;
 
 
     opens com.gendergapanalyser.gendergapanalyser to javafx.fxml;

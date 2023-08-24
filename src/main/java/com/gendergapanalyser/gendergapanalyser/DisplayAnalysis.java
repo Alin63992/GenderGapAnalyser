@@ -1,40 +1,56 @@
 package com.gendergapanalyser.gendergapanalyser;
 
-import animatefx.animation.FadeOut;
-import animatefx.animation.FadeOutLeft;
-import animatefx.animation.SlideInRight;
+import animatefx.animation.*;
 import eu.iamgio.animated.transition.AnimatedSwitcher;
 import eu.iamgio.animated.transition.AnimatedThemeSwitcher;
 import eu.iamgio.animated.transition.Animation;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
+import java.util.Calendar;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class DisplayAnalysis implements Initializable {
     @FXML
+    private Hyperlink voidLink;
+    @FXML
+    private AnimatedSwitcher promptAnimator;
+    @FXML
+    private AnimatedSwitcher darkOverlayAnimator;
+    @FXML
+    private ImageView loadingCircleImageView;
+    @FXML
+    private AnchorPane backgroundOperations;
+    @FXML
+    private Rectangle darkOverlay;
+    @FXML
     private AnchorPane titleBar;
     @FXML
     private ChoiceBox<String> languagePicker;
+    @FXML
+    private ChoiceBox<String> currencyPicker;
+    @FXML
+    private ImageView lightModeButtonGlyph;
+    @FXML
+    private ImageView darkModeButtonGlyph;
+    @FXML
+    private ImageView wageGapIcon;
     @FXML
     private HBox predictionControls;
     @FXML
@@ -109,11 +125,24 @@ public class DisplayAnalysis implements Initializable {
     private void toggleDisplayMode() throws IOException {
         Main.displayMode = Main.displayMode.equals("Light") ? "Dark" : "Light";
         BufferedWriter buildUserSettings = new BufferedWriter(new FileWriter("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
-        buildUserSettings.write("DisplayMode=" + Main.displayMode + "\nLanguage=" + Main.language);
+        buildUserSettings.write("DisplayMode=" + Main.displayMode + "\nLanguage=" + Main.language + "\nCurrency=" + Main.currency + "\nExchangeRateLastUpdated=" + Main.exchangeRateLastUpdated.get(Calendar.DAY_OF_MONTH) + "." + Main.exchangeRateLastUpdated.get(Calendar.MONTH) + "." + Main.exchangeRateLastUpdated.get(Calendar.YEAR) + "\nExchangeRateToEUR=" + Main.exchangeRateEUR + "\nExchangeRateToRON=" + Main.exchangeRateRON);
         buildUserSettings.close();
         if (Main.processData.predictionsGenerated) Main.processData.createSalaryGraphWithPredictionsForEverybody();
         Main.processData.createSalaryGraphForEverybody();
         Main.getCurrentStage().getScene().getStylesheets().setAll(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
+        if (Main.displayMode.equals("Dark")) {
+            darkModeButtonGlyph.setFitHeight(50);
+            lightModeButtonGlyph.setFitHeight(35);
+            //Also changing the wage gap icon
+            wageGapIcon.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/AppIcon-Dark.png")));
+        }
+        else {
+            lightModeButtonGlyph.setFitHeight(50);
+            darkModeButtonGlyph.setFitHeight(35);
+            //Also changing the wage gap icon
+            wageGapIcon.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/AppIcon.png")));
+        }
+        voidLink.requestFocus();
     }
 
     //Function used when initializing the screen by populating the scroll panes with the interpretations
@@ -185,6 +214,10 @@ public class DisplayAnalysis implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        promptAnimator.setIn(new Animation(new ZoomIn()).setSpeed(3));
+        promptAnimator.setOut(new Animation(new ZoomOut()).setSpeed(10));
+        darkOverlayAnimator.setIn(new Animation(new FadeIn()).setSpeed(3));
+        darkOverlayAnimator.setOut(new Animation(new ZoomOut()).setSpeed(10));
         titleBar.setOnMousePressed(event -> {
             Main.dragX = Main.getCurrentStage().getX() - event.getScreenX();
             Main.dragY = Main.getCurrentStage().getY() - event.getScreenY();
@@ -196,28 +229,136 @@ public class DisplayAnalysis implements Initializable {
         //Setting up the language picker
         languagePicker.setItems(FXCollections.observableArrayList(Main.languages));
         switch (Main.language) {
-            case "EN" -> languagePicker.setValue(Main.languages[0]);
-            case "FR" -> languagePicker.setValue(Main.languages[1]);
-            case "RO" -> languagePicker.setValue(Main.languages[2]);
+            case "EN" -> {
+                languagePicker.setValue(Main.languages[0]);
+                currencyPicker.setValue(Main.currencies[0]);
+            }
+            case "FR" -> {
+                languagePicker.setValue(Main.languages[1]);
+                currencyPicker.setValue(Main.currencies[1]);
+            }
+            case "RO" -> {
+                languagePicker.setValue(Main.languages[2]);
+                currencyPicker.setValue(Main.currencies[2]);
+            }
         }
+        //When selecting another language from the language picker...
         languagePicker.getSelectionModel().selectedIndexProperty().addListener(((observable, oldValue, newValue) -> {
-            try {
-                Main.language = Main.languagesShort[newValue.intValue()];
-                BufferedWriter buildUserSettings = new BufferedWriter(new FileWriter("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
-                buildUserSettings.write("DisplayMode=" + Main.displayMode + "\nLanguage=" + Main.language);
-                buildUserSettings.close();
-                if (Main.processData.predictionsGenerated) Main.processData.createSalaryGraphWithPredictionsForEverybody();
-                Main.processData.createSalaryGraphForEverybody();
+            //Updating the language with the newly picked one and the currency to the one associated with the language
+            Main.language = Main.languagesShort[newValue.intValue()];
+            Main.currency = Main.currencies[newValue.intValue()];
+            //Setting the boolean variable used by DataProcessing.createPDF method to true so that the method generates a new PDF document in a new language
+            Main.changedLanguage = true;
+            //Setting the boolean variable used by DataProcessing.createPDF method to true so that the method generates a new PDF document with the new currency
+            Main.changedCurrency = true;
+            Runnable rebuildResources = () -> {
+                try {
+                    BufferedWriter buildUserSettings = new BufferedWriter(new FileWriter("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
+                    buildUserSettings.write("DisplayMode=" + Main.displayMode + "\nLanguage=" + Main.language + "\nCurrency=" + Main.currency + "\nExchangeRateLastUpdated=" + Main.exchangeRateLastUpdated.get(Calendar.DAY_OF_MONTH) + "." + Main.exchangeRateLastUpdated.get(Calendar.MONTH) + "." + Main.exchangeRateLastUpdated.get(Calendar.YEAR) + "\nExchangeRateToEUR=" + Main.exchangeRateEUR + "\nExchangeRateToRON=" + Main.exchangeRateRON);
+                    buildUserSettings.close();
+                    //Creating the usable dataset again so that it uses the new currency
+                    Main.processData.prepareData();
+                    //Recreating predictions graphs so that they use the newly set currency
+                    if (Main.processData.predictionsGenerated) {
+                        Main.processData.predictEvolutions(Main.predictionValue);
+                        Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                    }
+                    Main.processData.createSalaryGraphForEverybody();
+                } catch (IOException ignored) {}
+                //Recreating analyses in the new currency
                 Main.processData.performAnalysis();
-                Main.processData.changedLanguage = true;
-                Main.getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("Analysis-" + Main.languagesShort[newValue.intValue()] + ".fxml")).load()));
-                Main.getCurrentStage().getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
-                //Changing the title of the current stage
-                Main.getCurrentStage().setTitle(Main.language.equals("EN") ? "Interpretations" : Main.language.equals("FR") ? "Interprétations" : "Interpretări");
-                switchTheme = new AnimatedThemeSwitcher(Main.getCurrentStage().getScene(), new Animation(new FadeOut()).setSpeed(2.5));
-                switchTheme.init();
-            } catch (IOException ignored) {}
+                Platform.runLater(() -> {
+                    try {
+                        Main.getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("Analysis-" + Main.languagesShort[newValue.intValue()] + ".fxml")).load()));
+                    } catch (IOException ignored) {}
+                    Main.getCurrentStage().getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
+                    //Changing the title of the current stage
+                    Main.getCurrentStage().setTitle(Main.language.equals("EN") ? "Evolution Graph" : Main.language.equals("FR") ? "Graphe d'Évolution" : "Grafic de Evoluție");
+                    switchTheme = new AnimatedThemeSwitcher(Main.getCurrentStage().getScene(), new Animation(new FadeOut()).setSpeed(2.5));
+                    switchTheme.init();
+                });
+            };
+            promptAnimator.setChild(new Pane(backgroundOperations));
+            darkOverlayAnimator.setChild(new Pane(darkOverlay));
+            try {
+                loadingCircleImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/loading-" + Main.displayMode + ".gif")));
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            backgroundOperations.setVisible(true);
+            darkOverlay.setVisible(true);
+            new Thread(rebuildResources).start();
         }));
+
+        //Setting up the currency picker
+        currencyPicker.setItems(FXCollections.observableArrayList(Main.currencies));
+        switch (Main.currency) {
+            case "USD" -> currencyPicker.setValue(Main.currencies[0]);
+            case "EUR" -> currencyPicker.setValue(Main.currencies[1]);
+            case "RON" -> currencyPicker.setValue(Main.currencies[2]);
+        }
+        //When selecting another language from the currency picker...
+        currencyPicker.getSelectionModel().selectedIndexProperty().addListener(((observable, oldValue, newValue) -> {
+            //Updating the currency with the newly picked one
+            Main.currency = Main.currencies[newValue.intValue()];
+            //Setting the boolean variable used by DataProcessing.createPDF method to true so that the method generates a new PDF document with the new currency
+            Main.changedCurrency = true;
+            Runnable rebuildResources = () -> {
+                try {
+                    BufferedWriter buildUserSettings = new BufferedWriter(new FileWriter("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
+                    buildUserSettings.write("DisplayMode=" + Main.displayMode + "\nLanguage=" + Main.language + "\nCurrency=" + Main.currency + "\nExchangeRateLastUpdated=" + Main.exchangeRateLastUpdated.get(Calendar.DAY_OF_MONTH) + "." + Main.exchangeRateLastUpdated.get(Calendar.MONTH) + "." + Main.exchangeRateLastUpdated.get(Calendar.YEAR) + "\nExchangeRateToEUR=" + Main.exchangeRateEUR + "\nExchangeRateToRON=" + Main.exchangeRateRON);
+                    buildUserSettings.close();
+                    //Creating the usable dataset again so that it uses the new currency
+                    Main.processData.prepareData();
+                    //Recreating predictions graphs so that they use the newly set currency
+                    if (Main.processData.predictionsGenerated) {
+                        Main.processData.predictEvolutions(Main.predictionValue);
+                        Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                    }
+                    Main.processData.createSalaryGraphForEverybody();
+                } catch (IOException ignored) {}
+                //Recreating analyses in the new currency
+                Main.processData.performAnalysis();
+                Platform.runLater(() -> {
+                    try {
+                        Main.getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("Analysis-" + Main.language + ".fxml")).load()));
+                    } catch (IOException ignored) {}
+                    Main.getCurrentStage().getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
+                    //Changing the title of the current stage
+                    Main.getCurrentStage().setTitle(Main.language.equals("EN") ? "Evolution Graph" : Main.language.equals("FR") ? "Graphe d'Évolution" : "Grafic de Evoluție");
+                    switchTheme = new AnimatedThemeSwitcher(Main.getCurrentStage().getScene(), new Animation(new FadeOut()).setSpeed(2.5));
+                    switchTheme.init();
+                });
+            };
+            promptAnimator.setChild(new Pane(backgroundOperations));
+            darkOverlayAnimator.setChild(new Pane(darkOverlay));
+            try {
+                loadingCircleImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/loading-" + Main.displayMode + ".gif")));
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            backgroundOperations.setVisible(true);
+            darkOverlay.setVisible(true);
+            new Thread(rebuildResources).start();
+        }));
+
+        //Setting up the theme toggle
+        if (Main.displayMode.equals("Dark")) {
+            darkModeButtonGlyph.setFitHeight(50);
+            lightModeButtonGlyph.setFitHeight(35);
+            //Also displaying the wage gap icon
+            try {
+                wageGapIcon.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/AppIcon-Dark.png")));
+            } catch (FileNotFoundException ignored) {}
+        }
+        else {
+            lightModeButtonGlyph.setFitHeight(50);
+            darkModeButtonGlyph.setFitHeight(35);
+            //Also displaying the wage gap icon
+            try {
+                wageGapIcon.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/AppIcon.png")));
+            } catch (FileNotFoundException ignored) {}
+        }
 
         if (Main.processData.predictionsGenerated) {
             //Disabling the prediction controls

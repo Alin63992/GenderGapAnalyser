@@ -30,7 +30,7 @@ public class SendEmailInBackground implements Runnable {
         // it was generated without including the generated predictions,
         // or it includes predictions that were deleted, the report is regenerated.
         Path PDFReportPath = Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/Analysis.pdf");
-        if (!Files.exists(PDFReportPath) || Main.processData.changedLanguage || Main.processData.predictionsGenerated && !Main.processData.PDFGeneratedWithPredictions || !Main.processData.predictionsGenerated && Main.processData.PDFGeneratedWithPredictions) {
+        if (!Files.exists(PDFReportPath) || Main.changedLanguage || Main.processData.predictionsGenerated && !Main.processData.PDFGeneratedWithPredictions || !Main.processData.predictionsGenerated && Main.processData.PDFGeneratedWithPredictions) {
             try {
                 Main.processData.createPDF();
             } catch (IOException | DocumentException ignored) {}
@@ -141,6 +141,7 @@ public class SendEmailInBackground implements Runnable {
             });
         } catch (EmailException e) {
             e.printStackTrace();
+
             //Checking to see if this thread is interrupted and stopping it if it is
             if (Thread.currentThread().isInterrupted()) {
                 try {
@@ -154,7 +155,7 @@ public class SendEmailInBackground implements Runnable {
             Platform.runLater(() -> {
                 Alert errorSendingEmail = new Alert(Alert.AlertType.ERROR);
                 errorSendingEmail.setTitle(Main.language.equals("EN") ? "Report not sent" : Main.language.equals("FR") ? "Rapport non envoyé" : "Raport netrimis");
-                errorSendingEmail.setHeaderText(Main.language.equals("EN") ? "The report couldn't be sent!\nPlease check your internet connection, or wait for a bit then try again!" : Main.language.equals("FR") ? "Le rapport n'a pas pu être envoyé !\nVeuillez vérifier votre connexion internet, ou attendez un peu et réessayez !" : "Raportul nu a putut fi trimis!\nVă rugăm verificați conexiunea la internet, sau așteptați puțin si reîncercați!");
+                errorSendingEmail.setHeaderText(Main.language.equals("EN") ? "The report couldn't be sent!\nPlease check your credentials, your internet connection, or wait for a bit then try again!" : Main.language.equals("FR") ? "Le rapport n'a pas pu être envoyé !\nVeuillez vérifier vos données d'authentification, votre connexion internet, ou attendez un peu et réessayez !" : "Raportul nu a putut fi trimis!\nVă rugăm verificați datele de autentificare, conexiunea la internet, sau așteptați puțin si reîncercați!");
                 errorSendingEmail.getDialogPane().setMaxWidth(750);
                 errorSendingEmail.initStyle(StageStyle.UNDECORATED);
                 errorSendingEmail.getDialogPane().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
@@ -184,7 +185,9 @@ public class SendEmailInBackground implements Runnable {
                 errorSendingEmail.show();
             });
         }
-        Main.outgoingAccountEmail = "";
-        Main.outgoingAccountPassword = "";
+        if (Main.email.equals(Main.outgoingAccountEmail)) {
+            Main.outgoingAccountEmail = "";
+            Main.outgoingAccountPassword = "";
+        }
     }
 }

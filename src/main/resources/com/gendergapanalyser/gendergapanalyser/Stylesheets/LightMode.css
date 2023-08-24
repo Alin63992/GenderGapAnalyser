@@ -6,6 +6,10 @@
     -fx-fill: #0000001A;
 }
 
+.hyperlink:visited {
+    -fx-text-fill: #0096c9;
+}
+
 .redButtons {
     -fx-background-color: #47474700;
     -fx-text-fill: red;
@@ -49,26 +53,23 @@
 }
 
 #lightModeButton {
-    -fx-background-color: #FFA500FF;
+    -fx-background-color: #E5E5E500;
 }
 #lightModeButton:hover {
-    -fx-background-color: #ea9900;
+    -fx-background-color: #bebebe;
 }
 #lightModeButton:focused {
-    -fx-background-color: #ea9900;
+    -fx-background-color: #bebebe;
 }
 
 #darkModeButton {
     -fx-background-color: #E5E5E500;
-    -fx-text-fill: black;
 }
 #darkModeButton:hover {
     -fx-background-color: #bebebe;
-    -fx-text-fill: black;
 }
 #darkModeButton:focused {
     -fx-background-color: #bebebe;
-    -fx-text-fill: black;
 }
 
 .main-buttons {
