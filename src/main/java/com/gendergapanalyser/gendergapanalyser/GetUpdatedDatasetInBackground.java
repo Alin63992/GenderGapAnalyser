@@ -29,7 +29,7 @@ public class GetUpdatedDatasetInBackground implements Runnable {
             //Setting the downloaded dataset path
             Path downloadedDatasetPath = Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/0DownloadedDataset.csv");
 
-            //Checking to see if this thread is interrupted and stopping it if it is
+            //Checking  if this thread is interrupted and stopping it if it is
             if (Thread.currentThread().isInterrupted()) {
                 Files.delete(downloadedDatasetPath);
                 return;
@@ -47,7 +47,7 @@ public class GetUpdatedDatasetInBackground implements Runnable {
                 Files.delete(PDFReportPath);
             } catch (IOException ignored) {}
 
-            //Checking to see if this thread is interrupted and stopping it if it is
+            //Checking  if this thread is interrupted and stopping it if it is
             if (Thread.currentThread().isInterrupted()) {
                 Files.delete(downloadedDatasetPath);
                 return;
@@ -57,13 +57,13 @@ public class GetUpdatedDatasetInBackground implements Runnable {
             Main.processData = new DataProcessing();
             Main.processData.prepareData();
 
-            //Checking to see if this thread is interrupted and stopping it if it is
+            //Checking  if this thread is interrupted and stopping it if it is
             if (Thread.currentThread().isInterrupted()) {
                 Files.delete(downloadedDatasetPath);
                 return;
             }
 
-            //Checking to see if the currently open window is the main menu one
+            //Checking  if the currently open window is the main menu one
             if (Main.getCurrentStage() != null && !Main.getCurrentStage().getTitle().equals(Main.language.equals("EN") ? "Main Menu" : Main.language.equals("FR") ? "Menu Principal" : "Meniu Principal") || predictionsGenerated || PDFGenerated) {
                 if (!Main.getCurrentStage().getTitle().equals("Gender Gap Analyser")) {
                     Platform.runLater(() -> {
@@ -85,7 +85,7 @@ public class GetUpdatedDatasetInBackground implements Runnable {
                         } catch (FileNotFoundException ignored) {
                         }
 
-                        //Checking to see if this thread is interrupted and stopping it if it is
+                        //Checking  if this thread is interrupted and stopping it if it is
                         if (Thread.currentThread().isInterrupted()) {
                             try {
                                 Files.delete(downloadedDatasetPath);

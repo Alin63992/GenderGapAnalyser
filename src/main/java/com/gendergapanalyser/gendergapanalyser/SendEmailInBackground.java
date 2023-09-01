@@ -36,7 +36,7 @@ public class SendEmailInBackground implements Runnable {
             } catch (IOException | DocumentException ignored) {}
         }
 
-        //Checking to see if this thread is interrupted and stopping it if it is
+        //Checking  if this thread is interrupted and stopping it if it is
         if (Thread.currentThread().isInterrupted()) {
             try {
                 Files.delete(PDFReportPath);
@@ -50,7 +50,7 @@ public class SendEmailInBackground implements Runnable {
         pdfDocument.setDisposition(EmailAttachment.ATTACHMENT);
         pdfDocument.setDescription(Main.language.equals("EN") ? "Gender equality in the United States" : Main.language.equals("FR") ? "L'égalité entre les genres dans les États-Unis" : "Egalitatea între genuri în Statele Unite");
 
-        //Checking to see if this thread is interrupted and stopping it if it is
+        //Checking  if this thread is interrupted and stopping it if it is
         if (Thread.currentThread().isInterrupted()) {
             try {
                 Files.delete(PDFReportPath);
@@ -75,7 +75,7 @@ public class SendEmailInBackground implements Runnable {
             //Setting the sender email address
             mail.setFrom(Main.outgoingAccountEmail);
 
-            //Checking to see if this thread is interrupted and stopping it if it is
+            //Checking  if this thread is interrupted and stopping it if it is
             if (Thread.currentThread().isInterrupted()) {
                 try {
                     Files.delete(PDFReportPath);
@@ -95,7 +95,7 @@ public class SendEmailInBackground implements Runnable {
             //Lift off! (Sending the email)
             mail.send();
 
-            //Checking to see if this thread is interrupted and stopping it if it is
+            //Checking  if this thread is interrupted and stopping it if it is
             if (Thread.currentThread().isInterrupted()) {
                 try {
                     Files.delete(PDFReportPath);
@@ -122,7 +122,7 @@ public class SendEmailInBackground implements Runnable {
                     ((Stage)emailSent.getDialogPane().getScene().getWindow()).getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/information.png")));
                 } catch (FileNotFoundException ignored) {}
 
-                //Checking to see if this thread is interrupted and stopping it if it is
+                //Checking  if this thread is interrupted and stopping it if it is
                 if (Thread.currentThread().isInterrupted()) {
                     try {
                         Files.delete(PDFReportPath);
@@ -142,7 +142,7 @@ public class SendEmailInBackground implements Runnable {
         } catch (EmailException e) {
             e.printStackTrace();
 
-            //Checking to see if this thread is interrupted and stopping it if it is
+            //Checking  if this thread is interrupted and stopping it if it is
             if (Thread.currentThread().isInterrupted()) {
                 try {
                     Files.delete(PDFReportPath);
@@ -168,7 +168,7 @@ public class SendEmailInBackground implements Runnable {
                     ((Stage)errorSendingEmail.getDialogPane().getScene().getWindow()).getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/close.png")));
                 } catch (FileNotFoundException ignored) {}
 
-                //Checking to see if this thread is interrupted and stopping it if it is
+                //Checking  if this thread is interrupted and stopping it if it is
                 if (Thread.currentThread().isInterrupted()) {
                     try {
                         Files.delete(PDFReportPath);

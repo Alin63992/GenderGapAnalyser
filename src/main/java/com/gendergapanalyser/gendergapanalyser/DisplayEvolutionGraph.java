@@ -142,19 +142,22 @@ public class DisplayEvolutionGraph implements Initializable {
 
     //Function that toggles the app display mode between light mode and dark mode, and changes the graph
     @FXML
-    public void toggleDisplayMode() throws IOException {
+    public void toggleDisplayMode() {
         Main.displayMode = Main.displayMode.equals("Light") ? "Dark" : "Light";
-        BufferedWriter buildUserSettings = new BufferedWriter(new FileWriter("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
-        buildUserSettings.write("DisplayMode=" + Main.displayMode + "\nLanguage=" + Main.language + "\nCurrency=" + Main.currency + "\nExchangeRateLastUpdated=" + Main.exchangeRateLastUpdated.get(Calendar.DAY_OF_MONTH) + "." + Main.exchangeRateLastUpdated.get(Calendar.MONTH) + "." + Main.exchangeRateLastUpdated.get(Calendar.YEAR) + "\nExchangeRateToEUR=" + Main.exchangeRateEUR + "\nExchangeRateToRON=" + Main.exchangeRateRON);
-        buildUserSettings.close();
-        if (Main.processData.predictionsGenerated) {
-            Main.processData.createSalaryGraphWithPredictionsForEverybody();
-            if (!minimumRangeInput.getText().equals(Main.processData.datasetWithPredictions[0][1]) || !maximumRangeInput.getText().equals(Main.processData.datasetWithPredictions[Main.processData.datasetWithPredictions.length - 1][1]))
-                Main.processData.createSalaryGraphWithinRangeWithPredictionsForEverybody(Integer.parseInt(minimumRangeInput.getText()), Integer.parseInt(maximumRangeInput.getText()));
+        try {
+            BufferedWriter buildUserSettings = new BufferedWriter(new FileWriter("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
+            buildUserSettings.write("DisplayMode=" + Main.displayMode + "\nLanguage=" + Main.language + "\nCurrency=" + Main.currency + "\nExchangeRateLastUpdated=" + Main.exchangeRateLastUpdated.get(Calendar.DAY_OF_MONTH) + "." + Main.exchangeRateLastUpdated.get(Calendar.MONTH) + "." + Main.exchangeRateLastUpdated.get(Calendar.YEAR) + "\nExchangeRateToEUR=" + Main.exchangeRateEUR + "\nExchangeRateToRON=" + Main.exchangeRateRON);
+            buildUserSettings.close();
+            if (Main.processData.predictionsGenerated) {
+                Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                if (!minimumRangeInput.getText().equals(Main.processData.datasetWithPredictions[0][1]) || !maximumRangeInput.getText().equals(Main.processData.datasetWithPredictions[Main.processData.datasetWithPredictions.length - 1][1]))
+                    Main.processData.createSalaryGraphWithinRangeWithPredictionsForEverybody(Integer.parseInt(minimumRangeInput.getText()), Integer.parseInt(maximumRangeInput.getText()));
+            }
+            Main.processData.createSalaryGraphForEverybody();
+            if (!minimumRangeInput.getText().equals(Main.processData.dataset[0][1]) || !maximumRangeInput.getText().equals(Main.processData.dataset[Main.processData.dataset.length - 1][1]))
+                Main.processData.createSalaryGraphWithinRangeForEverybody(Integer.parseInt(minimumRangeInput.getText()), Integer.parseInt(maximumRangeInput.getText()));
         }
-        Main.processData.createSalaryGraphForEverybody();
-        if (!minimumRangeInput.getText().equals(Main.processData.dataset[0][1]) || !maximumRangeInput.getText().equals(Main.processData.dataset[Main.processData.dataset.length - 1][1]))
-            Main.processData.createSalaryGraphWithinRangeForEverybody(Integer.parseInt(minimumRangeInput.getText()), Integer.parseInt(maximumRangeInput.getText()));
+        catch (IOException ignored) {}
         Main.getCurrentStage().getScene().getStylesheets().setAll(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
         if (Main.displayMode.equals("Dark")) {
             darkModeButtonGlyph.setFitHeight(50);
@@ -166,38 +169,7 @@ public class DisplayEvolutionGraph implements Initializable {
         }
         voidLink.requestFocus();
         FileInputStream graph = null;
-        if (changeGraph.getSelectionModel().getSelectedIndex() == 0 && showPayGapToggle.isSelected()) {
-            if (includePredictionsToggle.isSelected())
-                graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.datasetWithPredictions[0][1]) && maximumRangeInput.getText().equals(Main.processData.datasetWithPredictions[Main.processData.datasetWithPredictions.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap-prediction.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap-prediction-range.png");
-            else
-                graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.dataset[0][1]) && maximumRangeInput.getText().equals(Main.processData.dataset[Main.processData.dataset.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap-range.png");
-        }
-        else if (changeGraph.getSelectionModel().getSelectedIndex() == 0 && !showPayGapToggle.isSelected()) {
-            if (includePredictionsToggle.isSelected())
-                graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.datasetWithPredictions[0][1]) && maximumRangeInput.getText().equals(Main.processData.datasetWithPredictions[Main.processData.datasetWithPredictions.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-prediction.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-prediction-range.png");
-            else
-                graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.dataset[0][1]) && maximumRangeInput.getText().equals(Main.processData.dataset[Main.processData.dataset.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-range.png");
-        }
-        else if (changeGraph.getSelectionModel().getSelectedIndex() == 1) {
-            if (includePredictionsToggle.isSelected())
-                graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.datasetWithPredictions[0][1]) && maximumRangeInput.getText().equals(Main.processData.datasetWithPredictions[Main.processData.datasetWithPredictions.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/men-prediction.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/men-prediction-range.png");
-            else
-                graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.dataset[0][1]) && maximumRangeInput.getText().equals(Main.processData.dataset[Main.processData.dataset.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/men.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/men-range.png");
-        }
-        else if (changeGraph.getSelectionModel().getSelectedIndex() == 2) {
-            if (includePredictionsToggle.isSelected())
-                graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.datasetWithPredictions[0][1]) && maximumRangeInput.getText().equals(Main.processData.datasetWithPredictions[Main.processData.datasetWithPredictions.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/women-prediction.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/women-prediction-range.png");
-            else
-                graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.dataset[0][1]) && maximumRangeInput.getText().equals(Main.processData.dataset[Main.processData.dataset.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/women.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/women-range.png");
-        }
-        else if (changeGraph.getSelectionModel().getSelectedIndex() == 3) {
-            if (includePredictionsToggle.isSelected())
-                graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.datasetWithPredictions[0][1]) && maximumRangeInput.getText().equals(Main.processData.datasetWithPredictions[Main.processData.datasetWithPredictions.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/wageGap-prediction.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/wageGap-prediction-range.png");
-            else
-                graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.dataset[0][1]) && maximumRangeInput.getText().equals(Main.processData.dataset[Main.processData.dataset.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/wageGap.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/wageGap-range.png");
-        }
-        chartImageView.setImage(new Image(graph));
-        graph.close();
+        processRange();
     }
 
     //Function that executes when the user toggles the include pay gap checkbox that gets enabled when the user selects the men's and women's evolution graph and that displays the appropriate graph based on what the user chose from the include pay gap and prediction checkboxes
@@ -289,7 +261,7 @@ public class DisplayEvolutionGraph implements Initializable {
         salary.setCellValueFactory((Callback<TableColumn.CellDataFeatures<String[], String>, ObservableValue>) param -> new SimpleStringProperty(Main.processData.formatSalary(param.getValue()[2])));
         gender.setPrefWidth(salariesView.getPrefWidth() / 3 - 6);
         year.setPrefWidth(salariesView.getPrefWidth() / 3 - 6);
-        salary.setMinWidth(salariesView.getPrefWidth() / 3 - 6);
+        salary.setPrefWidth(salariesView.getPrefWidth() / 3 - 6);
         salaries.setPrefHeight(salariesView.getPrefHeight());
         salaries.getColumns().addAll(gender, year, salary);
         salaries.setItems(data);
@@ -488,48 +460,165 @@ public class DisplayEvolutionGraph implements Initializable {
                 else
                     Main.processData.createSalaryGraphWithinRangeForEverybody(Integer.parseInt(minimumRangeInput.getText()), Integer.parseInt(maximumRangeInput.getText()));
             }
-
-            //Updating the chart view with the updated graphs
-            FileInputStream graph = null;
-            if (changeGraph.getSelectionModel().getSelectedIndex() == 0 && showPayGapToggle.isSelected()) {
-                if (includePredictionsToggle.isSelected())
-                    graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.datasetWithPredictions[0][1]) && maximumRangeInput.getText().equals(Main.processData.datasetWithPredictions[Main.processData.datasetWithPredictions.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap-prediction.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap-prediction-range.png");
-                else
-                    graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.dataset[0][1]) && maximumRangeInput.getText().equals(Main.processData.dataset[Main.processData.dataset.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap-range.png");
-            }
-            else if (changeGraph.getSelectionModel().getSelectedIndex() == 0 && !showPayGapToggle.isSelected()) {
-                if (includePredictionsToggle.isSelected())
-                    graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.datasetWithPredictions[0][1]) && maximumRangeInput.getText().equals(Main.processData.datasetWithPredictions[Main.processData.datasetWithPredictions.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-prediction.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-prediction-range.png");
-                else
-                    graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.dataset[0][1]) && maximumRangeInput.getText().equals(Main.processData.dataset[Main.processData.dataset.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-range.png");
-            }
-            else if (changeGraph.getSelectionModel().getSelectedIndex() == 1) {
-                if (includePredictionsToggle.isSelected())
-                    graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.datasetWithPredictions[0][1]) && maximumRangeInput.getText().equals(Main.processData.datasetWithPredictions[Main.processData.datasetWithPredictions.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/men-prediction.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/men-prediction-range.png");
-                else
-                    graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.dataset[0][1]) && maximumRangeInput.getText().equals(Main.processData.dataset[Main.processData.dataset.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/men.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/men-range.png");
-            }
-            else if (changeGraph.getSelectionModel().getSelectedIndex() == 2) {
-                if (includePredictionsToggle.isSelected())
-                    graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.datasetWithPredictions[0][1]) && maximumRangeInput.getText().equals(Main.processData.datasetWithPredictions[Main.processData.datasetWithPredictions.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/women-prediction.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/women-prediction-range.png");
-                else
-                    graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.dataset[0][1]) && maximumRangeInput.getText().equals(Main.processData.dataset[Main.processData.dataset.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/women.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/women-range.png");
-            }
-            else if (changeGraph.getSelectionModel().getSelectedIndex() == 3) {
-                if (includePredictionsToggle.isSelected())
-                    graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.datasetWithPredictions[0][1]) && maximumRangeInput.getText().equals(Main.processData.datasetWithPredictions[Main.processData.datasetWithPredictions.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/wageGap-prediction.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/wageGap-prediction-range.png");
-                else
-                    graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.dataset[0][1]) && maximumRangeInput.getText().equals(Main.processData.dataset[Main.processData.dataset.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/wageGap.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/wageGap-range.png");
-            }
-            chartImageView.setImage(new Image(graph));
-            graph.close();
         }
         catch (NumberFormatException e) {
             minimumRangeInput.setText(String.valueOf((int) rangeSlider.getLowValue()));
             maximumRangeInput.setText(String.valueOf((int) rangeSlider.getHighValue()));
             processRange();
         }
-        catch (IOException ignored) {}
+
+        //Updating the chart view with the updated graphs
+        FileInputStream graph = null;
+        if (changeGraph.getSelectionModel().getSelectedIndex() == 0 && showPayGapToggle.isSelected()) {
+            if (includePredictionsToggle.isSelected()) {
+                try {
+                    graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.datasetWithPredictions[0][1]) && maximumRangeInput.getText().equals(Main.processData.datasetWithPredictions[Main.processData.datasetWithPredictions.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap-prediction.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap-prediction-range.png");
+                } catch (FileNotFoundException e) {
+                    try {
+                        Main.processData.createSalaryGraphForEverybody();
+                        Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                        processRange();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+            else {
+                try {
+                    graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.dataset[0][1]) && maximumRangeInput.getText().equals(Main.processData.dataset[Main.processData.dataset.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap-range.png");
+                } catch (FileNotFoundException e) {
+                    try {
+                        Main.processData.createSalaryGraphForEverybody();
+                        if (Main.processData.predictionsGenerated)
+                            Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                        processRange();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+        }
+        else if (changeGraph.getSelectionModel().getSelectedIndex() == 0 && !showPayGapToggle.isSelected()) {
+            if (includePredictionsToggle.isSelected()) {
+                try {
+                    graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.datasetWithPredictions[0][1]) && maximumRangeInput.getText().equals(Main.processData.datasetWithPredictions[Main.processData.datasetWithPredictions.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-prediction.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-prediction-range.png");
+                } catch (FileNotFoundException e) {
+                    try {
+                        Main.processData.createSalaryGraphForEverybody();
+                        Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                        processRange();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+            else {
+                try {
+                    graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.dataset[0][1]) && maximumRangeInput.getText().equals(Main.processData.dataset[Main.processData.dataset.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-range.png");
+                } catch (FileNotFoundException e) {
+                    try {
+                        Main.processData.createSalaryGraphForEverybody();
+                        if (Main.processData.predictionsGenerated)
+                            Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                        processRange();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+        }
+        else if (changeGraph.getSelectionModel().getSelectedIndex() == 1) {
+            if (includePredictionsToggle.isSelected()) {
+                try {
+                    graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.datasetWithPredictions[0][1]) && maximumRangeInput.getText().equals(Main.processData.datasetWithPredictions[Main.processData.datasetWithPredictions.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/men-prediction.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/men-prediction-range.png");
+                } catch (FileNotFoundException e) {
+                    try {
+                        Main.processData.createSalaryGraphForEverybody();
+                        Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                        processRange();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+            else {
+                try {
+                    graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.dataset[0][1]) && maximumRangeInput.getText().equals(Main.processData.dataset[Main.processData.dataset.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/men.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/men-range.png");
+                } catch (FileNotFoundException e) {
+                    try {
+                        Main.processData.createSalaryGraphForEverybody();
+                        if (Main.processData.predictionsGenerated)
+                            Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                        processRange();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+        }
+        else if (changeGraph.getSelectionModel().getSelectedIndex() == 2) {
+            if (includePredictionsToggle.isSelected()) {
+                try {
+                    graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.datasetWithPredictions[0][1]) && maximumRangeInput.getText().equals(Main.processData.datasetWithPredictions[Main.processData.datasetWithPredictions.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/women-prediction.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/women-prediction-range.png");
+                    }
+                catch (FileNotFoundException e) {
+                    try {
+                        Main.processData.createSalaryGraphForEverybody();
+                        Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                        processRange();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+            else {
+                try {
+                    graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.dataset[0][1]) && maximumRangeInput.getText().equals(Main.processData.dataset[Main.processData.dataset.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/women.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/women-range.png");
+                } catch (FileNotFoundException e) {
+                    try {
+                        Main.processData.createSalaryGraphForEverybody();
+                        if (Main.processData.predictionsGenerated)
+                            Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                        processRange();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+        }
+        else if (changeGraph.getSelectionModel().getSelectedIndex() == 3) {
+            if (includePredictionsToggle.isSelected()) {
+                try {
+                    graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.datasetWithPredictions[0][1]) && maximumRangeInput.getText().equals(Main.processData.datasetWithPredictions[Main.processData.datasetWithPredictions.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/wageGap-prediction.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/wageGap-prediction-range.png");
+                } catch (FileNotFoundException e) {
+                    try {
+                        Main.processData.createSalaryGraphForEverybody();
+                        Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                        processRange();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+            else {
+                try {
+                    graph = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.dataset[0][1]) && maximumRangeInput.getText().equals(Main.processData.dataset[Main.processData.dataset.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/wageGap.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/wageGap-range.png");
+                } catch (FileNotFoundException e) {
+                    try {
+                        Main.processData.createSalaryGraphForEverybody();
+                        if (Main.processData.predictionsGenerated)
+                            Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                        processRange();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+        }
+        chartImageView.setImage(new Image(graph));
+        try {
+            graph.close();
+        } catch (IOException ignored) {}
     }
 
     @Override
@@ -678,7 +767,16 @@ public class DisplayEvolutionGraph implements Initializable {
             chartImageView.setImage(new Image(initialImageInput));
             initialImageInput.close();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            try {
+                Main.processData.createSalaryGraphForEverybody();
+                if (Main.processData.predictionsGenerated)
+                    Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                FileInputStream initialImageInput = new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders.png");
+                chartImageView.setImage(new Image(initialImageInput));
+                initialImageInput.close();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         }
 
         //Preparing the salary table containing 3 columns for the genders, year and salary, then setting the contents of the dataset into its respective column in the table, then setting the table to its container
@@ -786,6 +884,8 @@ public class DisplayEvolutionGraph implements Initializable {
         //If the user changes their graph choice
         changeGraph.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
             FileInputStream imageInput = null;
+            //Boolean used to check if the image from the ImageView was set by the processRange() function if the requested graph or the Graphs folder can't be found
+            boolean alternatePath = false;
             //If the user chooses the first option
             if (newValue.intValue() == 0) {
                 //Making the include pay gap checkbox selectable
@@ -795,7 +895,14 @@ public class DisplayEvolutionGraph implements Initializable {
                     try {
                         imageInput = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.datasetWithPredictions[0][1]) && maximumRangeInput.getText().equals(Main.processData.datasetWithPredictions[Main.processData.datasetWithPredictions.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-prediction.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-prediction-range.png");
                     } catch (FileNotFoundException e) {
-                        throw new RuntimeException(e);
+                        try {
+                            Main.processData.createSalaryGraphForEverybody();
+                            Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                            processRange();
+                            alternatePath = true;
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
                     }
                 }
                 //If not, we select the all genders graph that doesn't include predictions
@@ -803,7 +910,15 @@ public class DisplayEvolutionGraph implements Initializable {
                     try {
                         imageInput = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.dataset[0][1]) && maximumRangeInput.getText().equals(Main.processData.dataset[Main.processData.dataset.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-range.png");
                     } catch (FileNotFoundException e) {
-                        throw new RuntimeException(e);
+                        try {
+                            Main.processData.createSalaryGraphForEverybody();
+                            if (Main.processData.predictionsGenerated)
+                                Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                            processRange();
+                            alternatePath = true;
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
                     }
                 }
             }
@@ -817,7 +932,14 @@ public class DisplayEvolutionGraph implements Initializable {
                     try {
                         imageInput = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.datasetWithPredictions[0][1]) && maximumRangeInput.getText().equals(Main.processData.datasetWithPredictions[Main.processData.datasetWithPredictions.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/men-prediction.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/men-prediction-range.png");
                     } catch (FileNotFoundException e) {
-                        throw new RuntimeException(e);
+                        try {
+                            Main.processData.createSalaryGraphForEverybody();
+                            Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                            processRange();
+                            alternatePath = true;
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
                     }
                 }
                 //If not, we select the men graph that doesn't include predictions
@@ -825,7 +947,15 @@ public class DisplayEvolutionGraph implements Initializable {
                     try {
                         imageInput = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.dataset[0][1]) && maximumRangeInput.getText().equals(Main.processData.dataset[Main.processData.dataset.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/men.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/men-range.png");
                     } catch (FileNotFoundException e) {
-                        throw new RuntimeException(e);
+                        try {
+                            Main.processData.createSalaryGraphForEverybody();
+                            if (Main.processData.predictionsGenerated)
+                                Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                            processRange();
+                            alternatePath = true;
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
                     }
                 }
             }
@@ -837,14 +967,29 @@ public class DisplayEvolutionGraph implements Initializable {
                     try {
                         imageInput = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.datasetWithPredictions[0][1]) && maximumRangeInput.getText().equals(Main.processData.datasetWithPredictions[Main.processData.datasetWithPredictions.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/women-prediction.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/women-prediction-range.png");
                     } catch (FileNotFoundException e) {
-                        throw new RuntimeException(e);
+                        try {
+                            Main.processData.createSalaryGraphForEverybody();
+                            Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                            processRange();
+                            alternatePath = true;
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
                     }
                 }
                 else {
                     try {
                         imageInput = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.dataset[0][1]) && maximumRangeInput.getText().equals(Main.processData.dataset[Main.processData.dataset.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/women.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/women-range.png");
                     } catch (FileNotFoundException e) {
-                        throw new RuntimeException(e);
+                        try {
+                            Main.processData.createSalaryGraphForEverybody();
+                            if (Main.processData.predictionsGenerated)
+                                Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                            processRange();
+                            alternatePath = true;
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
                     }
                 }
             }
@@ -855,23 +1000,40 @@ public class DisplayEvolutionGraph implements Initializable {
                     try {
                         imageInput = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.datasetWithPredictions[0][1]) && maximumRangeInput.getText().equals(Main.processData.datasetWithPredictions[Main.processData.datasetWithPredictions.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/wageGap-prediction.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/wageGap-prediction-range.png");
                     } catch (FileNotFoundException e) {
-                        throw new RuntimeException(e);
+                        try {
+                            Main.processData.createSalaryGraphForEverybody();
+                            Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                            processRange();
+                            alternatePath = true;
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
                     }
                 }
                 else {
                     try {
                         imageInput = new FileInputStream(minimumRangeInput.getText().equals(Main.processData.dataset[0][1]) && maximumRangeInput.getText().equals(Main.processData.dataset[Main.processData.dataset.length - 1][1]) ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/wageGap.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/wageGap-range.png");
                     } catch (FileNotFoundException e) {
-                        throw new RuntimeException(e);
+                        try {
+                            Main.processData.createSalaryGraphForEverybody();
+                            if (Main.processData.predictionsGenerated)
+                                Main.processData.createSalaryGraphWithPredictionsForEverybody();
+                            processRange();
+                            alternatePath = true;
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
                     }
                 }
             }
             //We set the chart container to show the graph the user chose
-            chartImageView.setImage(new Image(imageInput));
-            try {
-                imageInput.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            if (!alternatePath) {
+                chartImageView.setImage(new Image(imageInput));
+                try {
+                    imageInput.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 

@@ -1,6 +1,9 @@
 package com.gendergapanalyser.gendergapanalyser;
 
-import animatefx.animation.*;
+import animatefx.animation.FadeIn;
+import animatefx.animation.FadeOut;
+import animatefx.animation.ZoomIn;
+import animatefx.animation.ZoomOut;
 import eu.iamgio.animated.transition.AnimatedSwitcher;
 import eu.iamgio.animated.transition.AnimatedThemeSwitcher;
 import eu.iamgio.animated.transition.Animation;
@@ -22,11 +25,15 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 
 import java.awt.*;
 import java.io.*;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -65,7 +72,7 @@ public class Main extends Application implements Initializable {
     @FXML
     private ImageView lightModeButtonGlyph;
     @FXML
-    private  ImageView darkModeButtonGlyph;
+    private ImageView darkModeButtonGlyph;
     @FXML
     private AnchorPane predictionPrompt;
     @FXML
@@ -105,13 +112,13 @@ public class Main extends Application implements Initializable {
     @FXML
     private ImageView loadingCircleImageView;
     protected static DataProcessing processData;
-    protected static String displayMode;
-    protected static String language;
+    protected static String displayMode = "Dark";
+    protected static String language = "EN";
     protected static boolean changedLanguage = false;
     protected static boolean changedCurrency = false;
     protected static GregorianCalendar exchangeRateLastUpdated = (GregorianCalendar) GregorianCalendar.getInstance();
-    protected static double exchangeRateEUR;
-    protected static double exchangeRateRON;
+    protected static double exchangeRateEUR = 1.0;
+    protected static double exchangeRateRON = 1.0;
     protected static String currency = "USD";
     protected static final String[] languages = {"English", "Français", "Română"};
     protected static final String[] languagesShort = {"EN", "FR", "RO"};
@@ -124,6 +131,7 @@ public class Main extends Application implements Initializable {
     protected static String outgoingAccountEmail = "";
     protected static String outgoingAccountPassword = "";
     private AnimatedThemeSwitcher switchTheme;
+    private boolean applicationHealthy = true;
 
 
     //Function used to set the currently open window to be used in the future
@@ -144,12 +152,10 @@ public class Main extends Application implements Initializable {
             downloadDataset.interrupt();
         }
 
-        //Locating the Graphs folder
-        File graphsFolder = new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs");
-        //Deleting every graph in the Graphs folder
-        for (File graph : Objects.requireNonNull(graphsFolder.listFiles())) {
-            graph.delete();
-        }
+        //Deleting the Graphs folder
+        try {
+            FileUtils.deleteDirectory(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs"));
+        } catch (IOException ignored) {}
 
         //Deleting the downloaded dataset file (if it exists)
         try {
@@ -636,9 +642,78 @@ public class Main extends Application implements Initializable {
 
     @Override
     public void start(Stage primaryStage) {
-        try {
-            //Loading the user settings
-            if (language == null && displayMode == null) {
+        //Firstly, checking the application health. The if statements' structure follows the folder structure
+        while (applicationHealthy) {
+            //Checking if the resources folder exists and if it contains 1 folder
+            File resourcesFolder = new File("src/main/resources");
+            if (resourcesFolder.exists() && resourcesFolder.listFiles().length == 1) {
+                //Checking if the folder within the resources folder contains 13 objects or more
+                if (new File("src/main/resources/com/gendergapanalyser/gendergapanalyser").listFiles().length >= 13) {
+                    //Checking if the Glyphs folder exists and contains 11 objects
+                    File glyphsFolder = new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs");
+                    if (glyphsFolder.exists() && glyphsFolder.listFiles().length == 11) {
+                        //Checking if the Emojis folder exists and contains 12 PNG icons
+                        File emojisFolder = new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis");
+                        if (emojisFolder.exists() && emojisFolder.listFiles().length == 12 && emojisFolder.listFiles((folder, name) -> name.endsWith(".png")).length == 12) {
+                            applicationHealthy = true;
+                        } else {
+                            applicationHealthy = false;
+                            break;
+                        }
+
+                        //Checking if the rest of the 10 objects of the Glyphs folder are divided into 8 PNGs and 2 GIFs
+                        if (glyphsFolder.listFiles((folder, name) -> name.endsWith(".png")).length == 8 && glyphsFolder.listFiles((folder, name) -> name.endsWith(".gif")).length == 2) {
+                            applicationHealthy = true;
+                        } else {
+                            applicationHealthy = false;
+                            break;
+                        }
+                    } else {
+                        applicationHealthy = false;
+                        break;
+                    }
+
+                    //Checking if the Stylesheets folder exists and if it contains only 2 CSS files and nothing more
+                    File stylesheetsFolder = new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets");
+                    if (stylesheetsFolder.exists() && stylesheetsFolder.listFiles().length == 2 && stylesheetsFolder.listFiles((folder, name) -> name.endsWith(".css")).length == 2) {
+                        applicationHealthy = true;
+                    } else {
+                        applicationHealthy = false;
+                        break;
+                    }
+
+                    //Checking if the fallback dataset CSV file exists
+                    if (new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/FallbackDataset.csv").exists()) {
+                        applicationHealthy = true;
+                    } else {
+                        applicationHealthy = false;
+                        break;
+                    }
+
+                    //Checking if there are 10 FXML files and if they are divided into 3 files for each of the app's
+                    // screen (Main menu, interpretations, evolution graph) - each in 3 languages - and one for the
+                    // splash screen
+                    File FXMLFiles = new File("src/main/resources/com/gendergapanalyser/gendergapanalyser");
+                    if (FXMLFiles.listFiles((folder, name) -> name.endsWith(".fxml")).length == 10) {
+                        if (Files.exists(Path.of(FXMLFiles.getAbsolutePath() + "/SplashScreen.fxml")) && FXMLFiles.listFiles((folder, name) -> name.startsWith("MainMenu-")).length == 3 && FXMLFiles.listFiles((folder, name) -> name.startsWith("DisplayEvolutionGraph-")).length == 3 && FXMLFiles.listFiles((folder, name) -> name.startsWith("Analysis-")).length == 3) {
+                            applicationHealthy = true;
+                        } else {
+                            applicationHealthy = false;
+                            break;
+                        }
+                    } else {
+                        applicationHealthy = false;
+                        break;
+                    }
+                } else {
+                    applicationHealthy = false;
+                    break;
+                }
+                break;
+            } else applicationHealthy = false;
+        }
+        if (applicationHealthy) {
+            try {
                 //Loading user settings (display mode and app language) from the UserSettings.txt file
                 try {
                     BufferedReader loadUserSettings = new BufferedReader(new FileReader("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
@@ -650,116 +725,138 @@ public class Main extends Application implements Initializable {
                             case "Language" -> language = settingParts[1];
                             case "Currency" -> currency = settingParts[1];
                             case "ExchangeRateLastUpdated" -> {
-                                exchangeRateLastUpdated.set(Calendar.DAY_OF_MONTH, Integer.parseInt(settingParts[1].split("\\.")[0]));
-                                exchangeRateLastUpdated.set(Calendar.MONTH, Integer.parseInt(settingParts[1].split("\\.")[1]));
-                                exchangeRateLastUpdated.set(Calendar.YEAR, Integer.parseInt(settingParts[1].split("\\.")[2]));
+                                exchangeRateLastUpdated.set(GregorianCalendar.DAY_OF_MONTH, Integer.parseInt(settingParts[1].split("\\.")[0]));
+                                exchangeRateLastUpdated.set(GregorianCalendar.MONTH, Integer.parseInt(settingParts[1].split("\\.")[1]));
+                                exchangeRateLastUpdated.set(GregorianCalendar.YEAR, Integer.parseInt(settingParts[1].split("\\.")[2]));
                             }
                             case "ExchangeRateToEUR" -> exchangeRateEUR = Double.parseDouble(settingParts[1]);
                             case "ExchangeRateToRON" -> exchangeRateRON = Double.parseDouble(settingParts[1]);
                         }
                     }
                     loadUserSettings.close();
-                } catch (IOException ignored) {}
-            }
-
-            //Setting the primary stage so that other controllers can use it to display what they need displayed
-            setCurrentStage(primaryStage);
-            getCurrentStage().initStyle(StageStyle.UNDECORATED);
-
-            //Setting the splash screen to be shown on the application window
-            getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("SplashScreen.fxml")).load()));
-            getCurrentStage().getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + displayMode + "Mode.css")).toExternalForm());
-
-            //Setting the app icon that's going to be shown on the taskbar to the Gender Fluid free icon created by Vitaly Gorbachev, published on the flaticon website (https://www.flaticon.com/free-icon/gender-fluid_3369089?term=gender&related_id=3369089)
-            getCurrentStage().getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/AppIcon.png")));
-
-            //Setting the window title
-            getCurrentStage().setTitle("Gender Gap Analyser");
-            getCurrentStage().centerOnScreen();
-
-            //Setting the window to be not resizable
-            getCurrentStage().setResizable(false);
-
-            //Opening the window
-            getCurrentStage().show();
-
-            Runnable appLoad = () -> {
-                try {
-                    //Trying to download the dataset file from the U.S. Department of Labor server
-                    downloadDataset.start();
-
-                    //Checking to see if a day has passed since last downloading exchange rates
-                    exchangeRateLastUpdated.add(GregorianCalendar.DAY_OF_MONTH, 1);
-                    //If a day did pass
-                    if (exchangeRateLastUpdated.get(GregorianCalendar.DAY_OF_MONTH) < LocalDate.now().getDayOfMonth() && exchangeRateLastUpdated.get(GregorianCalendar.MONTH) <= LocalDate.now().getMonthValue() && exchangeRateLastUpdated.get(GregorianCalendar.YEAR) <= LocalDate.now().getYear()) {
-                        //Preparing to connect to the ExchangeRate-API to obtain new exchange rates
-                        HttpURLConnection connection = (HttpURLConnection) new URI("https://v6.exchangerate-api.com/v6/9a9fc15f7944c0cb9bf532a8/latest/USD").toURL().openConnection();
-                        connection.setConnectTimeout(500);
-                        connection.setReadTimeout(1000);
-                        connection.addRequestProperty("User-Agent", "Mozilla/5.0");
-                        //Attempting to connect (hoping that the computer is connected to the internet)
-                        try {
-                            connection.connect();
-                            //Saving the JSON response
-                            BufferedReader br = new BufferedReader(new InputStreamReader((InputStream) (connection.getResponseCode() == 200 ? connection.getContent() : connection.getErrorStream())));
-                            ArrayList<String> json = new ArrayList<>();
-                            String output;
-                            while ((output = br.readLine()) != null)
-                                json.add(output);
-                            if (json.size() > 1 && json.get(1).contains("\"result\":\"success\"")) {
-                                for (String jsonPart : json) {
-                                    if (jsonPart.contains("\"EUR\""))
-                                        exchangeRateEUR = Double.parseDouble(jsonPart.split(":")[1].substring(0, jsonPart.split(":")[1].length() - 1));
-                                    else if (jsonPart.contains("\"RON\"")) {
-                                        exchangeRateRON = Double.parseDouble(jsonPart.split(":")[1].substring(0, jsonPart.split(":")[1].length() - 1));
-                                        break;
-                                    }
-                                }
-                                //Setting the current date as the date of last update
-                                exchangeRateLastUpdated.set(GregorianCalendar.DAY_OF_MONTH, LocalDate.now().getDayOfMonth());
-                                exchangeRateLastUpdated.set(GregorianCalendar.MONTH, LocalDate.now().getMonthValue());
-                                exchangeRateLastUpdated.set(GregorianCalendar.YEAR, LocalDate.now().getYear());
-
-                                //Rebuilding the user settings file with the new currency values
-                                BufferedWriter buildUserSettings = new BufferedWriter(new FileWriter("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
-                                buildUserSettings.write("DisplayMode=" + displayMode + "\nLanguage=" + language + "\nCurrency=" + currency + "\nExchangeRateLastUpdated=" + exchangeRateLastUpdated.get(Calendar.DAY_OF_MONTH) + "." + exchangeRateLastUpdated.get(Calendar.MONTH) + "." + exchangeRateLastUpdated.get(Calendar.YEAR) + "\nExchangeRateToEUR=" + exchangeRateEUR + "\nExchangeRateToRON=" + exchangeRateRON);
-                                buildUserSettings.close();
-                            }
-                        } catch (IOException ignored) {
-                        }
-                    } else {
-                        //Reverting the change made to the date so that the application does not use the wrong date
-                        exchangeRateLastUpdated.add(GregorianCalendar.DAY_OF_MONTH, -1);
-                    }
-
-                    //Preparing the dataset and creating the plots
-                    processData = new DataProcessing();
-                    processData.prepareData();
-
-                    //Switching to the main menu page because the app loading is done
-                    Platform.runLater(() -> {
-                        AnimatedSwitcher as = new AnimatedSwitcher();
-                        as.setIn(new Animation(new ZoomIn()).setSpeed(1.3));
-                        Scene scene = new Scene(new Pane(as));
-                        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
-                        as.of(Main.getCurrentStage().getScene().getRoot());
-                        try {
-                            as.setChild(new FXMLLoader(getClass().getResource("MainMenu-" + Main.language + ".fxml")).load());
-                        } catch (IOException ignored) {}
-                        getCurrentStage().setScene(scene);
-                        switchTheme = new AnimatedThemeSwitcher(getCurrentStage().getScene(), new Animation(new FadeOut()).setSpeed(2.5));
-                        switchTheme.init();
-
-                        //Setting the window title
-                        getCurrentStage().setTitle(language.equals("EN") ? "Main Menu" : language.equals("FR") ? "Menu Principal" : "Meniu Principal");
-                        getCurrentStage().centerOnScreen();
-                    });
-
+                } catch (IOException e) {
+                    exchangeRateLastUpdated.add(GregorianCalendar.DAY_OF_MONTH, -2);
+                    BufferedWriter buildUserSettings = new BufferedWriter(new FileWriter("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
+                    buildUserSettings.write("DisplayMode=" + displayMode + "\nLanguage=" + language + "\nCurrency=" + currency + "\nExchangeRateLastUpdated=" + exchangeRateLastUpdated.get(Calendar.DAY_OF_MONTH) + "." + exchangeRateLastUpdated.get(Calendar.MONTH) + "." + exchangeRateLastUpdated.get(Calendar.YEAR) + "\nExchangeRateToEUR=" + exchangeRateEUR + "\nExchangeRateToRON=" + exchangeRateRON);
+                    buildUserSettings.close();
                 }
-                catch (IOException | URISyntaxException ignored) {}
-            };
-            new Thread(appLoad).start();
-        } catch (IOException ignored) {}
+
+                //Setting the primary stage so that other controllers can use it to display what they need displayed
+                setCurrentStage(primaryStage);
+                getCurrentStage().initStyle(StageStyle.UNDECORATED);
+
+                //Setting the splash screen to be shown on the application window
+                getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("SplashScreen.fxml")).load()));
+                getCurrentStage().getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + displayMode + "Mode.css")).toExternalForm());
+
+                //Setting the app icon that's going to be shown on the taskbar to the Gender Fluid free icon created by Vitaly Gorbachev, published on the flaticon website (https://www.flaticon.com/free-icon/gender-fluid_3369089?term=gender&related_id=3369089)
+                getCurrentStage().getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/AppIcon.png")));
+
+                //Setting the window title
+                getCurrentStage().setTitle("Gender Gap Analyser");
+                getCurrentStage().centerOnScreen();
+
+                //Setting the window to be not resizable
+                getCurrentStage().setResizable(false);
+
+                //Opening the window
+                getCurrentStage().show();
+
+                Runnable appLoad = () -> {
+                    try {
+                        //Trying to download the dataset file from the U.S. Department of Labor server
+                        downloadDataset.start();
+
+                        //Checking  if a day has passed since last downloading exchange rates
+                        exchangeRateLastUpdated.add(GregorianCalendar.DAY_OF_MONTH, 1);
+                        //If a day did pass
+                        if (exchangeRateLastUpdated.get(GregorianCalendar.DAY_OF_MONTH) < LocalDate.now().getDayOfMonth() || exchangeRateLastUpdated.get(GregorianCalendar.MONTH) <= LocalDate.now().getMonthValue() || exchangeRateLastUpdated.get(GregorianCalendar.YEAR) <= LocalDate.now().getYear()) {
+                            //Preparing to connect to the ExchangeRate-API to obtain new exchange rates
+                            HttpURLConnection connection = (HttpURLConnection) new URI("https://v6.exchangerate-api.com/v6/9a9fc15f7944c0cb9bf532a8/latest/USD").toURL().openConnection();
+                            connection.setConnectTimeout(500);
+                            connection.setReadTimeout(1000);
+                            connection.addRequestProperty("User-Agent", "Mozilla/5.0");
+                            //Attempting to connect (hoping that the computer is connected to the internet)
+                            try {
+                                connection.connect();
+                                //Saving the JSON response
+                                BufferedReader br = new BufferedReader(new InputStreamReader((InputStream) (connection.getResponseCode() == 200 ? connection.getContent() : connection.getErrorStream())));
+                                ArrayList<String> json = new ArrayList<>();
+                                String output;
+                                while ((output = br.readLine()) != null)
+                                    json.add(output);
+                                if (json.size() > 1 && json.get(1).contains("\"result\":\"success\"")) {
+                                    for (String jsonPart : json) {
+                                        if (jsonPart.contains("\"EUR\""))
+                                            exchangeRateEUR = Double.parseDouble(jsonPart.split(":")[1].substring(0, jsonPart.split(":")[1].length() - 1));
+                                        else if (jsonPart.contains("\"RON\"")) {
+                                            exchangeRateRON = Double.parseDouble(jsonPart.split(":")[1].substring(0, jsonPart.split(":")[1].length() - 1));
+                                            break;
+                                        }
+                                    }
+                                    //Setting the current date as the date of last update
+                                    exchangeRateLastUpdated.set(GregorianCalendar.DAY_OF_MONTH, LocalDate.now().getDayOfMonth());
+                                    exchangeRateLastUpdated.set(GregorianCalendar.MONTH, LocalDate.now().getMonthValue());
+                                    exchangeRateLastUpdated.set(GregorianCalendar.YEAR, LocalDate.now().getYear());
+
+                                    //Rebuilding the user settings file with the new currency values
+                                    BufferedWriter buildUserSettings = new BufferedWriter(new FileWriter("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
+                                    buildUserSettings.write("DisplayMode=" + displayMode + "\nLanguage=" + language + "\nCurrency=" + currency + "\nExchangeRateLastUpdated=" + exchangeRateLastUpdated.get(Calendar.DAY_OF_MONTH) + "." + exchangeRateLastUpdated.get(Calendar.MONTH) + "." + exchangeRateLastUpdated.get(Calendar.YEAR) + "\nExchangeRateToEUR=" + exchangeRateEUR + "\nExchangeRateToRON=" + exchangeRateRON);
+                                    buildUserSettings.close();
+                                }
+                            } catch (IOException ignored) {
+                            }
+                        } else {
+                            //Reverting the change made to the date so that the application does not use the wrong date
+                            exchangeRateLastUpdated.add(GregorianCalendar.DAY_OF_MONTH, -1);
+                        }
+
+                        //Preparing the dataset and creating the plots
+                        processData = new DataProcessing();
+                        processData.prepareData();
+
+                        //Switching to the main menu page because the app loading is done
+                        Platform.runLater(() -> {
+                            AnimatedSwitcher as = new AnimatedSwitcher();
+                            as.setIn(new Animation(new ZoomIn()).setSpeed(1.3));
+                            Scene scene = new Scene(new Pane(as));
+                            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
+                            as.of(Main.getCurrentStage().getScene().getRoot());
+                            try {
+                                as.setChild(new FXMLLoader(getClass().getResource("MainMenu-" + Main.language + ".fxml")).load());
+                            } catch (IOException ignored) {
+                            }
+                            getCurrentStage().setScene(scene);
+                            switchTheme = new AnimatedThemeSwitcher(getCurrentStage().getScene(), new Animation(new FadeOut()).setSpeed(2.5));
+                            switchTheme.init();
+
+                            //Setting the window title
+                            getCurrentStage().setTitle(language.equals("EN") ? "Main Menu" : language.equals("FR") ? "Menu Principal" : "Meniu Principal");
+                            getCurrentStage().centerOnScreen();
+                        });
+
+                    } catch (IOException | URISyntaxException ignored) {
+                    }
+                };
+                new Thread(appLoad).start();
+            } catch (IOException ignored) {
+            }
+        }
+        else {
+            Alert applicationError = new Alert(Alert.AlertType.ERROR);
+            applicationError.setTitle("Application Error");
+            applicationError.setHeaderText("Severe Application Error!");
+            ButtonType goToGitHub = new ButtonType("Go to GitHub", ButtonBar.ButtonData.LEFT);
+            applicationError.setContentText("The application cannot start because one or more files required for it to run are missing.\nPlease click the \"Go to GitHub\" button below to download the app again and get back on track.");
+            applicationError.getButtonTypes().add(goToGitHub);
+            applicationError.getDialogPane().setMaxWidth(750);
+            Optional<ButtonType> choice = applicationError.showAndWait();
+            if (choice.isPresent() && choice.get() == goToGitHub) {
+                try {
+                    Desktop.getDesktop().browse(new URI("https://github.com/Alin63992/GenderGapAnalyser"));
+                } catch (IOException | URISyntaxException ignored) {}
+            }
+        }
     }
 
     @Override
@@ -909,7 +1006,7 @@ public class Main extends Application implements Initializable {
         try {
             ERALogoImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/ExchangeRate-API-Logo-" + displayMode + ".png")));
         } catch (FileNotFoundException ignored) {}
-        ERALastUpdatedLabel.setText(ERALastUpdatedLabel.getText() + exchangeRateLastUpdated.get(GregorianCalendar.DAY_OF_MONTH) + (exchangeRateLastUpdated.get(GregorianCalendar.MONTH) < 10 ? ".0" : ".") + exchangeRateLastUpdated.get(GregorianCalendar.MONTH) + "." + exchangeRateLastUpdated.get(GregorianCalendar.YEAR));
+        ERALastUpdatedLabel.setText(ERALastUpdatedLabel.getText() + (exchangeRateLastUpdated.get(GregorianCalendar.DAY_OF_MONTH) < 10 ? "0" + exchangeRateLastUpdated.get(GregorianCalendar.DAY_OF_MONTH) : exchangeRateLastUpdated.get(GregorianCalendar.DAY_OF_MONTH)) + (exchangeRateLastUpdated.get(GregorianCalendar.MONTH) < 10 ? ".0" : ".") + exchangeRateLastUpdated.get(GregorianCalendar.MONTH) + "." + exchangeRateLastUpdated.get(GregorianCalendar.YEAR));
 
         //Displaying the discard predictions button if the user generated predictions
         discardPredictionsButton.setVisible(processData.predictionsGenerated);

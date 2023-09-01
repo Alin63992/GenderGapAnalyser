@@ -13,6 +13,7 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.util.List;
 import java.util.*;
@@ -222,11 +223,11 @@ public class DataProcessing {
 
                 //If they are 0, then the peaks weren't found and saved yet, so we proceed with the lookup and memorisation
                 if (peakWomen[0] == 0 && datasetWithPredictions[i][0].equals("Women")) {
-                    peakWomen[0] = Integer.parseInt(datasetWithPredictions[i][1]);
-                    peakWomen[1] = Integer.parseInt(datasetWithPredictions[i][2]);
+                    peakWomen[0] = Double.parseDouble(datasetWithPredictions[i][1]);
+                    peakWomen[1] = Double.parseDouble(datasetWithPredictions[i][2]);
                 } else if (peakMen[0] == 0 && datasetWithPredictions[i][0].equals("Men")) {
-                    peakMen[0] = Integer.parseInt(datasetWithPredictions[i][1]);
-                    peakMen[1] = Integer.parseInt(datasetWithPredictions[i][2]);
+                    peakMen[0] = Double.parseDouble(datasetWithPredictions[i][1]);
+                    peakMen[1] = Double.parseDouble(datasetWithPredictions[i][2]);
                 }
             }
 
@@ -416,7 +417,7 @@ public class DataProcessing {
             //If the evolution period is not over
             if (risingYearsWomen.get(i) != -1) {
                 //If we didn't start formatting the evolution period yet
-                if (tempPeriod.equals("")) {
+                if (tempPeriod.isEmpty()) {
                     //We start the formatted period with the first year of the evolution period
                     tempPeriod = risingYearsWomen.get(i) + " - ";
                     //We calculate the difference between the wage of the first 2 years in the evolution period
@@ -477,7 +478,7 @@ public class DataProcessing {
             //If the evolution period is not over
             if (risingYearsMen.get(i) != -1) {
                 //If we didn't start formatting the evolution period yet
-                if (tempPeriod.equals("")) {
+                if (tempPeriod.isEmpty()) {
                     //We start the formatted period with the first year of the evolution period
                     tempPeriod = risingYearsMen.get(i) + " - ";
                     //We calculate the difference between the wage of the first 2 years in the evolution period
@@ -539,7 +540,7 @@ public class DataProcessing {
             //If the evolution period is not over
             if (dippingYearsPayGap.get(i) != -1) {
                 //If we didn't start formatting the evolution period yet
-                if (tempPeriod.equals("")) {
+                if (tempPeriod.isEmpty()) {
                     //We start the formatted period with the first year of the evolution period
                     tempPeriod = dippingYearsPayGap.get(i) + " - ";
                     //We calculate the difference between the wage gaps of the first 2 years in the evolution period
@@ -788,7 +789,6 @@ public class DataProcessing {
         int biggestSalaryMen = Collections.max(menSalaries).intValue();
         int smallestPayGap = Collections.min(payGapsArray).intValue();
         int biggestPayGap = Collections.max(payGapsArray).intValue();
-        double YAxisUpperBound = 0.0;
         //Transforming the above variables into string for easier manipulation later
         String smallestSalaryEverybodyString = String.valueOf(smallestSalaryEverybody);
         String biggestSalaryEverybodyString = String.valueOf(biggestSalaryEverybody);
@@ -798,6 +798,9 @@ public class DataProcessing {
         String biggestSalaryMenString = String.valueOf(biggestSalaryMen);
         String smallestPayGapString = String.valueOf(smallestPayGap);
         String biggestPayGapString = String.valueOf(biggestPayGap);
+
+        //Creating the Graphs folder if it doesn't exist
+        Files.createDirectories(Paths.get("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs"));
 
         //Generating the plot with all the salaries
         Plot allGendersPlot = Plot.plot(Plot.plotOpts().title(Main.language.equals("EN") ? "Wage Evolution in the United States" : Main.language.equals("FR") ? "Évolution des Salaires dans les États Unis" : "Evoluția Salariilor în Statele Unite").legend(Plot.LegendFormat.BOTTOM)).
@@ -837,7 +840,7 @@ public class DataProcessing {
 
     //Function that creates all the graphs containing specified range in advance for performance boost when displaying, when the user makes different display choices
     //Uses the Plot class created by YuriY Guskov, found at https://github.com/yuriy-g/simple-java-plot
-    public void createSalaryGraphWithinRangeForEverybody(int minimum, int maximum) throws IOException {
+    public void createSalaryGraphWithinRangeForEverybody(int minimum, int maximum) {
         //Separating the dataset into 3 arrays (one with the years, one with men's salaries and one with women's salaries) to use in the plot
         List<Double> years = new ArrayList<>();
         List<Double> womenSalaries = new ArrayList<>();
@@ -903,17 +906,25 @@ public class DataProcessing {
                 yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestPayGapString.length() == 1 ? 0 : smallestPayGap - Integer.parseInt(smallestPayGapString.substring(1)), biggestPayGapString.length() == 1 ? 10 : Math.ceil(biggestPayGap / Math.pow(10, biggestPayGapString.length() - 2)) * Math.pow(10, biggestPayGapString.length() - 2) + (Math.pow(10, biggestPayGapString.length() - 2) / 2))).
                 series(Main.language.equals("EN") ? "Wage gap" : Main.language.equals("FR") ? "Différence de la paye'" : "Diferența între salarii", Plot.data().xy(years, payGapsArray), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.magenta).color(Color.magenta));
         //Saving the plots to be used in the graph display screen
-        allGendersPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-range", "png");
-        allGendersPlotWithGap.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap-range", "png");
-        womenPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/women-range", "png");
-        menPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/men-range", "png");
-        wageGapPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/wageGap-range", "png");
+        try {
+            if (!Files.exists(Paths.get("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs"))) {
+                createSalaryGraphForEverybody();
+                if (Main.processData.predictionsGenerated)
+                    createSalaryGraphWithPredictionsForEverybody();
+            }
+            allGendersPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-range", "png");
+            allGendersPlotWithGap.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap-range", "png");
+            womenPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/women-range", "png");
+            menPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/men-range", "png");
+            wageGapPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/wageGap-range", "png");
+        }
+        catch (IOException ignored) {}
         //Now we can generate 5 graphs - one for men's salaries, one for women's salaries, one for both, one for both that also include the wage gap, and one for the wage gap which include the statistics within the range the user specified - to be displayed according to the user's choice
     }
 
     //Function that creates all the graphs that also contain the generated predictions in advance for performance boost when displaying, when the user makes different display choices
     //Uses the Plot class created by YuriY Guskov, found at https://github.com/yuriy-g/simple-java-plot
-    public void createSalaryGraphWithPredictionsForEverybody() throws IOException {
+    public void createSalaryGraphWithPredictionsForEverybody() {
         double smallestYear = Double.parseDouble(datasetWithPredictions[0][1]);
         double biggestYear = Double.parseDouble(datasetWithPredictions[datasetWithPredictions.length - 1][1]);
         //Separating the dataset into 3 arrays (one with the years, one with men's salaries and one with women's salaries) to use in the plot
@@ -978,17 +989,22 @@ public class DataProcessing {
                 yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestPayGapString.length() == 1 ? 0 : smallestPayGap - Integer.parseInt(smallestPayGapString.substring(1)), biggestPayGapString.length() == 1 ? 10 : Math.ceil(biggestPayGap / Math.pow(10, biggestPayGapString.length() - 2)) * Math.pow(10, biggestPayGapString.length() - 2) + (Math.pow(10, biggestPayGapString.length() - 2) / 2))).
                 series(Main.language.equals("EN") ? "Wage gap" : Main.language.equals("FR") ? "Différence de la paye'" : "Diferența între salarii", Plot.data().xy(years, payGapsArray), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.magenta).color(Color.magenta));
         //Saving the plots to be used in the graph display screen
-        allGendersPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-prediction", "png");
-        allGendersPlotWithGap.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap-prediction", "png");
-        womenPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/women-prediction", "png");
-        menPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/men-prediction", "png");
-        wageGapPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/wageGap-prediction", "png");
+        try {
+            if (!Files.exists(Paths.get("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs")))
+                createSalaryGraphForEverybody();
+            allGendersPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-prediction", "png");
+            allGendersPlotWithGap.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap-prediction", "png");
+            womenPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/women-prediction", "png");
+            menPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/men-prediction", "png");
+            wageGapPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/wageGap-prediction", "png");
+        }
+        catch (IOException ignored) {}
         //Now we can generate 5 graphs - one for men's salaries, one for women's salaries, one for both, one for both that also include the wage gap, and one for the wage gap which include the generated predictions - to be displayed according to the user's choice
     }
 
     //Function that creates all the graphs containing specified range, that include predictions, in advance for performance boost when displaying, when the user makes different display choices
     //Uses the Plot class created by YuriY Guskov, found at https://github.com/yuriy-g/simple-java-plot
-    public void createSalaryGraphWithinRangeWithPredictionsForEverybody(int minimum, int maximum) throws IOException {
+    public void createSalaryGraphWithinRangeWithPredictionsForEverybody(int minimum, int maximum) {
         //Separating the dataset into 3 arrays (one with the years, one with men's salaries and one with women's salaries) to use in the plot
         List<Double> years = new ArrayList<>();
         List<Double> womenSalaries = new ArrayList<>();
@@ -1054,11 +1070,19 @@ public class DataProcessing {
                 yAxis(Main.language.equals("EN") ? "Wage" : Main.language.equals("FR") ? "Salaire" : "Salariu", Plot.axisOpts().range(smallestPayGapString.length() == 1 ? 0 : smallestPayGap - Integer.parseInt(smallestPayGapString.substring(1)), biggestPayGapString.length() == 1 ? 10 : Math.ceil(biggestPayGap / Math.pow(10, biggestPayGapString.length() - 2)) * Math.pow(10, biggestPayGapString.length() - 2) + (Math.pow(10, biggestPayGapString.length() - 2) / 2))).
                 series(Main.language.equals("EN") ? "Wage gap" : Main.language.equals("FR") ? "Différence de la paye'" : "Diferența între salarii", Plot.data().xy(years, payGapsArray), Plot.seriesOpts().marker(Plot.Marker.CIRCLE).markerColor(Color.magenta).color(Color.magenta));
         //Saving the plots to be used in the graph display screen
-        allGendersPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-prediction-range", "png");
-        allGendersPlotWithGap.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap-prediction-range", "png");
-        womenPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/women-prediction-range", "png");
-        menPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/men-prediction-range", "png");
-        wageGapPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/wageGap-prediction-range", "png");
+        try {
+            if (!Files.exists(Paths.get("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs"))) {
+                createSalaryGraphForEverybody();
+                createSalaryGraphWithPredictionsForEverybody();
+                createSalaryGraphWithinRangeForEverybody(minimum, maximum);
+            }
+            allGendersPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-prediction-range", "png");
+            allGendersPlotWithGap.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap-prediction-range", "png");
+            womenPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/women-prediction-range", "png");
+            menPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/men-prediction-range", "png");
+            wageGapPlot.save("src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/wageGap-prediction-range", "png");
+        }
+        catch (IOException ignored) {}
         //Now we can generate 5 graphs - one for men's salaries, one for women's salaries, one for both, one for both that also include the wage gap, and one for the wage gap which include the statistics within the range the user specified and the predictions - to be displayed according to the user's choice
     }
 
@@ -1076,7 +1100,7 @@ public class DataProcessing {
         title.setAlignment(Element.ALIGN_CENTER);
         pdf.add(title);
 
-        //Checking to see what the app's display mode has been set to, so that we can generate a light graph if the app is set to dark mode
+        //Checking  what the app's display mode has been set to, so that we can generate a light graph if the app is set to dark mode
         Image graph;
         if (Main.displayMode.equals("Dark")) {
             //Temporarily setting the displayMode variable to Light so we can generate light backgrounds to be set on light pages
@@ -1155,7 +1179,7 @@ public class DataProcessing {
         //Iterating over the dataset that includes or not the predictions, depending on the case
         for (String[] statistic : predictionsGenerated ? datasetWithPredictions : dataset) {
             //If we have something set in the 4 string variables above
-            if (!year.equals("") && !womanSalary.equals("") && !manSalary.equals("") && !payGap.equals("")) {
+            if (!year.isEmpty() && !womanSalary.isEmpty() && !manSalary.isEmpty() && !payGap.isEmpty()) {
                 //We create a cell for each, containing what each string variable contains
                 PdfPCell yearCell = new PdfPCell(new Phrase(year));
                 //We only set the year's cell background to be different

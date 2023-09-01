@@ -9,7 +9,6 @@ import javafx.scene.image.ImageView;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class SplashStart implements Initializable {
@@ -39,7 +38,7 @@ public class SplashStart implements Initializable {
                 case "FR" -> splashLabel.setText("Analyseur de l'Égalité Entre les Genres");
                 case "RO" -> splashLabel.setText("Analizator al Egalității între Genuri");
             }
-            if (Objects.equals(Main.displayMode, "Dark"))
+            if (Main.displayMode.equals("Dark"))
                 appIconImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/AppIcon-Dark.png")));
             loadingCircleImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/loading-" + Main.displayMode + ".gif")));
         } catch (FileNotFoundException ignored) {}

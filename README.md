@@ -10,6 +10,19 @@ It uses JavaFX in order to have a GUI that's not cluttered and that's easy and p
 ### Changelog
 <ul>
 <li>
+<u>01.09.2023</u><br>
+- Discovered that the folder where evolution graphs are stored, which is empty when the app is not running, wasn't being uploaded to Git, thus preventing the app from starting. Now, if the folder doesn't exist, it is created in the DataProcessing.createSalaryGraphForEverybody() function, since it's the first graph drawing function to be called when the app first starts, thus assuring that the folder exists.<br>
+- Considering the above fix, now the Graphs folder isn't emptied out upon exit anymore, but deleted as a whole instead.<br>
+- The application is now more resilient if something happens to one or all of the graphs or the folder where they're saved. If that happens, the app recreates the folder and the graphs that were drawn up until the point of failure, plus the needed graphs requested by the user. That way, the app is now able to recover from this kind of failure.<br>
+- Fixed a bug that was preventing analyses from being written when a currency other than the USD was being used and predictions were created.<br>
+- Fixed a mistake that allowed the salary column in the statistics table on the evolution graphs screen to change according to the salary's length and not stay fixed to a third of the VBox parent and shorten the salary when predictions were created, thus displaying a horizontal scroll bar below the table and creating visual glitches.<br>
+- Replaced checks of empty strings using <b>equals("")</b> with <b>isEmpty()</b>.<br>
+- Added an application integrity check that checks if the application has all the files needed for it to run, and if not, then an error is shown in the default look and the app start is cancelled.<br>
+- The app now ships without a UserSettings file, and it's generated with the default settings if it doesn't exist (the app will be in English, in dark mode, and will be using USD as the currency). The exchange rates will be updated when the application starts.<br>
+- Removed the unused Google GSON Maven dependency.
+</li>
+<br>
+<li>
 <u>24.08.2023</u> - big update day!<br>
 - Fixed the bug that was preventing the app from starting.<br>
 - Added a new splash screen with the app icon, the app title in English/French/Romanian (according to the user's preferred language) and a spinning wheel animation. The splash screen follows the user's preferred theme. The app now appears on the screen faster while it processes the dataset and prepares everything in the background, so it won't take long to display after starting it on slower systems, and there's something displayed while the data and resources are being prepared.<br>
