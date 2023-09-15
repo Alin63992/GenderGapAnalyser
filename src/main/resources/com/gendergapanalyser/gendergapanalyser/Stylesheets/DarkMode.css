@@ -44,11 +44,11 @@
     -fx-text-fill: white;
 }
 
-.labels {
+.texts {
     -fx-fill: white;
 }
 
-#splashLabel {
+.labels {
     -fx-text-fill: white;
 }
 
@@ -99,12 +99,18 @@
     -fx-text-fill: green;
 }
 
-.scroll-pane {
+.analysisScrollPanes {
     -fx-padding: 10;
     -fx-background: black;
     -fx-border-color: black;
     -fx-text-fill: white;
 }
+#infoBoxScrollPane {
+     -fx-padding: 10;
+     -fx-background: #313131FF;
+     -fx-border-color: #313131FF;
+     -fx-text-fill: white;
+ }
 
 .scroll-bar:vertical {
     -fx-background-color: transparent;
@@ -169,6 +175,18 @@
     -fx-background-color: #4b4b4b;
     -fx-text-fill: white;
     -fx-cursor: hand;
+}
+
+.informationToggles {
+    -fx-background-color: #313131FF;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+.informationToggles:hover {
+    -fx-background-color: #3a3a3a;
+}
+.informationToggles:selected {
+    -fx-text-fill: #0096c9;
 }
 
 .inputs {

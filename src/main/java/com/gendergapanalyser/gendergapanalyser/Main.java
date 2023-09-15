@@ -3,7 +3,6 @@ package com.gendergapanalyser.gendergapanalyser;
 import animatefx.animation.FadeIn;
 import animatefx.animation.FadeOut;
 import animatefx.animation.ZoomIn;
-import animatefx.animation.ZoomOut;
 import eu.iamgio.animated.transition.AnimatedSwitcher;
 import eu.iamgio.animated.transition.AnimatedThemeSwitcher;
 import eu.iamgio.animated.transition.Animation;
@@ -15,6 +14,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -22,18 +22,17 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 
 import java.awt.*;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -41,6 +40,17 @@ import java.util.*;
 
 public class Main extends Application implements Initializable {
     private static Stage currentStage;
+    public ToggleButton sourcesToggle;
+    public ToggleButton creditsToggle;
+    public AnchorPane contentCredits;
+    public Hyperlink USDeptOfLaborHyperlink;
+    public Hyperlink ERAHyperlink;
+    public ImageView appIconCreditsImageView;
+    public ImageView appIconImageView;
+    public Text recoveryLabel;
+    public Text updateLabel;
+    @FXML
+    private AnchorPane contentSources;
     @FXML
     private Hyperlink voidLink;
     @FXML
@@ -88,11 +98,11 @@ public class Main extends Application implements Initializable {
     @FXML
     private AnchorPane dataSources;
     @FXML
-    private Text usDeptOfLaborYearRangeLabel;
+    private Label usDeptOfLaborYearRangeLabel;
     @FXML
     private ImageView ERALogoImageView;
     @FXML
-    private Text ERALastUpdatedLabel;
+    private Label ERALastUpdatedLabel;
     @FXML
     private TextField emailField;
     @FXML
@@ -130,8 +140,8 @@ public class Main extends Application implements Initializable {
     protected static String email = "";
     protected static String outgoingAccountEmail = "";
     protected static String outgoingAccountPassword = "";
+    private boolean fileNotFoundOnGit = false;
     private AnimatedThemeSwitcher switchTheme;
-    private boolean applicationHealthy = true;
 
 
     //Function used to set the currently open window to be used in the future
@@ -196,13 +206,15 @@ public class Main extends Application implements Initializable {
         buildUserSettings.close();
         if (processData.predictionsGenerated) processData.createSalaryGraphWithPredictionsForEverybody();
         processData.createSalaryGraphForEverybody();
-        ERALogoImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/ExchangeRate-API-Logo-" + displayMode + ".png")));
         getCurrentStage().getScene().getStylesheets().setAll(Objects.requireNonNull(getClass().getResource("Stylesheets/" + displayMode + "Mode.css")).toExternalForm());
+        ERALogoImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/ExchangeRate-API-Logo-" + displayMode + ".png")));
         if (displayMode.equals("Dark")) {
+            appIconCreditsImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon-Dark.png")));
             darkModeButtonGlyph.setFitHeight(50);
             lightModeButtonGlyph.setFitHeight(35);
         }
         else {
+            appIconCreditsImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon.png")));
             lightModeButtonGlyph.setFitHeight(50);
             darkModeButtonGlyph.setFitHeight(35);
         }
@@ -216,7 +228,7 @@ public class Main extends Application implements Initializable {
         Stage graphStage = new Stage();
         graphStage.initStyle(StageStyle.UNDECORATED);
         graphStage.setTitle(language.equals("EN") ? "Evolution Graph" : language.equals("FR") ? "Graphe d'Évolution" : "Grafic de Evoluție");
-        graphStage.setScene(new Scene(new FXMLLoader(getClass().getResource("DisplayEvolutionGraph-" + Main.language + ".fxml")).load()));
+        graphStage.setScene(new Scene(new FXMLLoader(getClass().getResource("AppScreens/DisplayEvolutionGraph-" + Main.language + ".fxml")).load()));
         graphStage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
         graphStage.setResizable(false);
         graphStage.centerOnScreen();
@@ -232,7 +244,7 @@ public class Main extends Application implements Initializable {
         // that's going to be shown on the taskbar to the Gender Fluid free icon created by Vitaly Gorbachev,
         // published on the flaticon website
         // (https://www.flaticon.com/free-icon/gender-fluid_3369089?term=gender&related_id=3369089)
-        getCurrentStage().getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/AppIcon.png")));
+        getCurrentStage().getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon.png")));
     }
 
     @FXML
@@ -241,7 +253,7 @@ public class Main extends Application implements Initializable {
         Stage analysisStage = new Stage();
         analysisStage.initStyle(StageStyle.UNDECORATED);
         analysisStage.setTitle(language.equals("EN") ? "Interpretations" : language.equals("FR") ? "Interprétations" : "Interpretări");
-        analysisStage.setScene(new Scene(new FXMLLoader(getClass().getResource("Analysis-" + Main.language + ".fxml")).load()));
+        analysisStage.setScene(new Scene(new FXMLLoader(getClass().getResource("AppScreens/Analysis-" + Main.language + ".fxml")).load()));
         analysisStage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
         analysisStage.setResizable(false);
         analysisStage.centerOnScreen();
@@ -257,13 +269,13 @@ public class Main extends Application implements Initializable {
         // that's going to be shown on the taskbar to the Gender Fluid free icon created by Vitaly Gorbachev,
         // published on the flaticon website
         // (https://www.flaticon.com/free-icon/gender-fluid_3369089?term=gender&related_id=3369089)
-        getCurrentStage().getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/AppIcon.png")));
+        getCurrentStage().getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon.png")));
     }
 
     //Function used to start the routine that creates the PDF that contains the interpretations, graph with all women's salaries, men's salaries and wage gap evolutions and the dataset
     @FXML
     private void generatePDF() throws IOException {
-        loadingCircleImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/loading-" + displayMode + ".gif")));
+        loadingCircleImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/loading-" + displayMode + ".gif")));
         promptAnimator.setChild(new Pane(backgroundOperations));
         darkOverlayAnimator.setChild(new Pane(darkOverlay));
         backgroundOperations.setVisible(true);
@@ -384,11 +396,10 @@ public class Main extends Application implements Initializable {
             int value = Integer.parseInt(predictionField.getText());
             if (value >= 1 && value <= 100) {
                 predictionValue = Integer.parseInt(predictionField.getText());
-                loadingCircleImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/loading-" + displayMode + ".gif")));
+                loadingCircleImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/loading-" + displayMode + ".gif")));
+                predictionPrompt.setVisible(false);
                 promptAnimator.setChild(new Pane(backgroundOperations));
-                darkOverlayAnimator.setChild(new Pane(darkOverlay));
                 backgroundOperations.setVisible(true);
-                darkOverlay.setVisible(true);
                 new Thread(new PredictInBackground()).start();
             } else invalidNumberWarning.setVisible(true);
         } catch (NumberFormatException e) {
@@ -410,8 +421,8 @@ public class Main extends Application implements Initializable {
         languagePicker.setFocusTraversable(false);
         currencyPicker.setFocusTraversable(false);
         discardPredictionsButton.setVisible(false);
-        promptAnimator.setChild(discardConfirmation);
-        darkOverlayAnimator.setChild(darkOverlay);
+        promptAnimator.setChild(new Pane(discardConfirmation));
+        darkOverlayAnimator.setChild(new Pane(darkOverlay));
         discardConfirmation.setVisible(true);
         darkOverlay.setVisible(true);
     }
@@ -428,10 +439,10 @@ public class Main extends Application implements Initializable {
         currencyPicker.setFocusTraversable(true);
         lightModeButton.setFocusTraversable(true);
         darkModeButton.setFocusTraversable(true);
-        discardConfirmation.setVisible(false);
-        darkOverlay.setVisible(false);
         promptAnimator.setChild(null);
         darkOverlayAnimator.setChild(null);
+        discardConfirmation.setVisible(false);
+        darkOverlay.setVisible(false);
     }
 
     //Function used to hide or show the prompt which asks the user for the period of time they need wage prediction for
@@ -534,12 +545,12 @@ public class Main extends Application implements Initializable {
                 // published on the flaticon website
                 // (https://www.flaticon.com/free-icon/question_189665?term=question&page=1&position=11&origin=search&related_id=189665)
                 try {
-                    ((Stage) confirmInclusionOfUserData.getDialogPane().getScene().getWindow()).getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/question.png")));
+                    ((Stage) confirmInclusionOfUserData.getDialogPane().getScene().getWindow()).getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-confirmation.png")));
                 } catch (FileNotFoundException ignored) {
                 }
                 Optional<ButtonType> confirmationResult = confirmInclusionOfUserData.showAndWait();
                 if (confirmationResult.isPresent() && confirmationResult.get() == yesButton) {
-                    loadingCircleImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/loading-" + displayMode + ".gif")));
+                    loadingCircleImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/loading-" + displayMode + ".gif")));
                     promptAnimator.setChild(new Pane(backgroundOperations));
                     darkOverlayAnimator.setChild(new Pane(darkOverlay));
                     backgroundOperations.setVisible(true);
@@ -579,12 +590,12 @@ public class Main extends Application implements Initializable {
                 // published on the flaticon website
                 // (https://www.flaticon.com/free-icon/question_189665?term=question&page=1&position=11&origin=search&related_id=189665)
                 try {
-                    ((Stage) confirmInclusionOfUserData.getDialogPane().getScene().getWindow()).getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/question.png")));
+                    ((Stage) confirmInclusionOfUserData.getDialogPane().getScene().getWindow()).getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-confirmation.png")));
                 } catch (FileNotFoundException ignored) {
                 }
                 Optional<ButtonType> confirmationResult = confirmInclusionOfUserData.showAndWait();
                 if (confirmationResult.isPresent() && confirmationResult.get() == yesButton) {
-                    loadingCircleImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/loading-" + displayMode + ".gif")));
+                    loadingCircleImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/loading-" + displayMode + ".gif")));
                     promptAnimator.setChild(new Pane(backgroundOperations));
                     darkOverlayAnimator.setChild(new Pane(darkOverlay));
                     backgroundOperations.setVisible(true);
@@ -593,16 +604,6 @@ public class Main extends Application implements Initializable {
                 }
             } else invalidOutgoingEmailWarning.setVisible(true);
         }
-    }
-
-    @FXML
-    private void openUSDeptOfLaborWebsite() throws URISyntaxException, IOException {
-        Desktop.getDesktop().browse(new URI("https://www.dol.gov/agencies/wb/data/earnings/median-annual-sex-race-hispanic-ethnicity"));
-    }
-
-    @FXML
-    private void openERAWebsite() throws URISyntaxException, IOException {
-        Desktop.getDesktop().browse(new URI("https://www.exchangerate-api.com/"));
     }
 
     @FXML
@@ -640,376 +641,933 @@ public class Main extends Application implements Initializable {
         }
     }
 
-    @Override
-    public void start(Stage primaryStage) {
-        //Firstly, checking the application health. The if statements' structure follows the folder structure
-        while (applicationHealthy) {
-            //Checking if the resources folder exists and if it contains 1 folder
-            File resourcesFolder = new File("src/main/resources");
-            if (resourcesFolder.exists() && resourcesFolder.listFiles().length == 1) {
-                //Checking if the folder within the resources folder contains 13 objects or more
-                if (new File("src/main/resources/com/gendergapanalyser/gendergapanalyser").listFiles().length >= 13) {
-                    //Checking if the Glyphs folder exists and contains 11 objects
-                    File glyphsFolder = new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs");
-                    if (glyphsFolder.exists() && glyphsFolder.listFiles().length == 11) {
-                        //Checking if the Emojis folder exists and contains 12 PNG icons
-                        File emojisFolder = new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis");
-                        if (emojisFolder.exists() && emojisFolder.listFiles().length == 12 && emojisFolder.listFiles((folder, name) -> name.endsWith(".png")).length == 12) {
-                            applicationHealthy = true;
-                        } else {
-                            applicationHealthy = false;
-                            break;
-                        }
+    @FXML
+    private void openAppIconPage() throws URISyntaxException, IOException {
+        Desktop.getDesktop().browse(new URI("https://www.flaticon.com/free-icon/gender-fluid_3369089?term=gender&related_id=3369089"));
+    }
 
-                        //Checking if the rest of the 10 objects of the Glyphs folder are divided into 8 PNGs and 2 GIFs
-                        if (glyphsFolder.listFiles((folder, name) -> name.endsWith(".png")).length == 8 && glyphsFolder.listFiles((folder, name) -> name.endsWith(".gif")).length == 2) {
-                            applicationHealthy = true;
-                        } else {
-                            applicationHealthy = false;
-                            break;
-                        }
-                    } else {
-                        applicationHealthy = false;
-                        break;
+    @FXML
+    private void openMSEmojipediaPage() throws URISyntaxException, IOException {
+        Desktop.getDesktop().browse(new URI("https://emojipedia.org/microsoft"));
+    }
+
+    private boolean checkAndRecover() {
+        System.out.println("Beginning application integrity check...");
+        //Checking if the resources folder exists
+        if (new File("src/main/resources/com/gendergapanalyser/gendergapanalyser").exists()) {
+            //String variable where the root of the GitHub link is stored for easier download
+            String githubRoot = "https://raw.githubusercontent.com/Alin63992/GenderGapAnalyser/master/src/main/resources/com/gendergapanalyser/gendergapanalyser/";
+
+            //Checking if the App Screens folder exists
+            File appScreensFolder = new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens");
+            if (appScreensFolder.exists()) {
+                //Checking if each file that should exist here does exist, and if not, trying to download it
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-EN.fxml"))) {
+                    recoveryLabel.setVisible(true);
+                    try {
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/SplashScreen-EN.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-EN.fxml"), 500, 2000);
+                    } catch (IOException e) {
+                        if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                        return false;
                     }
-
-                    //Checking if the Stylesheets folder exists and if it contains only 2 CSS files and nothing more
-                    File stylesheetsFolder = new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets");
-                    if (stylesheetsFolder.exists() && stylesheetsFolder.listFiles().length == 2 && stylesheetsFolder.listFiles((folder, name) -> name.endsWith(".css")).length == 2) {
-                        applicationHealthy = true;
-                    } else {
-                        applicationHealthy = false;
-                        break;
+                }
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-FR.fxml"))) {
+                    recoveryLabel.setVisible(true);
+                    try {
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/SplashScreen-FR.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-FR.fxml"), 500, 2000);
+                    } catch (IOException e) {
+                        if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                        return false;
                     }
-
-                    //Checking if the fallback dataset CSV file exists
-                    if (new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/FallbackDataset.csv").exists()) {
-                        applicationHealthy = true;
-                    } else {
-                        applicationHealthy = false;
-                        break;
+                }
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-RO.fxml"))) {
+                    recoveryLabel.setVisible(true);
+                    try {
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/SplashScreen-RO.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-RO.fxml"), 500, 2000);
+                    } catch (IOException e) {
+                        if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                        return false;
                     }
+                }
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-EN.fxml"))) {
+                    recoveryLabel.setVisible(true);
+                    try {
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/MainMenu-EN.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-EN.fxml"), 500, 2000);
+                    } catch (IOException e) {
+                        if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                        return false;
+                    }
+                }
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-FR.fxml"))) {
+                    recoveryLabel.setVisible(true);
+                    try {
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/MainMenu-FR.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-FR.fxml"), 500, 2000);
+                    } catch (IOException e) {
+                        if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                        return false;
+                    }
+                }
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-RO.fxml"))) {
+                    recoveryLabel.setVisible(true);
+                    try {
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/MainMenu-RO.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-RO.fxml"), 500, 2000);
+                    } catch (IOException e) {
+                        if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                        return false;
+                    }
+                }
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-EN.fxml"))) {
+                    recoveryLabel.setVisible(true);
+                    try {
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/DisplayEvolutionGraph-EN.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-EN.fxml"), 500, 2000);
+                    } catch (IOException e) {
+                        if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                        return false;
+                    }
+                }
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-FR.fxml"))) {
+                    recoveryLabel.setVisible(true);
+                    try {
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/DisplayEvolutionGraph-FR.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-FR.fxml"), 500, 2000);
+                    } catch (IOException e) {
+                        if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                        return false;
+                    }
+                }
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-RO.fxml"))) {
+                    recoveryLabel.setVisible(true);
+                    try {
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/DisplayEvolutionGraph-RO.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-RO.fxml"), 500, 2000);
+                    } catch (IOException e) {
+                        if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                        return false;
+                    }
+                }
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-EN.fxml"))) {
+                    recoveryLabel.setVisible(true);
+                    try {
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/Analysis-EN.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-EN.fxml"), 500, 2000);
+                    } catch (IOException e) {
+                        if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                        return false;
+                    }
+                }
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-FR.fxml"))) {
+                    recoveryLabel.setVisible(true);
+                    try {
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/Analysis-FR.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-FR.fxml"), 500, 2000);
+                    } catch (IOException e) {
+                        if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                        return false;
+                    }
+                }
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-RO.fxml"))) {
+                    recoveryLabel.setVisible(true);
+                    try {
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/Analysis-RO.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-RO.fxml"), 500, 2000);
+                    } catch (IOException e) {
+                        if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                        return false;
+                    }
+                }
+            } else {
+                recoveryLabel.setVisible(true);
+                try {
+                    //Creating the App Screens folder and downloading all the files that should be in it
+                    Files.createDirectories(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens"));
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/SplashScreen-EN.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-EN.fxml"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/SplashScreen-FR.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-FR.fxml"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/SplashScreen-RO.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-RO.fxml"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/MainMenu-EN.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-EN.fxml"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/MainMenu-FR.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-FR.fxml"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/MainMenu-RO.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-RO.fxml"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/DisplayEvolutionGraph-EN.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-EN.fxml"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/DisplayEvolutionGraph-FR.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-FR.fxml"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/DisplayEvolutionGraph-RO.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-RO.fxml"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/Analysis-EN.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-EN.fxml"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/Analysis-FR.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-FR.fxml"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/Analysis-RO.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-RO.fxml"), 500, 2000);
+                } catch (IOException e) {
+                    if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                    return false;
+                }
+            }
 
-                    //Checking if there are 10 FXML files and if they are divided into 3 files for each of the app's
-                    // screen (Main menu, interpretations, evolution graph) - each in 3 languages - and one for the
-                    // splash screen
-                    File FXMLFiles = new File("src/main/resources/com/gendergapanalyser/gendergapanalyser");
-                    if (FXMLFiles.listFiles((folder, name) -> name.endsWith(".fxml")).length == 10) {
-                        if (Files.exists(Path.of(FXMLFiles.getAbsolutePath() + "/SplashScreen.fxml")) && FXMLFiles.listFiles((folder, name) -> name.startsWith("MainMenu-")).length == 3 && FXMLFiles.listFiles((folder, name) -> name.startsWith("DisplayEvolutionGraph-")).length == 3 && FXMLFiles.listFiles((folder, name) -> name.startsWith("Analysis-")).length == 3) {
-                            applicationHealthy = true;
-                        } else {
-                            applicationHealthy = false;
-                            break;
+            //Checking if the Glyphs folder exists
+            File glyphsFolder = new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs");
+            if (glyphsFolder.exists()) {
+                //Checking if the Emojis folder exists
+                File emojisFolder = new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis");
+                if (emojisFolder.exists()) {
+                    //Checking if each file that should exist here does exist, and if not, trying to download it
+                    if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Black_Rightwards_Arrow.png"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Black_Rightwards_Arrow.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Black_Rightwards_Arrow.png"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
                         }
-                    } else {
-                        applicationHealthy = false;
-                        break;
+                    }
+                    if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Black_Sun_with_Rays.png"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Black_Sun_with_Rays.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Black_Sun_with_Rays.png"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
+                        }
+                    }
+                    if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Calendar.png"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Calendar.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Calendar.png"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
+                        }
+                    }
+                    if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Chart_with_Upwards_Trend.png"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Chart_with_Upwards_Trend.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Chart_with_Upwards_Trend.png"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
+                        }
+                    }
+                    if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Crescent_Moon.png"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Crescent_Moon.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Crescent_Moon.png"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
+                        }
+                    }
+                    if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Crystal_Ball.png"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Crystal_Ball.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Crystal_Ball.png"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
+                        }
+                    }
+                    if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/E-Mail_Symbol.png"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/E-Mail_Symbol.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/E-Mail_Symbol.png"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
+                        }
+                    }
+                    if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Female_Sign.png"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Female_Sign.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Female_Sign.png"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
+                        }
+                    }
+                    if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Globe_with_Meridians.png"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Globe_with_Meridians.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Globe_with_Meridians.png"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
+                        }
+                    }
+                    if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Information_Source.png"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Information_Source.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Information_Source.png"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
+                        }
+                    }
+                    if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Leftwards_Black_Arrow.png"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Leftwards_Black_Arrow.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Leftwards_Black_Arrow.png"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
+                        }
+                    }
+                    if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Male_Sign.png"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Male_Sign.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Male_Sign.png"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
+                        }
+                    }
+                    if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Memo.png"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Memo.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Memo.png"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
+                        }
+                    }
+                    if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Page_Facing_Up.png"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Page_Facing_Up.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Page_Facing_Up.png"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
+                        }
                     }
                 } else {
-                    applicationHealthy = false;
-                    break;
-                }
-                break;
-            } else applicationHealthy = false;
-        }
-        if (applicationHealthy) {
-            try {
-                //Loading user settings (display mode and app language) from the UserSettings.txt file
-                try {
-                    BufferedReader loadUserSettings = new BufferedReader(new FileReader("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
-                    String setting;
-                    while ((setting = loadUserSettings.readLine()) != null) {
-                        String[] settingParts = setting.split("=");
-                        switch (settingParts[0]) {
-                            case "DisplayMode" -> displayMode = settingParts[1];
-                            case "Language" -> language = settingParts[1];
-                            case "Currency" -> currency = settingParts[1];
-                            case "ExchangeRateLastUpdated" -> {
-                                exchangeRateLastUpdated.set(GregorianCalendar.DAY_OF_MONTH, Integer.parseInt(settingParts[1].split("\\.")[0]));
-                                exchangeRateLastUpdated.set(GregorianCalendar.MONTH, Integer.parseInt(settingParts[1].split("\\.")[1]));
-                                exchangeRateLastUpdated.set(GregorianCalendar.YEAR, Integer.parseInt(settingParts[1].split("\\.")[2]));
-                            }
-                            case "ExchangeRateToEUR" -> exchangeRateEUR = Double.parseDouble(settingParts[1]);
-                            case "ExchangeRateToRON" -> exchangeRateRON = Double.parseDouble(settingParts[1]);
-                        }
-                    }
-                    loadUserSettings.close();
-                } catch (IOException e) {
-                    exchangeRateLastUpdated.add(GregorianCalendar.DAY_OF_MONTH, -2);
-                    BufferedWriter buildUserSettings = new BufferedWriter(new FileWriter("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
-                    buildUserSettings.write("DisplayMode=" + displayMode + "\nLanguage=" + language + "\nCurrency=" + currency + "\nExchangeRateLastUpdated=" + exchangeRateLastUpdated.get(Calendar.DAY_OF_MONTH) + "." + exchangeRateLastUpdated.get(Calendar.MONTH) + "." + exchangeRateLastUpdated.get(Calendar.YEAR) + "\nExchangeRateToEUR=" + exchangeRateEUR + "\nExchangeRateToRON=" + exchangeRateRON);
-                    buildUserSettings.close();
-                }
-
-                //Setting the primary stage so that other controllers can use it to display what they need displayed
-                setCurrentStage(primaryStage);
-                getCurrentStage().initStyle(StageStyle.UNDECORATED);
-
-                //Setting the splash screen to be shown on the application window
-                getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("SplashScreen.fxml")).load()));
-                getCurrentStage().getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + displayMode + "Mode.css")).toExternalForm());
-
-                //Setting the app icon that's going to be shown on the taskbar to the Gender Fluid free icon created by Vitaly Gorbachev, published on the flaticon website (https://www.flaticon.com/free-icon/gender-fluid_3369089?term=gender&related_id=3369089)
-                getCurrentStage().getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/AppIcon.png")));
-
-                //Setting the window title
-                getCurrentStage().setTitle("Gender Gap Analyser");
-                getCurrentStage().centerOnScreen();
-
-                //Setting the window to be not resizable
-                getCurrentStage().setResizable(false);
-
-                //Opening the window
-                getCurrentStage().show();
-
-                Runnable appLoad = () -> {
+                    recoveryLabel.setVisible(true);
                     try {
-                        //Trying to download the dataset file from the U.S. Department of Labor server
-                        downloadDataset.start();
-
-                        //Checking  if a day has passed since last downloading exchange rates
-                        exchangeRateLastUpdated.add(GregorianCalendar.DAY_OF_MONTH, 1);
-                        //If a day did pass
-                        if (exchangeRateLastUpdated.get(GregorianCalendar.DAY_OF_MONTH) < LocalDate.now().getDayOfMonth() || exchangeRateLastUpdated.get(GregorianCalendar.MONTH) <= LocalDate.now().getMonthValue() || exchangeRateLastUpdated.get(GregorianCalendar.YEAR) <= LocalDate.now().getYear()) {
-                            //Preparing to connect to the ExchangeRate-API to obtain new exchange rates
-                            HttpURLConnection connection = (HttpURLConnection) new URI("https://v6.exchangerate-api.com/v6/9a9fc15f7944c0cb9bf532a8/latest/USD").toURL().openConnection();
-                            connection.setConnectTimeout(500);
-                            connection.setReadTimeout(1000);
-                            connection.addRequestProperty("User-Agent", "Mozilla/5.0");
-                            //Attempting to connect (hoping that the computer is connected to the internet)
-                            try {
-                                connection.connect();
-                                //Saving the JSON response
-                                BufferedReader br = new BufferedReader(new InputStreamReader((InputStream) (connection.getResponseCode() == 200 ? connection.getContent() : connection.getErrorStream())));
-                                ArrayList<String> json = new ArrayList<>();
-                                String output;
-                                while ((output = br.readLine()) != null)
-                                    json.add(output);
-                                if (json.size() > 1 && json.get(1).contains("\"result\":\"success\"")) {
-                                    for (String jsonPart : json) {
-                                        if (jsonPart.contains("\"EUR\""))
-                                            exchangeRateEUR = Double.parseDouble(jsonPart.split(":")[1].substring(0, jsonPart.split(":")[1].length() - 1));
-                                        else if (jsonPart.contains("\"RON\"")) {
-                                            exchangeRateRON = Double.parseDouble(jsonPart.split(":")[1].substring(0, jsonPart.split(":")[1].length() - 1));
-                                            break;
-                                        }
-                                    }
-                                    //Setting the current date as the date of last update
-                                    exchangeRateLastUpdated.set(GregorianCalendar.DAY_OF_MONTH, LocalDate.now().getDayOfMonth());
-                                    exchangeRateLastUpdated.set(GregorianCalendar.MONTH, LocalDate.now().getMonthValue());
-                                    exchangeRateLastUpdated.set(GregorianCalendar.YEAR, LocalDate.now().getYear());
-
-                                    //Rebuilding the user settings file with the new currency values
-                                    BufferedWriter buildUserSettings = new BufferedWriter(new FileWriter("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
-                                    buildUserSettings.write("DisplayMode=" + displayMode + "\nLanguage=" + language + "\nCurrency=" + currency + "\nExchangeRateLastUpdated=" + exchangeRateLastUpdated.get(Calendar.DAY_OF_MONTH) + "." + exchangeRateLastUpdated.get(Calendar.MONTH) + "." + exchangeRateLastUpdated.get(Calendar.YEAR) + "\nExchangeRateToEUR=" + exchangeRateEUR + "\nExchangeRateToRON=" + exchangeRateRON);
-                                    buildUserSettings.close();
-                                }
-                            } catch (IOException ignored) {
-                            }
-                        } else {
-                            //Reverting the change made to the date so that the application does not use the wrong date
-                            exchangeRateLastUpdated.add(GregorianCalendar.DAY_OF_MONTH, -1);
-                        }
-
-                        //Preparing the dataset and creating the plots
-                        processData = new DataProcessing();
-                        processData.prepareData();
-
-                        //Switching to the main menu page because the app loading is done
-                        Platform.runLater(() -> {
-                            AnimatedSwitcher as = new AnimatedSwitcher();
-                            as.setIn(new Animation(new ZoomIn()).setSpeed(1.3));
-                            Scene scene = new Scene(new Pane(as));
-                            scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
-                            as.of(Main.getCurrentStage().getScene().getRoot());
-                            try {
-                                as.setChild(new FXMLLoader(getClass().getResource("MainMenu-" + Main.language + ".fxml")).load());
-                            } catch (IOException ignored) {
-                            }
-                            getCurrentStage().setScene(scene);
-                            switchTheme = new AnimatedThemeSwitcher(getCurrentStage().getScene(), new Animation(new FadeOut()).setSpeed(2.5));
-                            switchTheme.init();
-
-                            //Setting the window title
-                            getCurrentStage().setTitle(language.equals("EN") ? "Main Menu" : language.equals("FR") ? "Menu Principal" : "Meniu Principal");
-                            getCurrentStage().centerOnScreen();
-                        });
-
-                    } catch (IOException | URISyntaxException ignored) {
+                        //Creating the Glyphs/Emojis folder and downloading all the files that should be in it
+                        Files.createDirectories(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/"));
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Black_Rightwards_Arrow.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Black_Rightwards_Arrow.png"), 500, 2000);
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Black_Sun_with_Rays.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Black_Sun_with_Rays.png"), 500, 2000);
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Calendar.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Calendar.png"), 500, 2000);
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Chart_with_Upwards_Trend.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Chart_with_Upwards_Trend.png"), 500, 2000);
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Crescent_Moon.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Crescent_Moon.png"), 500, 2000);
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Crystal_Ball.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Crystal_Ball.png"), 500, 2000);
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/E-Mail_Symbol.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/E-Mail_Symbol.png"), 500, 2000);
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Female_Sign.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Female_Sign.png"), 500, 2000);
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Globe_with_Meridians.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Globe_with_Meridians.png"), 500, 2000);
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Information_Source.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Information_Source.png"), 500, 2000);
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Leftwards_Black_Arrow.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Leftwards_Black_Arrow.png"), 500, 2000);
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Male_Sign.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Male_Sign.png"), 500, 2000);
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Memo.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Memo.png"), 500, 2000);
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Page_Facing_Up.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Page_Facing_Up.png"), 500, 2000);
+                    } catch (IOException e) {
+                        if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                        return false;
                     }
-                };
-                new Thread(appLoad).start();
-            } catch (IOException ignored) {
-            }
-        }
-        else {
-            Alert applicationError = new Alert(Alert.AlertType.ERROR);
-            applicationError.setTitle("Application Error");
-            applicationError.setHeaderText("Severe Application Error!");
-            ButtonType goToGitHub = new ButtonType("Go to GitHub", ButtonBar.ButtonData.LEFT);
-            applicationError.setContentText("The application cannot start because one or more files required for it to run are missing.\nPlease click the \"Go to GitHub\" button below to download the app again and get back on track.");
-            applicationError.getButtonTypes().add(goToGitHub);
-            applicationError.getDialogPane().setMaxWidth(750);
-            Optional<ButtonType> choice = applicationError.showAndWait();
-            if (choice.isPresent() && choice.get() == goToGitHub) {
+                }
+
+                //Checking if the Miscellaneous folder exists
+                File miscellaneousFolder = new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous");
+                if (miscellaneousFolder.exists()) {
+                    //Checking if each file that should exist here does exist, and if not, trying to download it
+                    if (!Arrays.stream(miscellaneousFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-confirmation.png"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/alert-confirmation.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-confirmation.png"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
+                        }
+                    }
+                    if (!Arrays.stream(miscellaneousFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-error.png"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/alert-error.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-error.png"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
+                        }
+                    }
+                    if (!Arrays.stream(miscellaneousFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-information.png"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/alert-information.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-information.png"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
+                        }
+                    }
+                    if (!Arrays.stream(miscellaneousFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon.png"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/AppIcon.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon.png"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
+                        }
+                    }
+                    if (!Arrays.stream(miscellaneousFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon-Dark.png"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/AppIcon-Dark.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon-Dark.png"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
+                        }
+                    }
+                    if (!Arrays.stream(miscellaneousFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/ExchangeRate-API-Logo-Dark.png"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/ExchangeRate-API-Logo-Dark.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/ExchangeRate-API-Logo-Dark.png"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
+                        }
+                    }
+                    if (!Arrays.stream(miscellaneousFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/ExchangeRate-API-Logo-Light.png"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/ExchangeRate-API-Logo-Light.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/ExchangeRate-API-Logo-Light.png"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
+                        }
+                    }
+                    if (!Arrays.stream(miscellaneousFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/loading-Dark.gif"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/loading-Dark.gif").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/loading-Dark.gif"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
+                        }
+                    }
+                    if (!Arrays.stream(miscellaneousFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/loading-Light.gif"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/loading-Light.gif").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/loading-Light.gif"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
+                        }
+                    }
+                    if (!Arrays.stream(miscellaneousFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/US-Dept-of-Labor-Logo.png"))) {
+                        recoveryLabel.setVisible(true);
+                        try {
+                            FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/US-Dept-of-Labor-Logo.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/US-Dept-of-Labor-Logo.png"), 500, 2000);
+                        } catch (IOException e) {
+                            if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                            return false;
+                        }
+                    }
+                } else {
+                    recoveryLabel.setVisible(true);
+                    try {
+                        //Creating the Glyphs/Miscellaneous folder and downloading all the files that should be in it
+                        Files.createDirectories(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous"));
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/alert-confirmation.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-confirmation.png"), 500, 2000);
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/alert-error.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-error.png"), 500, 2000);
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/alert-information.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-information.png"), 500, 2000);
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/AppIcon.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon.png"), 500, 2000);
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/AppIcon-Dark.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon-Dark.png"), 500, 2000);
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/ExchangeRate-API-Logo-Dark.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/ExchangeRate-API-Logo-Dark.png"), 500, 2000);
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/ExchangeRate-API-Logo-Light.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/ExchangeRate-API-Logo-Light.png"), 500, 2000);
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/loading-Dark.gif").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/loading-Dark.gif"), 500, 2000);
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/loading-Light.gif").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/loading-Light.gif"), 500, 2000);
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/US-Dept--of-Labor-Logo.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/US-Dept--of-Labor-Logo.png"), 500, 2000);
+                    } catch (IOException e) {
+                        if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                        return false;
+                    }
+                }
+            } else {
+                recoveryLabel.setVisible(true);
                 try {
-                    Desktop.getDesktop().browse(new URI("https://github.com/Alin63992/GenderGapAnalyser"));
-                } catch (IOException | URISyntaxException ignored) {}
+                    //Creating the Glyphs and the Miscellaneous folder and downloading all the files that should be in it
+                    Files.createDirectories(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous"));
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/alert-confirmation.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-confirmation.png"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/alert-error.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-error.png"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/alert-information.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-information.png"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/AppIcon.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon.png"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/AppIcon-Dark.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon-Dark.png"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/ExchangeRate-API-Logo-Dark.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/ExchangeRate-API-Logo-Dark.png"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/ExchangeRate-API-Logo-Light.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/ExchangeRate-API-Logo-Light.png"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/loading-Dark.gif").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/loading-Dark.gif"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/loading-Light.gif").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/loading-Light.gif"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/US-Dept--of-Labor-Logo.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/US-Dept--of-Labor-Logo.png"), 500, 2000);
+                    //Creating the Glyphs/Emojis folder and downloading the PNGs that are in it
+                    Files.createDirectories(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/"));
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Black_Rightwards_Arrow.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Black_Rightwards_Arrow.png"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Black_Sun_with_Rays.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Black_Sun_with_Rays.png"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Calendar.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Calendar.png"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Chart_with_Upwards_Trend.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Chart_with_Upwards_Trend.png"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Crescent_Moon.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Crescent_Moon.png"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Crystal_Ball.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Crystal_Ball.png"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/E-Mail_Symbol.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/E-Mail_Symbol.png"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Female_Sign.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Female_Sign.png"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Globe_with_Meridians.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Globe_with_Meridians.png"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Information_Source.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Information_Source.png"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Leftwards_Black_Arrow.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Leftwards_Black_Arrow.png"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Male_Sign.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Male_Sign.png"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Memo.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Memo.png"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Page_Facing_Up.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Page_Facing_Up.png"), 500, 2000);
+                } catch (IOException e) {
+                    if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                    return false;
+                }
+            }
+
+            //Checking if the Stylesheets folder exists
+            File stylesheetsFolder = new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets");
+            if (stylesheetsFolder.exists()) {
+                //Checking if each file that should exist here does exist, and if not, trying to download it
+                if (!Arrays.stream(stylesheetsFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets/DarkMode.css"))) {
+                    recoveryLabel.setVisible(true);
+                    try {
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Stylesheets/DarkMode.css").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets/DarkMode.css"), 500, 2000);
+                    } catch (IOException e) {
+                        if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                        return false;
+                    }
+                }
+                if (!Arrays.stream(stylesheetsFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets/LightMode.css"))) {
+                    recoveryLabel.setVisible(true);
+                    try {
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Stylesheets/LightMode.css").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets/LightMode.css"), 500, 2000);
+                    } catch (IOException e) {
+                        if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                        return false;
+                    }
+                }
+            } else {
+                recoveryLabel.setVisible(true);
+                try {
+                    //Creating the Stylesheets folder and downloading all the files that should be in it
+                    Files.createDirectories(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets"));
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Stylesheets/DarkMode.css").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets/DarkMode.css"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "Stylesheets/LightMode.css").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Stylesheets/LightMode.css"), 500, 2000);
+                } catch (IOException e) {
+                    if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                    return false;
+                }
+            }
+
+            //Checking if the fallback dataset CSV file exists, and if not, trying to download it
+            if (!new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/FallbackDataset.csv").exists()) {
+                recoveryLabel.setVisible(true);
+                try {
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "FallbackDataset.csv").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/FallbackDataset.csv"), 500, 10000);
+                } catch (IOException e) {
+                    if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
+                    return false;
+                }
             }
         }
+        return true;
+    }
+
+    @Override
+    public void start(Stage primaryStage) {
+        Runnable appLoad = () -> {
+            try {
+                if (checkAndRecover()) {
+                    System.out.println("Application integrity check complete. Application is healthy, and it can start.");
+                    //Trying to download the dataset file from the U.S. Department of Labor server
+                    downloadDataset.start();
+
+                    //Checking  if a day has passed since last downloading exchange rates
+                    exchangeRateLastUpdated.add(GregorianCalendar.DAY_OF_MONTH, 1);
+                    //If a day did pass
+                    if (exchangeRateLastUpdated.get(GregorianCalendar.DAY_OF_MONTH) < LocalDate.now().getDayOfMonth() || exchangeRateLastUpdated.get(GregorianCalendar.MONTH) <= LocalDate.now().getMonthValue() || exchangeRateLastUpdated.get(GregorianCalendar.YEAR) <= LocalDate.now().getYear()) {
+                        //Preparing to connect to the ExchangeRate-API to obtain new exchange rates
+                        HttpURLConnection connection = (HttpURLConnection) new URI("https://v6.exchangerate-api.com/v6/9a9fc15f7944c0cb9bf532a8/latest/USD").toURL().openConnection();
+                        connection.setConnectTimeout(500);
+                        connection.setReadTimeout(1000);
+                        connection.addRequestProperty("User-Agent", "Mozilla/5.0");
+                        //Attempting to connect (hoping that the computer is connected to the internet)
+                        try {
+                            connection.connect();
+                            //Saving the JSON response
+                            BufferedReader br = new BufferedReader(new InputStreamReader((InputStream) (connection.getResponseCode() == 200 ? connection.getContent() : connection.getErrorStream())));
+                            ArrayList<String> json = new ArrayList<>();
+                            String output;
+                            while ((output = br.readLine()) != null)
+                                json.add(output);
+                            if (json.size() > 1 && json.get(1).contains("\"result\":\"success\"")) {
+                                for (String jsonPart : json) {
+                                    if (jsonPart.contains("\"EUR\""))
+                                        exchangeRateEUR = Double.parseDouble(jsonPart.split(":")[1].substring(0, jsonPart.split(":")[1].length() - 1));
+                                    else if (jsonPart.contains("\"RON\"")) {
+                                        exchangeRateRON = Double.parseDouble(jsonPart.split(":")[1].substring(0, jsonPart.split(":")[1].length() - 1));
+                                        break;
+                                    }
+                                }
+                                //Setting the current date as the date of last update
+                                exchangeRateLastUpdated.set(GregorianCalendar.DAY_OF_MONTH, LocalDate.now().getDayOfMonth());
+                                exchangeRateLastUpdated.set(GregorianCalendar.MONTH, LocalDate.now().getMonthValue());
+                                exchangeRateLastUpdated.set(GregorianCalendar.YEAR, LocalDate.now().getYear());
+
+                                //Rebuilding the user settings file with the new currency values
+                                BufferedWriter buildUserSettings = new BufferedWriter(new FileWriter("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
+                                buildUserSettings.write("DisplayMode=" + displayMode + "\nLanguage=" + language + "\nCurrency=" + currency + "\nExchangeRateLastUpdated=" + exchangeRateLastUpdated.get(Calendar.DAY_OF_MONTH) + "." + exchangeRateLastUpdated.get(Calendar.MONTH) + "." + exchangeRateLastUpdated.get(Calendar.YEAR) + "\nExchangeRateToEUR=" + exchangeRateEUR + "\nExchangeRateToRON=" + exchangeRateRON);
+                                buildUserSettings.close();
+                            }
+                        } catch (IOException ignored) {}
+                    } else {
+                        //Reverting the change made to the date so that the application does not use the wrong date
+                        exchangeRateLastUpdated.add(GregorianCalendar.DAY_OF_MONTH, -1);
+                    }
+
+                    //Preparing the dataset and creating the plots
+                    processData = new DataProcessing();
+                    processData.prepareData();
+
+                    //Switching to the main menu page because the app loading is done
+                    Platform.runLater(() -> {
+                        //Setting the window title
+                        getCurrentStage().setTitle(language.equals("EN") ? "Main Menu" : language.equals("FR") ? "Menu Principal" : "Meniu Principal");
+                        AnimatedSwitcher as = new AnimatedSwitcher();
+                        as.setIn(new Animation(new ZoomIn()).setSpeed(1.3));
+                        Scene scene = new Scene(new Pane(as));
+                        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
+                        as.of(Main.getCurrentStage().getScene().getRoot());
+                        try {
+                            as.setChild(new FXMLLoader(getClass().getResource("AppScreens/MainMenu-" + Main.language + ".fxml")).load());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        getCurrentStage().setScene(scene);
+                        switchTheme = new AnimatedThemeSwitcher(getCurrentStage().getScene(), new Animation(new FadeOut()).setSpeed(2.5));
+                        switchTheme.init();
+                        getCurrentStage().centerOnScreen();
+                    });
+                }
+                else {
+                    System.out.println("Application integrity check complete. Application is missing essential files! Startup aborted!");
+                    Platform.runLater(() -> {
+                        Alert applicationError = new Alert(Alert.AlertType.ERROR);
+                        applicationError.setTitle("Application Error");
+                        applicationError.setHeaderText("Severe Application Error!");
+                        if (!new File("src/main/resources/com/gendergapanalyser/gendergapanalyser").exists() || fileNotFoundOnGit) {
+                            ButtonType goToGitHub = new ButtonType("Go to GitHub", ButtonBar.ButtonData.LEFT);
+                            applicationError.setContentText("The application cannot start because one or more files required for it to run are missing and online recovery is impossible because " + (fileNotFoundOnGit ? "the missing files were not found on GitHub" : "the application's internal folder structure is broken") + ".\nPlease click the \"Go to GitHub\" button below to download the app again and get back on track.");
+                            applicationError.getButtonTypes().add(goToGitHub);
+                            applicationError.getDialogPane().setMaxWidth(750);
+                            Optional<ButtonType> choice = applicationError.showAndWait();
+                            if (choice.isPresent() && choice.get() == goToGitHub) {
+                                try {
+                                    Desktop.getDesktop().browse(new URI("https://github.com/Alin63992/GenderGapAnalyser"));
+                                } catch (IOException | URISyntaxException ignored) {
+                                }
+                            }
+                        }
+                        else {
+                            applicationError.setContentText("The application cannot start because one or more files required for it to run are missing and they couldn't be downloaded right now.\nPlease check that you're connected to the internet or wait for a few minutes and start the application again.");
+                            applicationError.show();
+                        }
+                    });
+                }
+            } catch (IOException | URISyntaxException ignored) {}
+        };
+        try {
+            //Loading user settings (display mode and app language) from the UserSettings.txt file
+            try {
+                BufferedReader loadUserSettings = new BufferedReader(new FileReader("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
+                String setting;
+                while ((setting = loadUserSettings.readLine()) != null) {
+                    String[] settingParts = setting.split("=");
+                    switch (settingParts[0]) {
+                        case "DisplayMode" -> displayMode = settingParts[1];
+                        case "Language" -> language = settingParts[1];
+                        case "Currency" -> currency = settingParts[1];
+                        case "ExchangeRateLastUpdated" -> {
+                            exchangeRateLastUpdated.set(GregorianCalendar.DAY_OF_MONTH, Integer.parseInt(settingParts[1].split("\\.")[0]));
+                            exchangeRateLastUpdated.set(GregorianCalendar.MONTH, Integer.parseInt(settingParts[1].split("\\.")[1]));
+                            exchangeRateLastUpdated.set(GregorianCalendar.YEAR, Integer.parseInt(settingParts[1].split("\\.")[2]));
+                        }
+                        case "ExchangeRateToEUR" -> exchangeRateEUR = Double.parseDouble(settingParts[1]);
+                        case "ExchangeRateToRON" -> exchangeRateRON = Double.parseDouble(settingParts[1]);
+                    }
+                }
+                loadUserSettings.close();
+            } catch (IOException e) {
+                //Setting the exchange rate last updated date 2 days back of the current date because, before updating,
+                // a day is added to the last updated day,
+                // so that way,
+                // the date is still behind the current day and the exchange rates are downloaded
+                exchangeRateLastUpdated.add(GregorianCalendar.DAY_OF_MONTH, -2);
+                BufferedWriter buildUserSettings = new BufferedWriter(new FileWriter("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
+                buildUserSettings.write("DisplayMode=" + displayMode + "\nLanguage=" + language + "\nCurrency=" + currency + "\nExchangeRateLastUpdated=" + exchangeRateLastUpdated.get(Calendar.DAY_OF_MONTH) + "." + exchangeRateLastUpdated.get(Calendar.MONTH) + "." + exchangeRateLastUpdated.get(Calendar.YEAR) + "\nExchangeRateToEUR=" + exchangeRateEUR + "\nExchangeRateToRON=" + exchangeRateRON);
+                buildUserSettings.close();
+            }
+
+            //Setting the primary stage so that other controllers can use it to display what they need displayed
+            setCurrentStage(primaryStage);
+            getCurrentStage().initStyle(StageStyle.UNDECORATED);
+
+            //Setting the window title
+            getCurrentStage().setTitle("Gender Gap Analyser");
+
+            //Setting the splash screen to be shown on the application window
+            getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("AppScreens/SplashScreen-" + language + ".fxml")).load()));
+            getCurrentStage().getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + displayMode + "Mode.css")).toExternalForm());
+
+            //Setting the app icon that's going to be shown on the taskbar to the Gender Fluid free icon created by Vitaly Gorbachev, published on the flaticon website (https://www.flaticon.com/free-icon/gender-fluid_3369089?term=gender&related_id=3369089)
+            getCurrentStage().getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon.png")));
+            getCurrentStage().centerOnScreen();
+
+            //Setting the window to be not resizable
+            getCurrentStage().setResizable(false);
+
+            //Opening the window
+            getCurrentStage().show();
+        }
+        catch (IOException e) {
+            if (new File("src/main/resources/com/gendergapanalyser/gendergapanalyser").exists()) {
+                try {
+                    //String variable where the root of the GitHub link is stored for easier download
+                    String githubRoot = "https://raw.githubusercontent.com/Alin63992/GenderGapAnalyser/master/src/main/resources/com/gendergapanalyser/gendergapanalyser/";
+                    //Creating the App Screens folder and downloading all the files that should be in it
+                    Files.createDirectories(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens"));
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/SplashScreen-EN.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-EN.fxml"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/SplashScreen-FR.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-FR.fxml"), 500, 2000);
+                    FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/SplashScreen-RO.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-RO.fxml"), 500, 2000);
+
+                    //Setting the splash screen to be shown on the application window
+                    getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("AppScreens/SplashScreen-" + language + ".fxml")).load()));
+                    getCurrentStage().getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + displayMode + "Mode.css")).toExternalForm());
+
+                    //Setting the app icon that's going to be shown on the taskbar to the Gender Fluid free icon created by Vitaly Gorbachev, published on the flaticon website (https://www.flaticon.com/free-icon/gender-fluid_3369089?term=gender&related_id=3369089)
+                    getCurrentStage().getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon.png")));
+                    getCurrentStage().centerOnScreen();
+
+                    //Setting the window to be not resizable
+                    getCurrentStage().setResizable(false);
+
+                    //Opening the window
+                    getCurrentStage().show();
+
+                    recoveryLabel.setVisible(true);
+                }
+                catch (IOException f) {
+                    Alert applicationError = new Alert(Alert.AlertType.ERROR);
+                    applicationError.setTitle("Application Error");
+                    applicationError.setHeaderText("Severe Application Error!");
+                    if (f instanceof FileNotFoundException) {
+                        ButtonType goToGitHub = new ButtonType("Go to GitHub", ButtonBar.ButtonData.LEFT);
+                        applicationError.setContentText("The application cannot start because one or more files required for it to run are missing and online recovery is impossible because " + (fileNotFoundOnGit ? "the missing files were not found on GitHub" : "the application's internal folder structure is broken") + ".\nPlease click the \"Go to GitHub\" button below to download the app again and get back on track.");
+                        applicationError.getButtonTypes().add(goToGitHub);
+                        applicationError.getDialogPane().setMaxWidth(750);
+                        Optional<ButtonType> choice = applicationError.showAndWait();
+                        if (choice.isPresent() && choice.get() == goToGitHub) {
+                            try {
+                                Desktop.getDesktop().browse(new URI("https://github.com/Alin63992/GenderGapAnalyser"));
+                            } catch (IOException | URISyntaxException ignored) {
+                            }
+                        }
+                    }
+                    else {
+                        applicationError.setContentText("The application cannot start because one or more files required for it to run are missing and they couldn't be downloaded right now.\nPlease check that you're connected to the internet or wait for a few minutes and start the application again.");
+                        applicationError.show();
+                    }
+                }
+            }
+            e.printStackTrace();
+        }
+        new Thread(appLoad).start();
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        promptAnimator.setIn(new Animation(new ZoomIn()).setSpeed(3));
-        promptAnimator.setOut(new Animation(new ZoomOut()).setSpeed(10));
-        darkOverlayAnimator.setIn(new Animation(new FadeIn()).setSpeed(3));
-        darkOverlayAnimator.setOut(new Animation(new ZoomOut()).setSpeed(10));
-        //Making the window movable when dragging the embedded title bar
-        titleBar.setOnMousePressed(event -> {
-            dragX = getCurrentStage().getX() - event.getScreenX();
-            dragY = getCurrentStage().getY() - event.getScreenY();
-        });
-        titleBar.setOnMouseDragged(event -> {
-            getCurrentStage().setX(event.getScreenX() + dragX);
-            getCurrentStage().setY(event.getScreenY() + dragY);
-        });
-
-        //Setting up the language picker
-        languagePicker.setItems(FXCollections.observableArrayList(languages));
-        switch (language) {
-            case "EN" -> {
-                languagePicker.setValue(languages[0]);
-                currencyPicker.setValue(currencies[0]);
-            }
-            case "FR" -> {
-                languagePicker.setValue(languages[1]);
-                currencyPicker.setValue(currencies[1]);
-            }
-            case "RO" -> {
-                languagePicker.setValue(languages[2]);
-                currencyPicker.setValue(currencies[2]);
-            }
-        }
-        //When selecting another language from the language picker...
-        languagePicker.getSelectionModel().selectedIndexProperty().addListener(((observable, oldValue, newValue) -> {
-            //Updating the language with the newly picked one and the currency to the one associated with the language
-            language = languagesShort[newValue.intValue()];
-            currency = currencies[newValue.intValue()];
-            //Setting the boolean variable used by DataProcessing.createPDF method to true so that the method generates a new PDF document in a new language
-            changedLanguage = true;
-            //Setting the boolean variable used by DataProcessing.createPDF method to true so that the method generates a new PDF document with the new currency
-            changedCurrency = true;
-            Runnable rebuildResources = () -> {
-                try {
-                    BufferedWriter buildUserSettings = new BufferedWriter(new FileWriter("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
-                    buildUserSettings.write("DisplayMode=" + displayMode + "\nLanguage=" + language + "\nCurrency=" + currency + "\nExchangeRateLastUpdated=" + exchangeRateLastUpdated.get(Calendar.DAY_OF_MONTH) + "." + exchangeRateLastUpdated.get(Calendar.MONTH) + "." + exchangeRateLastUpdated.get(Calendar.YEAR) + "\nExchangeRateToEUR=" + exchangeRateEUR + "\nExchangeRateToRON=" + exchangeRateRON);
-                    buildUserSettings.close();
-                    //Creating the usable dataset again so that it uses the new currency
-                    processData.prepareData();
-                    //Recreating predictions graphs so that they use the newly set currency
-                    if (processData.predictionsGenerated) {
-                        processData.predictEvolutions(predictionValue);
-                        processData.createSalaryGraphWithPredictionsForEverybody();
-                    }
-                    processData.createSalaryGraphForEverybody();
-                } catch (IOException ignored) {}
-                //Recreating analyses in the new currency
-                processData.performAnalysis();
-                Platform.runLater(() -> {
-                    try {
-                        getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("MainMenu-" + languagesShort[newValue.intValue()] + ".fxml")).load()));
-                    } catch (IOException ignored) {}
-                    getCurrentStage().getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + displayMode + "Mode.css")).toExternalForm());
-                    //Changing the title of the current stage
-                    getCurrentStage().setTitle(language.equals("EN") ? "Evolution Graph" : language.equals("FR") ? "Graphe d'Évolution" : "Grafic de Evoluție");
-                    switchTheme = new AnimatedThemeSwitcher(getCurrentStage().getScene(), new Animation(new FadeOut()).setSpeed(2.5));
-                    switchTheme.init();
-                });
-            };
-            promptAnimator.setChild(new Pane(backgroundOperations));
-            darkOverlayAnimator.setChild(new Pane(darkOverlay));
+        if (getCurrentStage().getTitle().equals("Gender Gap Analyser")) {
             try {
-                loadingCircleImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/loading-" + displayMode + ".gif")));
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-            backgroundOperations.setVisible(true);
-            darkOverlay.setVisible(true);
-            new Thread(rebuildResources).start();
-        }));
-
-        //Setting up the currency picker
-        currencyPicker.setItems(FXCollections.observableArrayList(currencies));
-        switch (currency) {
-            case "USD" -> currencyPicker.setValue(currencies[0]);
-            case "EUR" -> currencyPicker.setValue(currencies[1]);
-            case "RON" -> currencyPicker.setValue(currencies[2]);
-        }
-        //When selecting another language from the currency picker...
-        currencyPicker.getSelectionModel().selectedIndexProperty().addListener(((observable, oldValue, newValue) -> {
-            //Updating the currency with the newly picked one
-            currency = currencies[newValue.intValue()];
-            //Setting the boolean variable used by DataProcessing.createPDF method to true so that the method generates a new PDF document with the new currency
-            changedCurrency = true;
-            Runnable rebuildResources = () -> {
-                try {
-                    BufferedWriter buildUserSettings = new BufferedWriter(new FileWriter("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
-                    buildUserSettings.write("DisplayMode=" + displayMode + "\nLanguage=" + language + "\nCurrency=" + currency + "\nExchangeRateLastUpdated=" + exchangeRateLastUpdated.get(Calendar.DAY_OF_MONTH) + "." + exchangeRateLastUpdated.get(Calendar.MONTH) + "." + exchangeRateLastUpdated.get(Calendar.YEAR) + "\nExchangeRateToEUR=" + exchangeRateEUR + "\nExchangeRateToRON=" + exchangeRateRON);
-                    buildUserSettings.close();
-                    //Creating the usable dataset again so that it uses the new currency
-                    processData.prepareData();
-                    //Recreating predictions graphs so that they use the newly set currency
-                    if (processData.predictionsGenerated) {
-                        processData.predictEvolutions(predictionValue);
-                        processData.createSalaryGraphWithPredictionsForEverybody();
-                    }
-                    processData.createSalaryGraphForEverybody();
-                } catch (IOException ignored) {}
-                //Recreating analyses in the new currency
-                processData.performAnalysis();
-                Platform.runLater(() -> {
-                    try {
-                        getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("MainMenu-" + language + ".fxml")).load()));
-                    } catch (IOException ignored) {}
-                    getCurrentStage().getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + displayMode + "Mode.css")).toExternalForm());
-                    //Changing the title of the current stage
-                    getCurrentStage().setTitle(language.equals("EN") ? "Evolution Graph" : language.equals("FR") ? "Graphe d'Évolution" : "Grafic de Evoluție");
-                    switchTheme = new AnimatedThemeSwitcher(getCurrentStage().getScene(), new Animation(new FadeOut()).setSpeed(2.5));
-                    switchTheme.init();
-                });
-            };
-            promptAnimator.setChild(new Pane(backgroundOperations));
-            darkOverlayAnimator.setChild(new Pane(darkOverlay));
-            try {
-                loadingCircleImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/loading-" + displayMode + ".gif")));
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-            backgroundOperations.setVisible(true);
-            darkOverlay.setVisible(true);
-            new Thread(rebuildResources).start();
-        }));
-
-        //Setting up the theme toggle
-        if (displayMode.equals("Dark")) {
-            darkModeButtonGlyph.setFitHeight(50);
-            lightModeButtonGlyph.setFitHeight(35);
+                if (displayMode.equals("Dark"))
+                    appIconImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon-Dark.png")));
+                loadingCircleImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/loading-" + Main.displayMode + ".gif")));
+            } catch (FileNotFoundException ignored) {}
         }
         else {
-            lightModeButtonGlyph.setFitHeight(50);
-            darkModeButtonGlyph.setFitHeight(35);
+            promptAnimator.setIn(new Animation(new ZoomIn()).setSpeed(3));
+            darkOverlayAnimator.setIn(new Animation(new FadeIn()).setSpeed(3));
+
+            //Making the window movable when dragging the embedded title bar
+            titleBar.setOnMousePressed(event -> {
+                dragX = getCurrentStage().getX() - event.getScreenX();
+                dragY = getCurrentStage().getY() - event.getScreenY();
+            });
+            titleBar.setOnMouseDragged(event -> {
+                getCurrentStage().setX(event.getScreenX() + dragX);
+                getCurrentStage().setY(event.getScreenY() + dragY);
+            });
+
+            //Setting up the language picker
+            languagePicker.setItems(FXCollections.observableArrayList(languages));
+            switch (language) {
+                case "EN" -> {
+                    languagePicker.setValue(languages[0]);
+                    currencyPicker.setValue(currencies[0]);
+                }
+                case "FR" -> {
+                    languagePicker.setValue(languages[1]);
+                    currencyPicker.setValue(currencies[1]);
+                }
+                case "RO" -> {
+                    languagePicker.setValue(languages[2]);
+                    currencyPicker.setValue(currencies[2]);
+                }
+            }
+            //When selecting another language from the language picker...
+            languagePicker.getSelectionModel().selectedIndexProperty().addListener(((observable, oldValue, newValue) -> {
+                //Updating the language with the newly picked one and the currency to the one associated with the language
+                language = languagesShort[newValue.intValue()];
+                currency = currencies[newValue.intValue()];
+                //Setting the boolean variable used by DataProcessing.createPDF method to true so that the method generates a new PDF document in a new language
+                changedLanguage = true;
+                //Setting the boolean variable used by DataProcessing.createPDF method to true so that the method generates a new PDF document with the new currency
+                changedCurrency = true;
+                Runnable rebuildResources = () -> {
+                    try {
+                        BufferedWriter buildUserSettings = new BufferedWriter(new FileWriter("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
+                        buildUserSettings.write("DisplayMode=" + displayMode + "\nLanguage=" + language + "\nCurrency=" + currency + "\nExchangeRateLastUpdated=" + exchangeRateLastUpdated.get(Calendar.DAY_OF_MONTH) + "." + exchangeRateLastUpdated.get(Calendar.MONTH) + "." + exchangeRateLastUpdated.get(Calendar.YEAR) + "\nExchangeRateToEUR=" + exchangeRateEUR + "\nExchangeRateToRON=" + exchangeRateRON);
+                        buildUserSettings.close();
+                        //Creating the usable dataset again so that it uses the new currency
+                        processData.prepareData();
+                        //Recreating predictions graphs so that they use the newly set currency
+                        if (processData.predictionsGenerated) {
+                            processData.predictEvolutions(predictionValue);
+                            processData.createSalaryGraphWithPredictionsForEverybody();
+                        }
+                        processData.createSalaryGraphForEverybody();
+                    } catch (IOException ignored) {
+                    }
+                    //Recreating analyses in the new currency
+                    processData.performAnalysis();
+                    Platform.runLater(() -> {
+                        try {
+                            getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("AppScreens/MainMenu-" + languagesShort[newValue.intValue()] + ".fxml")).load()));
+                        } catch (IOException ignored) {
+                        }
+                        getCurrentStage().getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + displayMode + "Mode.css")).toExternalForm());
+                        //Changing the title of the current stage
+                        getCurrentStage().setTitle(language.equals("EN") ? "Evolution Graph" : language.equals("FR") ? "Graphe d'Évolution" : "Grafic de Evoluție");
+                        switchTheme = new AnimatedThemeSwitcher(getCurrentStage().getScene(), new Animation(new FadeOut()).setSpeed(2.5));
+                        switchTheme.init();
+                    });
+                };
+                promptAnimator.setChild(new Pane(backgroundOperations));
+                darkOverlayAnimator.setChild(new Pane(darkOverlay));
+                try {
+                    loadingCircleImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/loading-" + displayMode + ".gif")));
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                backgroundOperations.setVisible(true);
+                darkOverlay.setVisible(true);
+                new Thread(rebuildResources).start();
+            }));
+
+            //Setting up the currency picker
+            currencyPicker.setItems(FXCollections.observableArrayList(currencies));
+            switch (currency) {
+                case "USD" -> currencyPicker.setValue(currencies[0]);
+                case "EUR" -> currencyPicker.setValue(currencies[1]);
+                case "RON" -> currencyPicker.setValue(currencies[2]);
+            }
+            //When selecting another language from the currency picker...
+            currencyPicker.getSelectionModel().selectedIndexProperty().addListener(((observable, oldValue, newValue) -> {
+                //Updating the currency with the newly picked one
+                currency = currencies[newValue.intValue()];
+                //Setting the boolean variable used by DataProcessing.createPDF method to true so that the method generates a new PDF document with the new currency
+                changedCurrency = true;
+                Runnable rebuildResources = () -> {
+                    try {
+                        BufferedWriter buildUserSettings = new BufferedWriter(new FileWriter("src/main/resources/com/gendergapanalyser/gendergapanalyser/UserSettings.txt"));
+                        buildUserSettings.write("DisplayMode=" + displayMode + "\nLanguage=" + language + "\nCurrency=" + currency + "\nExchangeRateLastUpdated=" + exchangeRateLastUpdated.get(Calendar.DAY_OF_MONTH) + "." + exchangeRateLastUpdated.get(Calendar.MONTH) + "." + exchangeRateLastUpdated.get(Calendar.YEAR) + "\nExchangeRateToEUR=" + exchangeRateEUR + "\nExchangeRateToRON=" + exchangeRateRON);
+                        buildUserSettings.close();
+                        //Creating the usable dataset again so that it uses the new currency
+                        processData.prepareData();
+                        //Recreating predictions graphs so that they use the newly set currency
+                        if (processData.predictionsGenerated) {
+                            processData.predictEvolutions(predictionValue);
+                            processData.createSalaryGraphWithPredictionsForEverybody();
+                        }
+                        processData.createSalaryGraphForEverybody();
+                    } catch (IOException ignored) {
+                    }
+                    //Recreating analyses in the new currency
+                    processData.performAnalysis();
+                    Platform.runLater(() -> {
+                        try {
+                            getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("AppScreens/MainMenu-" + language + ".fxml")).load()));
+                        } catch (IOException ignored) {
+                        }
+                        getCurrentStage().getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + displayMode + "Mode.css")).toExternalForm());
+                        //Changing the title of the current stage
+                        getCurrentStage().setTitle(language.equals("EN") ? "Evolution Graph" : language.equals("FR") ? "Graphe d'Évolution" : "Grafic de Evoluție");
+                        switchTheme = new AnimatedThemeSwitcher(getCurrentStage().getScene(), new Animation(new FadeOut()).setSpeed(2.5));
+                        switchTheme.init();
+                    });
+                };
+                promptAnimator.setChild(new Pane(backgroundOperations));
+                darkOverlayAnimator.setChild(new Pane(darkOverlay));
+                try {
+                    loadingCircleImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/loading-" + displayMode + ".gif")));
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                backgroundOperations.setVisible(true);
+                darkOverlay.setVisible(true);
+                new Thread(rebuildResources).start();
+            }));
+
+            //Setting up the theme toggle
+            if (displayMode.equals("Dark")) {
+                darkModeButtonGlyph.setFitHeight(50);
+                lightModeButtonGlyph.setFitHeight(35);
+            } else {
+                lightModeButtonGlyph.setFitHeight(50);
+                darkModeButtonGlyph.setFitHeight(35);
+            }
+
+            //Setting up the information prompt
+            sourcesToggle.setOnAction(e -> {
+                if (contentCredits.isVisible()) {
+                    contentCredits.setVisible(false);
+                    contentSources.setVisible(true);
+                } else sourcesToggle.setSelected(true);
+            });
+            creditsToggle.setOnAction(e -> {
+                if (contentSources.isVisible()) {
+                    contentSources.setVisible(false);
+                    contentCredits.setVisible(true);
+                } else creditsToggle.setSelected(true);
+            });
+            Tooltip USDeptOfLaborHyperlinkDescription = new Tooltip(language.equals("EN") ? "Opens the United States Department of Labor website in your default browser." : language.equals("FR") ? "Ouvre le site web du Département du Travail des États Unis dans votre navigateur." : "Deschide site-ul web al Departamentului de Muncă al Statelor Unite în navigatorul dumneavoastră.");
+            USDeptOfLaborHyperlinkDescription.setFont(new Font("Calibri", 13));
+            USDeptOfLaborHyperlinkDescription.setShowDelay(Duration.millis(200));
+            USDeptOfLaborHyperlink.setOnAction(a -> {
+                try {
+                    Desktop.getDesktop().browse(new URI("https://www.dol.gov/agencies/wb/data/earnings/median-annual-sex-race-hispanic-ethnicity"));
+                } catch (IOException | URISyntaxException ignored) {
+                }
+            });
+            USDeptOfLaborHyperlink.setTooltip(USDeptOfLaborHyperlinkDescription);
+            usDeptOfLaborYearRangeLabel.setText(usDeptOfLaborYearRangeLabel.getText() + processData.dataset[0][1] + " - " + processData.dataset[processData.dataset.length - 1][1]);
+            try {
+                ERALogoImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/ExchangeRate-API-Logo-" + displayMode + ".png")));
+            } catch (FileNotFoundException ignored) {
+            }
+            Tooltip ERAHyperlinkDescription = new Tooltip(language.equals("EN") ? "Opens the ExchangeRates-API website in your default browser." : language.equals("FR") ? "Ouvre le site web d'ExchangeRates-API dans votre navigateur." : "Deschide site-ul web al ExchangeRates-API în navigatorul dumneavoastră.");
+            ERAHyperlinkDescription.setFont(new Font("Calibri", 13));
+            ERAHyperlinkDescription.setShowDelay(Duration.millis(200));
+            ERAHyperlink.setOnAction(a -> {
+                try {
+                    Desktop.getDesktop().browse(new URI("https://www.exchangerate-api.com/"));
+                } catch (IOException | URISyntaxException ignored) {
+                }
+            });
+            ERAHyperlink.setTooltip(ERAHyperlinkDescription);
+            ERALastUpdatedLabel.setText(ERALastUpdatedLabel.getText() + (exchangeRateLastUpdated.get(GregorianCalendar.DAY_OF_MONTH) < 10 ? "0" + exchangeRateLastUpdated.get(GregorianCalendar.DAY_OF_MONTH) : exchangeRateLastUpdated.get(GregorianCalendar.DAY_OF_MONTH)) + (exchangeRateLastUpdated.get(GregorianCalendar.MONTH) < 10 ? ".0" : ".") + exchangeRateLastUpdated.get(GregorianCalendar.MONTH) + "." + exchangeRateLastUpdated.get(GregorianCalendar.YEAR));
+            if (displayMode.equals("Light")) {
+                try {
+                    appIconCreditsImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon.png")));
+                } catch (FileNotFoundException ignored) {
+                }
+            } else {
+                try {
+                    appIconCreditsImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon-Dark.png")));
+                } catch (FileNotFoundException ignored) {
+                }
+            }
+
+            //Displaying the discard predictions button if the user generated predictions
+            discardPredictionsButton.setVisible(processData.predictionsGenerated);
         }
-
-        //Setting up the data sources prompt
-        usDeptOfLaborYearRangeLabel.setText(usDeptOfLaborYearRangeLabel.getText() + processData.dataset[0][1] + " - " + processData.dataset[processData.dataset.length - 1][1]);
-        try {
-            ERALogoImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/ExchangeRate-API-Logo-" + displayMode + ".png")));
-        } catch (FileNotFoundException ignored) {}
-        ERALastUpdatedLabel.setText(ERALastUpdatedLabel.getText() + (exchangeRateLastUpdated.get(GregorianCalendar.DAY_OF_MONTH) < 10 ? "0" + exchangeRateLastUpdated.get(GregorianCalendar.DAY_OF_MONTH) : exchangeRateLastUpdated.get(GregorianCalendar.DAY_OF_MONTH)) + (exchangeRateLastUpdated.get(GregorianCalendar.MONTH) < 10 ? ".0" : ".") + exchangeRateLastUpdated.get(GregorianCalendar.MONTH) + "." + exchangeRateLastUpdated.get(GregorianCalendar.YEAR));
-
-        //Displaying the discard predictions button if the user generated predictions
-        discardPredictionsButton.setVisible(processData.predictionsGenerated);
     }
 
     //Launch time!

@@ -72,7 +72,7 @@ public class DisplayAnalysis implements Initializable {
         //Setting the new window's title
         mainMenu.setTitle(Main.language.equals("EN") ? "Main Menu" : Main.language.equals("FR") ? "Menu Principal" : "Meniu Principal");
         //Setting the main menu page to be shown on the new window
-        mainMenu.setScene(new Scene(new FXMLLoader(getClass().getResource("MainMenu-" + Main.language + ".fxml")).load()));
+        mainMenu.setScene(new Scene(new FXMLLoader(getClass().getResource("AppScreens/MainMenu-" + Main.language + ".fxml")).load()));
         mainMenu.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
         //Making the new window not resizeable so that the user doesn't change the size of the window and the elements of the page won't look out of place
         mainMenu.setResizable(false);
@@ -89,7 +89,7 @@ public class DisplayAnalysis implements Initializable {
         // that's going to be shown on the taskbar to the Gender Fluid free icon created by Vitaly Gorbachev,
         // published on the flaticon website
         // (https://www.flaticon.com/free-icon/gender-fluid_3369089?term=gender&related_id=3369089)
-        Main.getCurrentStage().getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/AppIcon.png")));
+        Main.getCurrentStage().getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon.png")));
     }
 
     //Function triggered when the user wants to display the graph page
@@ -98,7 +98,7 @@ public class DisplayAnalysis implements Initializable {
         AnimatedSwitcher as = new AnimatedSwitcher(new Animation(new SlideInRight()).setSpeed(3), new Animation(new FadeOutLeft()));
         Scene scene = new Scene(new Pane(as));
         as.of(Main.getCurrentStage().getScene().getRoot());
-        as.setChild(new FXMLLoader(getClass().getResource("DisplayEvolutionGraph-" + Main.language + ".fxml")).load());
+        as.setChild(new FXMLLoader(getClass().getResource("AppScreens/DisplayEvolutionGraph-" + Main.language + ".fxml")).load());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
         //Changing the title of the current stage
         Main.getCurrentStage().setTitle(Main.language.equals("EN") ? "Evolution Graph" : Main.language.equals("FR") ? "Graphe d'Évolution" : "Grafic de Evoluție");
@@ -134,13 +134,13 @@ public class DisplayAnalysis implements Initializable {
             darkModeButtonGlyph.setFitHeight(50);
             lightModeButtonGlyph.setFitHeight(35);
             //Also changing the wage gap icon
-            wageGapIcon.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/AppIcon-Dark.png")));
+            wageGapIcon.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon-Dark.png")));
         }
         else {
             lightModeButtonGlyph.setFitHeight(50);
             darkModeButtonGlyph.setFitHeight(35);
             //Also changing the wage gap icon
-            wageGapIcon.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/AppIcon.png")));
+            wageGapIcon.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon.png")));
         }
         voidLink.requestFocus();
     }
@@ -208,7 +208,7 @@ public class DisplayAnalysis implements Initializable {
     @FXML
     private void discardPredictions() throws IOException {
         Main.processData.discardPredictions();
-        Main.getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("Analysis-" + Main.language + ".fxml")).load()));
+        Main.getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("AppScreens/Analysis-" + Main.language + ".fxml")).load()));
         Main.getCurrentStage().getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
     }
 
@@ -269,7 +269,7 @@ public class DisplayAnalysis implements Initializable {
                 Main.processData.performAnalysis();
                 Platform.runLater(() -> {
                     try {
-                        Main.getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("Analysis-" + Main.languagesShort[newValue.intValue()] + ".fxml")).load()));
+                        Main.getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("AppScreens/Analysis-" + Main.languagesShort[newValue.intValue()] + ".fxml")).load()));
                     } catch (IOException ignored) {}
                     Main.getCurrentStage().getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
                     //Changing the title of the current stage
@@ -281,7 +281,7 @@ public class DisplayAnalysis implements Initializable {
             promptAnimator.setChild(new Pane(backgroundOperations));
             darkOverlayAnimator.setChild(new Pane(darkOverlay));
             try {
-                loadingCircleImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/loading-" + Main.displayMode + ".gif")));
+                loadingCircleImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/loading-" + Main.displayMode + ".gif")));
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -321,7 +321,7 @@ public class DisplayAnalysis implements Initializable {
                 Main.processData.performAnalysis();
                 Platform.runLater(() -> {
                     try {
-                        Main.getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("Analysis-" + Main.language + ".fxml")).load()));
+                        Main.getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("AppScreens/Analysis-" + Main.language + ".fxml")).load()));
                     } catch (IOException ignored) {}
                     Main.getCurrentStage().getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
                     //Changing the title of the current stage
@@ -333,7 +333,7 @@ public class DisplayAnalysis implements Initializable {
             promptAnimator.setChild(new Pane(backgroundOperations));
             darkOverlayAnimator.setChild(new Pane(darkOverlay));
             try {
-                loadingCircleImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/loading-" + Main.displayMode + ".gif")));
+                loadingCircleImageView.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/loading-" + Main.displayMode + ".gif")));
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -348,7 +348,7 @@ public class DisplayAnalysis implements Initializable {
             lightModeButtonGlyph.setFitHeight(35);
             //Also displaying the wage gap icon
             try {
-                wageGapIcon.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/AppIcon-Dark.png")));
+                wageGapIcon.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon-Dark.png")));
             } catch (FileNotFoundException ignored) {}
         }
         else {
@@ -356,7 +356,7 @@ public class DisplayAnalysis implements Initializable {
             darkModeButtonGlyph.setFitHeight(35);
             //Also displaying the wage gap icon
             try {
-                wageGapIcon.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/AppIcon.png")));
+                wageGapIcon.setImage(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon.png")));
             } catch (FileNotFoundException ignored) {}
         }
 

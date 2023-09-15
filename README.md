@@ -6,9 +6,38 @@ from the U.S. Department of Labor's website,
 and that analyses the salaries, creates graphs and predictions using data mining and simple regression,
 generates a PDF report that contains an evolution graph, the interpretations of the evolutions and a table with all the data used, and can mail the PDF report to the user's email address.<br>
 It uses JavaFX in order to have a GUI that's not cluttered and that's easy and pleasant to use.
+Coordinating teacher: Iuliana Marin
 
 ### Changelog
 <ul>
+<li>
+<u>15.09.2023</u><br>
+- <b>Added earlier but forgotten to be mentioned in changelogs: </b> On the graphs screen, now the salaries and the pay gaps all have tooltips that specify the full sum, so that if the sum doesn't fit inside its cell (in the case of RON, for example) then the user can see the sum inside the tooltip.<br>
+- Fixed the digits being slightly cut off or only 3 digits being displayed (if using typing a number using wide digits like 9999) in the inputs for the limit years of the range of years to be included in the graph on the graph screen by slightly increasing the width of the inputs, so that 4 digits fully fit into the input box now.<br>
+- Fixed the graph recovery not happening when toggling the inclusion of the pay gap or the predictions (if applicable) on the graphs screen.<br>
+- Fixed the background not getting darker when opening a prompt on the main menu after discarding generated predictions from it.<br>
+- Removed some instructions that weren't actually helping with anything
+(e.g. setting the dark overlay in <b>Main.attemptPrediction()</b>
+as an animator child and making it visible while it was already visible from <b>Main.togglePredictionPrompt()</b>).<br>
+- Made the icons of the buttons on the main menu smaller for French and Romanian,
+so they match the ones for English.<br>
+- Modified the data sources popup to be more spacious and introduced icons in it,
+and also added a section into the same prompt
+to credit the creators of the icons and pictures
+used throughout the program and the person
+who came up with the idea for this app and the reason why it was developed.<br>
+- Changed the name of all the emojis used in the app to use the official Unicode Character Database names.<br>
+- Reorganised the Resources folder: the Glyphs folder still contains the Emojis folder,
+and the rest of its items are now contained into the new Miscellaneous folder;
+the FXML files are now contained into the new AppScreens folder.<br>
+- Split the SplashScreen.fxml file into three files dependent on the app language
+(like for the other three screens).<br>
+- Improved the app integrity check:
+the app now checks for each file specifically by path and name, not just by extension.
+Also, for the files that couldn't be found, the app now attempts to download them from GitHub (to be tested).<br>
+- Removed the SplashStart class and made Main the controller of the splash screen.<br>
+</li>
+<br>
 <li>
 <u>01.09.2023</u><br>
 - Discovered that the folder where evolution graphs are stored, which is empty when the app is not running, wasn't being uploaded to Git, thus preventing the app from starting. Now, if the folder doesn't exist, it is created in the DataProcessing.createSalaryGraphForEverybody() function, since it's the first graph drawing function to be called when the app first starts, thus assuring that the folder exists.<br>

@@ -7,8 +7,9 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<AnchorPane id="main" prefHeight="790.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gendergapanalyser.gendergapanalyser.SplashStart">
+<AnchorPane id="main" prefHeight="790.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.gendergapanalyser.gendergapanalyser.Main">
    <children>
       <Hyperlink style="-fx-padding: 0;">
          <font>
@@ -27,14 +28,24 @@
       </Button>
       <ImageView fx:id="appIconImageView" fitHeight="150.0" fitWidth="200.0" layoutX="254.0" layoutY="215.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@Glyphs/AppIcon.png" />
+            <Image url="@../Glyphs/Miscellaneous/AppIcon.png" />
          </image>
       </ImageView>
-      <Label id="splashLabel" fx:id="splashLabel" layoutX="475.0" layoutY="215.0" prefHeight="150.0" prefWidth="513.0" text="Gender Gap Analyser" wrapText="true">
+      <Label layoutX="475.0" layoutY="215.0" prefHeight="150.0" prefWidth="513.0" styleClass="labels" text="Analizator al Egalității între Genuri" wrapText="true">
          <font>
-            <Font size="40.0" />
+            <Font name="Calibri" size="40.0" />
          </font>
       </Label>
       <ImageView fx:id="loadingCircleImageView" fitHeight="150.0" fitWidth="150.0" layoutX="475.0" layoutY="425.0" pickOnBounds="true" preserveRatio="true" />
+      <Text fx:id="recoveryLabel" layoutX="285.0" layoutY="620.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Câteva fișiere esențiale lipsesc! Încercăm să le descărcăm acum..." visible="false">
+         <font>
+            <Font name="Calibri" size="20.0" />
+         </font>
+      </Text>
+      <Text fx:id="updateLabel" layoutX="444.0" layoutY="620.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Se actualizează aplicația..." visible="false">
+         <font>
+            <Font name="Calibri" size="20.0" />
+         </font>
+      </Text>
    </children>
 </AnchorPane>

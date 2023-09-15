@@ -81,7 +81,7 @@ public class GetUpdatedDatasetInBackground implements Runnable {
                         // published on the flaticon website
                         // (https://www.flaticon.com/free-icon/information_9195785)
                         try {
-                            ((Stage) refreshInfo.getDialogPane().getScene().getWindow()).getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/information.png")));
+                            ((Stage) refreshInfo.getDialogPane().getScene().getWindow()).getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-information.png")));
                         } catch (FileNotFoundException ignored) {
                         }
 
@@ -101,7 +101,7 @@ public class GetUpdatedDatasetInBackground implements Runnable {
                         mainMenu.setTitle(Main.language == null || Main.language.equals("EN") ? "Main Menu" : Main.language.equals("FR") ? "Menu Principal" : "Meniu Principal");
                         try {
                             //Preparing the new window
-                            mainMenu.setScene(new Scene(new FXMLLoader(getClass().getResource("MainMenu-" + Main.language + ".fxml")).load()));
+                            mainMenu.setScene(new Scene(new FXMLLoader(getClass().getResource("AppScreens/MainMenu-" + Main.language + ".fxml")).load()));
                             mainMenu.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
                             //Making the new window not resizeable so that the user doesn't change the size of the window and the elements of the page won't look out of place
                             mainMenu.setResizable(false);
@@ -116,7 +116,7 @@ public class GetUpdatedDatasetInBackground implements Runnable {
                             AnimatedThemeSwitcher switchTheme = new AnimatedThemeSwitcher(Main.getCurrentStage().getScene(), new Animation(new FadeOut()).setSpeed(2.5));
                             switchTheme.init();
                             //Setting the app icon that's going to be shown on the title bar and taskbar to the Gender Fluid free icon created by Vitaly Gorbachev, published on the flaticon website (https://www.flaticon.com/free-icon/gender-fluid_3369089?term=gender&related_id=3369089)
-                            Main.getCurrentStage().getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/AppIcon.png")));
+                            Main.getCurrentStage().getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon.png")));
                         } catch (IOException ignored) {
                         }
                         refreshInfo.show();
@@ -145,7 +145,7 @@ public class GetUpdatedDatasetInBackground implements Runnable {
                 // published on the flaticon website
                 // (https://www.flaticon.com/free-icon/close_463612)
                 try {
-                    ((Stage)errorDownload.getDialogPane().getScene().getWindow()).getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/close.png")));
+                    ((Stage)errorDownload.getDialogPane().getScene().getWindow()).getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-error.png")));
                 } catch (FileNotFoundException ignored) {}
                 errorDownload.show();
             });

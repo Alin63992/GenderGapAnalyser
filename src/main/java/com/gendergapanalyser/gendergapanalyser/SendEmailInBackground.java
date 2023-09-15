@@ -119,7 +119,7 @@ public class SendEmailInBackground implements Runnable {
                 // published on the flaticon website
                 // (https://www.flaticon.com/free-icon/information_9195785)
                 try {
-                    ((Stage)emailSent.getDialogPane().getScene().getWindow()).getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/information.png")));
+                    ((Stage)emailSent.getDialogPane().getScene().getWindow()).getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-information.png")));
                 } catch (FileNotFoundException ignored) {}
 
                 //Checking  if this thread is interrupted and stopping it if it is
@@ -132,7 +132,7 @@ public class SendEmailInBackground implements Runnable {
 
                 //Reloading the main menu screen so the wait screen is removed and the menu is usable again
                 try {
-                    Main.getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("MainMenu-" + Main.language + ".fxml")).load()));
+                    Main.getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("AppScreens/MainMenu-" + Main.language + ".fxml")).load()));
                     Main.getCurrentStage().getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
                     AnimatedThemeSwitcher switchTheme = new AnimatedThemeSwitcher(Main.getCurrentStage().getScene(), new Animation(new FadeOut()).setSpeed(2.5));
                     switchTheme.init();
@@ -165,7 +165,7 @@ public class SendEmailInBackground implements Runnable {
                 // published on the flaticon website
                 // (https://www.flaticon.com/free-icon/close_463612)
                 try {
-                    ((Stage)errorSendingEmail.getDialogPane().getScene().getWindow()).getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/close.png")));
+                    ((Stage)errorSendingEmail.getDialogPane().getScene().getWindow()).getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-error.png")));
                 } catch (FileNotFoundException ignored) {}
 
                 //Checking  if this thread is interrupted and stopping it if it is
@@ -177,7 +177,7 @@ public class SendEmailInBackground implements Runnable {
                 }
 
                 try {
-                    Main.getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("MainMenu-" + Main.language + ".fxml")).load()));
+                    Main.getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("AppScreens/MainMenu-" + Main.language + ".fxml")).load()));
                     Main.getCurrentStage().getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
                     AnimatedThemeSwitcher switchTheme = new AnimatedThemeSwitcher(Main.getCurrentStage().getScene(), new Animation(new FadeOut()).setSpeed(2.5));
                     switchTheme.init();

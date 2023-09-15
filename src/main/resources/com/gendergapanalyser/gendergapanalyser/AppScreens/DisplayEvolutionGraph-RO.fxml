@@ -27,25 +27,25 @@
       <AnchorPane fx:id="titleBar">
          <children>
             <Rectangle id="top-bar" arcHeight="5.0" arcWidth="5.0" fill="#0000001a" height="100.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="1300.0" />
-            <Text id="title" layoutX="14.0" layoutY="43.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="labels" text="Here are the evolution graphs for men's and women's wages, and for the wage gap.">
+            <Text id="title" layoutX="14.0" layoutY="43.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Aici sunt graficele de evoluție a salariilor femeilor și bărbaților, și a diferenței între salarii.">
                <font>
                   <Font name="Calibri" size="20.0" />
                </font>
             </Text>
-            <Hyperlink layoutX="14.0" layoutY="50.0" onAction="#backToMainMenu" style="-fx-padding: 0;" text="Back to main menu">
+            <Hyperlink layoutX="14.0" layoutY="50.0" onAction="#backToMainMenu" style="-fx-padding: 0;" text="Întoarcere la meniul principal">
                <font>
                   <Font name="Calibri" size="20.0" />
                </font>
                <graphic>
                   <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@Glyphs/Emojis/left-arrow.png" />
+                        <Image url="@../Glyphs/Emojis/Leftwards_Black_Arrow.png" />
                      </image>
                   </ImageView>
                </graphic>
             </Hyperlink>
-            <ChoiceBox fx:id="languagePicker" layoutX="912.0" layoutY="25.0" prefHeight="25.0" prefWidth="150.0" styleClass="promptButtons" />
-            <Text layoutX="933.0" layoutY="65.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="labels" text="Currency: ">
+            <ChoiceBox fx:id="languagePicker" layoutX="912.0" layoutY="25.0" prefWidth="150.0" styleClass="promptButtons" />
+            <Text layoutX="936.0" layoutY="65.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Monedă: ">
                <font>
                   <Font name="Calibri" size="13.0" />
                </font>
@@ -53,62 +53,62 @@
             <ChoiceBox fx:id="currencyPicker" layoutX="987.0" layoutY="50.0" prefWidth="75.0" styleClass="promptButtons" />
          </children>
       </AnchorPane>
-      <Text layoutX="924.0" layoutY="126.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="labels" text="Statistics">
+      <Text layoutX="926.0" layoutY="136.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Statistici">
          <font>
             <Font name="Calibri" size="20.0" />
          </font>
       </Text>
-      <Text layoutX="1142.0" layoutY="126.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="labels" text="Yearly pay gaps">
+      <Text layoutX="1108.0" layoutY="124.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Diferența anuală între salarii" textAlignment="CENTER" wrappingWidth="184.0">
          <font>
             <Font name="Calibri" size="20.0" />
          </font>
       </Text>
       <ImageView fx:id="chartImageView" fitHeight="562.0" fitWidth="800.0" layoutX="20.0" layoutY="137.0" pickOnBounds="true" preserveRatio="true" />
-      <VBox fx:id="salariesView" layoutX="835.0" layoutY="137.0" prefHeight="600.0" prefWidth="250.0" />
-      <VBox fx:id="payGapsView" layoutX="1130.0" layoutY="137.0" prefHeight="600.0" prefWidth="150.0" />
-      <Text layoutX="14.0" layoutY="726.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="labels" text="Select range to be included in the graph: ">
+      <VBox fx:id="salariesView" layoutX="835.0" layoutY="161.0" prefHeight="515.0" prefWidth="250.0" />
+      <VBox fx:id="payGapsView" layoutX="1125.0" layoutY="161.0" prefHeight="515.0" prefWidth="150.0" />
+      <Text layoutX="14.0" layoutY="726.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Selectează intervalul de ani pentru a fi afișat în grafic: ">
          <font>
             <Font name="Calibri" size="20.0" />
          </font>
       </Text>
-      <TextField fx:id="minimumRangeInput" layoutX="354.0" layoutY="707.0" prefHeight="25.0" prefWidth="50.0" styleClass="inputs">
+      <TextField fx:id="minimumRangeInput" layoutX="453.0" layoutY="707.0" prefHeight="25.0" prefWidth="55.0" styleClass="inputs">
          <font>
             <Font name="Calibri" size="15.0" />
          </font>
       </TextField>
-      <RangeSlider fx:id="rangeSlider" layoutX="414.0" layoutY="714.0" />
-      <TextField fx:id="maximumRangeInput" layoutX="565.0" layoutY="707.0" prefHeight="25.0" prefWidth="50.0" styleClass="inputs">
+      <RangeSlider fx:id="rangeSlider" layoutX="514.0" layoutY="714.0" prefHeight="14.0" prefWidth="140.0" />
+      <TextField fx:id="maximumRangeInput" layoutX="660.0" layoutY="707.0" prefHeight="25.0" prefWidth="55.0" styleClass="inputs">
          <font>
             <Font name="Calibri" size="15.0" />
          </font>
       </TextField>
-      <Button layoutX="637.0" layoutY="707.0" mnemonicParsing="false" onAction="#processRange" styleClass="promptButtons" text="See graph for this range">
+      <Button layoutX="736.0" layoutY="707.0" mnemonicParsing="false" onAction="#processRange" styleClass="promptButtons" text="Arată graficul pentru acest interval">
          <font>
             <Font name="Calibri" size="15.0" />
          </font>
       </Button>
-      <Text layoutX="14.0" layoutY="769.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="labels" text="Choose which evolution to display: ">
+      <Text layoutX="14.0" layoutY="769.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Alege evoluția de afișat: ">
          <font>
             <Font name="Calibri" size="20.0" />
          </font>
       </Text>
-      <ChoiceBox fx:id="changeGraph" layoutX="302.0" layoutY="751.0" prefHeight="25.0" prefWidth="170.0" styleClass="promptButtons">
+      <ChoiceBox fx:id="changeGraph" layoutX="213.0" layoutY="752.0" prefHeight="25.0" prefWidth="170.0" styleClass="promptButtons">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></ChoiceBox>
-      <ToggleButton fx:id="showPayGapToggle" layoutX="484.0" layoutY="751.0" mnemonicParsing="false" onAction="#togglePayGap" styleClass="toggles" text="Exclude pay gap">
+      <ToggleButton fx:id="showPayGapToggle" layoutX="419.0" layoutY="750.0" mnemonicParsing="false" onAction="#togglePayGap" styleClass="toggles" text="Exclude evoluția diferenței de salariu">
          <font>
             <Font name="Calibri" size="15.0" />
          </font>
       </ToggleButton>
-      <HBox fx:id="predictionControls" alignment="CENTER" layoutX="722.0" layoutY="751.0" prefHeight="28.0" prefWidth="324.0" style="-fx-spacing: 15;">
+      <HBox fx:id="predictionControls" alignment="CENTER" layoutX="702.0" layoutY="752.0" prefHeight="28.0" prefWidth="369.0" style="-fx-spacing: 15;">
          <children>
-            <ToggleButton fx:id="includePredictionsToggle" mnemonicParsing="false" onAction="#togglePredictions" styleClass="toggles" text="Exclude predictions">
+            <ToggleButton fx:id="includePredictionsToggle" mnemonicParsing="false" onAction="#togglePredictions" styleClass="toggles" text="Exclude predicțiile">
                <font>
                   <Font name="Calibri" size="15.0" />
                </font>
             </ToggleButton>
-            <Button mnemonicParsing="false" onAction="#discardPredictions" styleClass="promptButtons" text="🚮 Discard predictions">
+            <Button mnemonicParsing="false" onAction="#discardPredictions" styleClass="promptButtons" text="🚮 Șterge predicțiile">
                <font>
                   <Font name="Calibri" size="15.0" />
                </font>
@@ -118,14 +118,14 @@
             </Button>
          </children>
       </HBox>
-      <Hyperlink contentDisplay="RIGHT" layoutX="1102.0" layoutY="752.0" onAction="#goToAnalysisPage" style="-fx-padding: 0;" text="Go to analysis page">
+      <Hyperlink contentDisplay="RIGHT" layoutX="1113.0" layoutY="752.0" onAction="#goToAnalysisPage" style="-fx-padding: 0;" text="Vezi interpretările">
          <font>
             <Font name="Calibri" size="20.0" />
          </font>
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@Glyphs/Emojis/right-arrow.png" />
+                  <Image url="@../Glyphs/Emojis/Black_Rightwards_Arrow.png" />
                </image>
             </ImageView>
          </graphic>
@@ -135,7 +135,7 @@
          <children>
             <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="168.0" layoutX="425.0" layoutY="311.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="prompts" width="450.0" />
             <ImageView fx:id="loadingCircleImageView" fitHeight="75.0" fitWidth="75.0" layoutX="613.0" layoutY="334.0" pickOnBounds="true" preserveRatio="true" />
-            <Text layoutX="436.0" layoutY="452.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="labels" text="Please wait..." textAlignment="CENTER" wrappingWidth="429.0">
+            <Text layoutX="436.0" layoutY="452.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Please wait..." textAlignment="CENTER" wrappingWidth="429.0">
                <font>
                   <Font name="Calibri Light" size="20.0" />
                </font>
@@ -151,7 +151,7 @@
          <graphic>
             <ImageView fx:id="lightModeButtonGlyph" fitHeight="45.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@Glyphs/Emojis/sun.png" />
+                  <Image url="@../Glyphs/Emojis/Black_Sun_with_Rays.png" />
                </image>
             </ImageView>
          </graphic>
@@ -163,7 +163,7 @@
          <graphic>
             <ImageView fx:id="darkModeButtonGlyph" fitHeight="45.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@Glyphs/Emojis/moon.png" />
+                  <Image url="@../Glyphs/Emojis/Crescent_Moon.png" />
                </image>
             </ImageView>
          </graphic>
