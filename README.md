@@ -3,8 +3,9 @@ A program
 written in Java for my bachelor's degree thesis
 that downloads a dataset of men's and women's salaries from the United States,
 from the U.S. Department of Labor's website,
-and that analyses the salaries, creates graphs and predictions using data mining and simple regression,
+and that analyses the salaries, creates graphs and predictions using data mining and simple regression for up to 100 years,
 generates a PDF report that contains an evolution graph, the interpretations of the evolutions and a table with all the data used, and can mail the PDF report to the user's email address.<br>
+The app is available in English, French and Romanian, and the statistics used by it come in the United States Dollar, but the app can convert them to Euro and Romanian New Leu using exchange rates provided by <a href="https://www.exchangerate-api.com/">ExchangeRate API</a>, based on the user's language or currency choice.<br>
 It uses JavaFX in order to have a GUI that's not cluttered and that's easy and pleasant to use.
 Coordinating teacher: Iuliana Marin
 
