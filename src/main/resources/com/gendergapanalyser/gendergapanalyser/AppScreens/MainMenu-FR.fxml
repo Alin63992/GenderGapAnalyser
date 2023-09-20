@@ -379,7 +379,7 @@
                <children>
                   <ScrollPane id="infoBoxScrollPane" prefHeight="450.0" prefWidth="460.0" style="-fx-padding: 10;">
                      <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="657.0" prefWidth="425.0">
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="768.0" prefWidth="425.0">
                            <children>
                               <ImageView fx:id="appIconCreditsImageView" fitHeight="150.0" fitWidth="200.0" layoutX="145.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -396,12 +396,22 @@
                                     <Font name="Calibri" size="15.0" />
                                  </font>
                               </Text>
-                              <Hyperlink layoutX="-1.0" layoutY="341.0" onAction="#openAppIconPage" style="-fx-padding: 0;" text="Page du l'icône sur flaticon.com">
+                              <Hyperlink layoutY="341.0" onAction="#openAppIconPage" style="-fx-padding: 0;" text="Page du l'icône sur flaticon.com">
                                  <font>
                                     <Font name="Calibri" size="15.0" />
                                  </font>
                               </Hyperlink>
-                              <GridPane layoutX="-1.0" layoutY="376.0">
+                              <Text layoutY="387.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="L'animation colorée affichée sur l'écran d'initialisation et les prompts &quot;Veuillez attendre...&quot; était téléchargée depuis le site Preloaders d'Icons8." textAlignment="JUSTIFY" wrappingWidth="425.0">
+                                 <font>
+                                    <Font name="Calibri" size="15.0" />
+                                 </font>
+                              </Text>
+                              <Hyperlink fx:id="openPreloadersWebsite" layoutY="427.0" onAction="#openPreloadersWebsite" style="-fx-padding: 0;" text="Le site Preloaders">
+                                 <font>
+                                    <Font name="Calibri" size="15.0" />
+                                 </font>
+                              </Hyperlink>
+                              <GridPane layoutX="-1.0" layoutY="463.0">
                                  <columnConstraints>
                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
@@ -488,21 +498,26 @@
                                     </ImageView>
                                  </children>
                               </GridPane>
-                              <Text layoutX="-1.0" layoutY="518.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Les icônes ci-dessus, affichés partout dans l'application, étaient dessinées par Microsoft Corporation et obtenus depuis Emojipedia.com" textAlignment="JUSTIFY" wrappingWidth="425.0">
+                              <Text layoutX="-1.0" layoutY="605.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Les icônes ci-dessus, affichés partout dans l'application, étaient dessinées par Microsoft Corporation et obtenus depuis Emojipedia.com" textAlignment="JUSTIFY" wrappingWidth="425.0">
                                  <font>
                                     <Font name="Calibri" size="15.0" />
                                  </font>
                               </Text>
-                              <Hyperlink layoutX="-1.0" layoutY="558.0" onAction="#openMSEmojipediaPage" style="-fx-padding: 0;" text="La page de Microsoft® sur Emojipedia®">
+                              <Hyperlink layoutX="-1.0" layoutY="645.0" onAction="#openMSEmojipediaPage" style="-fx-padding: 0;" text="La page de Microsoft® sur Emojipedia®">
                                  <font>
                                     <Font name="Calibri" size="15.0" />
                                  </font>
                               </Hyperlink>
-                              <Text layoutX="-1.0" layoutY="608.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Cette application à était développée par Alin-Lucian STĂNESCU pour l'examen final de licence, basée sur l'idée du professeur coordonateur Iuliana MARIN." textAlignment="JUSTIFY" wrappingWidth="425.0">
+                              <Text layoutX="-1.0" layoutY="695.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Cette application à était développée par Alin-Lucian STĂNESCU pour l'examen final de licence, basée sur l'idée du professeur coordonateur Iuliana MARIN." textAlignment="JUSTIFY" wrappingWidth="425.0">
                                  <font>
                                     <Font name="Calibri" size="15.0" />
                                  </font>
                               </Text>
+                              <Hyperlink layoutX="-1.0" layoutY="735.0" onAction="#openProjectGitHubPage" style="-fx-padding: 0;" text="Ouvrir la page de GitHub de ce projet">
+                                 <font>
+                                    <Font name="Calibri" size="15.0" />
+                                 </font>
+                              </Hyperlink>
                            </children>
                         </AnchorPane>
                      </content>

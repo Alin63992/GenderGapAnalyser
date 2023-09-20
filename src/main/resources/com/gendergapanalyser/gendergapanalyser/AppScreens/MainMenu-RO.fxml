@@ -379,7 +379,7 @@
                <children>
                   <ScrollPane id="infoBoxScrollPane" prefHeight="450.0" prefWidth="460.0" style="-fx-padding: 10;">
                      <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="641.0" prefWidth="425.0">
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="748.0" prefWidth="425.0">
                            <children>
                               <ImageView fx:id="appIconCreditsImageView" fitHeight="150.0" fitWidth="200.0" layoutX="145.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -401,7 +401,17 @@
                                     <Font name="Calibri" size="15.0" />
                                  </font>
                               </Hyperlink>
-                              <GridPane layoutY="376.0">
+                              <Text layoutY="387.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Animația colorată care apare pe ecranul de inițializare si pe prompt-urile &quot;Vă rugăm așteptați...&quot; a fost descărcată de pe site-ul Preloaders a Icons8." textAlignment="JUSTIFY" wrappingWidth="425.0">
+                                 <font>
+                                    <Font name="Calibri" size="15.0" />
+                                 </font>
+                              </Text>
+                              <Hyperlink layoutY="427.0" onAction="#openPreloadersWebsite" style="-fx-padding: 0;" text="Site-ul Preloaders">
+                                 <font>
+                                    <Font name="Calibri" size="15.0" />
+                                 </font>
+                              </Hyperlink>
+                              <GridPane layoutX="-1.0" layoutY="461.0">
                                  <columnConstraints>
                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
@@ -488,21 +498,26 @@
                                     </ImageView>
                                  </children>
                               </GridPane>
-                              <Text layoutY="518.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Iconițele de mai sus, afișate peste tot prin această aplicație, au fost desenate de Microsoft Corporation si obținute prin Emojipedia.com." textAlignment="JUSTIFY" wrappingWidth="425.0">
+                              <Text layoutX="-1.0" layoutY="603.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Iconițele de mai sus, afișate peste tot prin această aplicație, au fost desenate de Microsoft Corporation si obținute prin Emojipedia.com." textAlignment="JUSTIFY" wrappingWidth="425.0">
                                  <font>
                                     <Font name="Calibri" size="15.0" />
                                  </font>
                               </Text>
-                              <Hyperlink layoutY="540.0" onAction="#openMSEmojipediaPage" style="-fx-padding: 0;" text="Pagina Microsoft® pe Emojipedia®">
+                              <Hyperlink layoutX="-1.0" layoutY="625.0" onAction="#openMSEmojipediaPage" style="-fx-padding: 0;" text="Pagina Microsoft® pe Emojipedia®">
                                  <font>
                                     <Font name="Calibri" size="15.0" />
                                  </font>
                               </Hyperlink>
-                              <Text layoutY="590.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Această aplicație a fost dezvoltată de către Stănescu Alin-Lucian pentru examenul final de licență, bazată pe ideea profesorului coordonator Marin Iuliana." textAlignment="JUSTIFY" wrappingWidth="425.0">
+                              <Text layoutX="-1.0" layoutY="675.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Această aplicație a fost dezvoltată de către Stănescu Alin-Lucian pentru examenul final de licență, bazată pe ideea profesorului coordonator Marin Iuliana." textAlignment="JUSTIFY" wrappingWidth="425.0">
                                  <font>
                                     <Font name="Calibri" size="15.0" />
                                  </font>
                               </Text>
+                              <Hyperlink layoutX="-1.0" layoutY="715.0" onAction="#openProjectGitHubPage" style="-fx-padding: 0;" text="Deschideți pagina de GitHub a proiectului">
+                                 <font>
+                                    <Font name="Calibri" size="15.0" />
+                                 </font>
+                              </Hyperlink>
                            </children>
                         </AnchorPane>
                      </content>

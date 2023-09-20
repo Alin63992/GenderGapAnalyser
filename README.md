@@ -1,4 +1,4 @@
-# <u>Gender Gap Analyser</u>
+ <u>Gender Gap Analyser</u>
 A program
 written in Java for my bachelor's degree thesis
 that downloads a dataset of men's and women's salaries from the United States,
@@ -11,6 +11,18 @@ Coordinating teacher: Iuliana Marin
 
 ### Changelog
 <ul>
+<li>
+<u>20.09.2023</u><br>
+- Fixed online recovery by copying the downloaded resource that was missing to the target folder too.
+This only happens for downloaded FXML and CSS files,
+since the rest are obtained through an absolute path to the "resources" folder. Also, the app also checks for the resources in the "target" folder.<br>
+- Moved the app integrity check & recovery procedure to its own function called <b>checkAndRecover()</b>.<br>
+- Removed setting the visibility of the recovery label on the splash screen as it was throwing NullPointerException, will look into it soon.<br>
+- Added credits for the rainbow spinning ball animation on the credits page.<br>
+- Added a link to the project's GitHub page on the credits page.<br>
+- Now the app window closes when a severe application error occurs.
+</li>
+<br>
 <li>
 <u>15.09.2023</u><br>
 - <b>Added earlier but forgotten to be mentioned in changelogs: </b> On the graphs screen, now the salaries and the pay gaps all have tooltips that specify the full sum, so that if the sum doesn't fit inside its cell (in the case of RON, for example) then the user can see the sum inside the tooltip.<br>
@@ -36,7 +48,7 @@ the FXML files are now contained into the new AppScreens folder.<br>
 - Improved the app integrity check:
 the app now checks for each file specifically by path and name, not just by extension.
 Also, for the files that couldn't be found, the app now attempts to download them from GitHub (to be tested).<br>
-- Removed the SplashStart class and made Main the controller of the splash screen.<br>
+- Removed the SplashStart class and made Main the controller of the splash screen.
 </li>
 <br>
 <li>

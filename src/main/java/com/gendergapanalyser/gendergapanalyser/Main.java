@@ -47,7 +47,6 @@ public class Main extends Application implements Initializable {
     public Hyperlink ERAHyperlink;
     public ImageView appIconCreditsImageView;
     public ImageView appIconImageView;
-    public Text recoveryLabel;
     public Text updateLabel;
     @FXML
     private AnchorPane contentSources;
@@ -645,10 +644,17 @@ public class Main extends Application implements Initializable {
     private void openAppIconPage() throws URISyntaxException, IOException {
         Desktop.getDesktop().browse(new URI("https://www.flaticon.com/free-icon/gender-fluid_3369089?term=gender&related_id=3369089"));
     }
-
     @FXML
     private void openMSEmojipediaPage() throws URISyntaxException, IOException {
         Desktop.getDesktop().browse(new URI("https://emojipedia.org/microsoft"));
+    }
+    @FXML
+    private void openProjectGitHubPage() throws URISyntaxException, IOException {
+        Desktop.getDesktop().browse(new URI("https://github.com/Alin63992/GenderGapAnalyser"));
+    }
+    @FXML
+    private void openPreloadersWebsite() throws URISyntaxException, IOException {
+        Desktop.getDesktop().browse(new URI("https://icons8.com/preloaders/"));
     }
 
     private boolean checkAndRecover() {
@@ -662,131 +668,203 @@ public class Main extends Application implements Initializable {
             File appScreensFolder = new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens");
             if (appScreensFolder.exists()) {
                 //Checking if each file that should exist here does exist, and if not, trying to download it
-                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-EN.fxml"))) {
-                    recoveryLabel.setVisible(true);
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-EN.fxml")) || !new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-EN.fxml").exists()) {
                     try {
                         FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/SplashScreen-EN.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-EN.fxml"), 500, 2000);
+                        if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-EN.fxml").exists()) {
+                            if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens").exists())
+                                Files.createDirectories(Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens"));
+                            Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-EN.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-EN.fxml"));
+                        }
                     } catch (IOException e) {
                         if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
                         return false;
                     }
                 }
-                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-FR.fxml"))) {
-                    recoveryLabel.setVisible(true);
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-FR.fxml")) || !new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-FR.fxml").exists()) {
                     try {
                         FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/SplashScreen-FR.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-FR.fxml"), 500, 2000);
+                        if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-FR.fxml").exists()) {
+                            if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens").exists())
+                                Files.createDirectories(Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens"));
+                            Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-FR.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-FR.fxml"));
+                        }
                     } catch (IOException e) {
                         if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
                         return false;
                     }
                 }
-                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-RO.fxml"))) {
-                    recoveryLabel.setVisible(true);
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-RO.fxml")) || !new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-RO.fxml").exists()) {
                     try {
                         FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/SplashScreen-RO.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-RO.fxml"), 500, 2000);
+                        if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-RO.fxml").exists()) {
+                            if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens").exists())
+                                Files.createDirectories(Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens"));
+                            Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-RO.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-RO.fxml"));
+                        }
                     } catch (IOException e) {
                         if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
                         return false;
                     }
                 }
-                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-EN.fxml"))) {
-                    recoveryLabel.setVisible(true);
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-EN.fxml")) || !new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-EN.fxml").exists()) {
                     try {
                         FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/MainMenu-EN.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-EN.fxml"), 500, 2000);
+                        if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-EN.fxml").exists()) {
+                            if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens").exists())
+                                Files.createDirectories(Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens"));
+                            Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-EN.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-EN.fxml"));
+                        }
                     } catch (IOException e) {
                         if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
                         return false;
                     }
                 }
-                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-FR.fxml"))) {
-                    recoveryLabel.setVisible(true);
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-FR.fxml")) || !new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-FR.fxml").exists()) {
                     try {
                         FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/MainMenu-FR.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-FR.fxml"), 500, 2000);
+                        if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-FR.fxml").exists()) {
+                            if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens").exists())
+                                Files.createDirectories(Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens"));
+                            Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-FR.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-FR.fxml"));
+                        }
                     } catch (IOException e) {
                         if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
                         return false;
                     }
                 }
-                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-RO.fxml"))) {
-                    recoveryLabel.setVisible(true);
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-RO.fxml")) || !new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-RO.fxml").exists()) {
                     try {
                         FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/MainMenu-RO.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-RO.fxml"), 500, 2000);
+                        if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-RO.fxml").exists()) {
+                            if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens").exists())
+                                Files.createDirectories(Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens"));
+                            Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-RO.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-RO.fxml"));
+                        }
                     } catch (IOException e) {
                         if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
                         return false;
                     }
                 }
-                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-EN.fxml"))) {
-                    recoveryLabel.setVisible(true);
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-EN.fxml")) || !new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-EN.fxml").exists()) {
                     try {
                         FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/DisplayEvolutionGraph-EN.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-EN.fxml"), 500, 2000);
+                        if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-EN.fxml").exists()) {
+                            if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens").exists())
+                                Files.createDirectories(Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens"));
+                            Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-EN.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-EN.fxml"));
+                        }
                     } catch (IOException e) {
                         if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
                         return false;
                     }
                 }
-                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-FR.fxml"))) {
-                    recoveryLabel.setVisible(true);
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-FR.fxml")) || !new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-FR.fxml").exists()) {
                     try {
                         FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/DisplayEvolutionGraph-FR.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-FR.fxml"), 500, 2000);
+                        if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-FR.fxml").exists()) {
+                            if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens").exists())
+                                Files.createDirectories(Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens"));
+                            Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-FR.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-FR.fxml"));
+                        }
                     } catch (IOException e) {
                         if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
                         return false;
                     }
                 }
-                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-RO.fxml"))) {
-                    recoveryLabel.setVisible(true);
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-RO.fxml")) || !new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-RO.fxml").exists()) {
                     try {
                         FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/DisplayEvolutionGraph-RO.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-RO.fxml"), 500, 2000);
+                        if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-RO.fxml").exists()) {
+                            if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens").exists())
+                                Files.createDirectories(Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens"));
+                            Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-RO.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-RO.fxml"));
+                        }
                     } catch (IOException e) {
                         if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
                         return false;
                     }
                 }
-                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-EN.fxml"))) {
-                    recoveryLabel.setVisible(true);
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-EN.fxml")) || !new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-EN.fxml").exists()) {
                     try {
                         FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/Analysis-EN.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-EN.fxml"), 500, 2000);
+                        if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-EN.fxml").exists()) {
+                            if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens").exists())
+                                Files.createDirectories(Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens"));
+                            Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-EN.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-EN.fxml"));
+                        }
                     } catch (IOException e) {
                         if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
                         return false;
                     }
                 }
-                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-FR.fxml"))) {
-                    recoveryLabel.setVisible(true);
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-FR.fxml")) || !new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-FR.fxml").exists()) {
                     try {
                         FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/Analysis-FR.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-FR.fxml"), 500, 2000);
+                        if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-FR.fxml").exists()) {
+                            if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens").exists())
+                                Files.createDirectories(Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens"));
+                            Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-FR.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-FR.fxml"));
+                        }
                     } catch (IOException e) {
                         if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
                         return false;
                     }
                 }
-                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-RO.fxml"))) {
-                    recoveryLabel.setVisible(true);
+                if (!Arrays.stream(appScreensFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-RO.fxml")) || !new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-RO.fxml").exists()) {
                     try {
                         FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/Analysis-RO.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-RO.fxml"), 500, 2000);
+                        if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-RO.fxml").exists()) {
+                            if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens").exists())
+                                Files.createDirectories(Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens"));
+                            Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-RO.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-RO.fxml"));
+                        }
                     } catch (IOException e) {
                         if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
                         return false;
                     }
                 }
             } else {
-                recoveryLabel.setVisible(true);
                 try {
                     //Creating the App Screens folder and downloading all the files that should be in it
                     Files.createDirectories(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens"));
+                    Files.createDirectories(Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens"));
                     FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/SplashScreen-EN.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-EN.fxml"), 500, 2000);
+                    if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-EN.fxml").exists())
+                        Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-EN.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-EN.fxml"));
                     FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/SplashScreen-FR.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-FR.fxml"), 500, 2000);
+                    if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-FR.fxml").exists())
+                        Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-FR.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-FR.fxml"));
                     FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/SplashScreen-RO.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-RO.fxml"), 500, 2000);
+                    if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-RO.fxml").exists())
+                        Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-RO.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-RO.fxml"));
                     FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/MainMenu-EN.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-EN.fxml"), 500, 2000);
+                    if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-EN.fxml").exists())
+                        Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-EN.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-EN.fxml"));
                     FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/MainMenu-FR.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-FR.fxml"), 500, 2000);
+                    if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-FR.fxml").exists())
+                        Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-FR.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-FR.fxml"));
                     FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/MainMenu-RO.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-RO.fxml"), 500, 2000);
+                    if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-RO.fxml").exists())
+                        Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-RO.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-RO.fxml"));
                     FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/DisplayEvolutionGraph-EN.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-EN.fxml"), 500, 2000);
+                    if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-EN.fxml").exists())
+                        Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-EN.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-EN.fxml"));
                     FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/DisplayEvolutionGraph-FR.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-FR.fxml"), 500, 2000);
+                    if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-FR.fxml").exists())
+                        Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-FR.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-FR.fxml"));
                     FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/DisplayEvolutionGraph-RO.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-RO.fxml"), 500, 2000);
+                    if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-RO.fxml").exists())
+                        Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-RO.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/DisplayEvolutionGraph-RO.fxml"));
                     FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/Analysis-EN.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-EN.fxml"), 500, 2000);
+                    if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-EN.fxml").exists())
+                        Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-EN.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-EN.fxml"));
                     FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/Analysis-FR.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-FR.fxml"), 500, 2000);
+                    if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-FR.fxml").exists())
+                        Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-FR.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-FR.fxml"));
                     FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/Analysis-RO.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-RO.fxml"), 500, 2000);
+                    if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-RO.fxml").exists())
+                        Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-RO.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/Analysis-RO.fxml"));
                 } catch (IOException e) {
                     if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
                     return false;
@@ -801,7 +879,6 @@ public class Main extends Application implements Initializable {
                 if (emojisFolder.exists()) {
                     //Checking if each file that should exist here does exist, and if not, trying to download it
                     if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Black_Rightwards_Arrow.png"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Black_Rightwards_Arrow.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Black_Rightwards_Arrow.png"), 500, 2000);
                         } catch (IOException e) {
@@ -810,7 +887,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                     if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Black_Sun_with_Rays.png"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Black_Sun_with_Rays.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Black_Sun_with_Rays.png"), 500, 2000);
                         } catch (IOException e) {
@@ -819,7 +895,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                     if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Calendar.png"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Calendar.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Calendar.png"), 500, 2000);
                         } catch (IOException e) {
@@ -828,7 +903,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                     if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Chart_with_Upwards_Trend.png"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Chart_with_Upwards_Trend.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Chart_with_Upwards_Trend.png"), 500, 2000);
                         } catch (IOException e) {
@@ -837,7 +911,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                     if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Crescent_Moon.png"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Crescent_Moon.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Crescent_Moon.png"), 500, 2000);
                         } catch (IOException e) {
@@ -846,7 +919,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                     if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Crystal_Ball.png"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Crystal_Ball.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Crystal_Ball.png"), 500, 2000);
                         } catch (IOException e) {
@@ -855,7 +927,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                     if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/E-Mail_Symbol.png"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/E-Mail_Symbol.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/E-Mail_Symbol.png"), 500, 2000);
                         } catch (IOException e) {
@@ -864,7 +935,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                     if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Female_Sign.png"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Female_Sign.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Female_Sign.png"), 500, 2000);
                         } catch (IOException e) {
@@ -873,7 +943,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                     if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Globe_with_Meridians.png"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Globe_with_Meridians.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Globe_with_Meridians.png"), 500, 2000);
                         } catch (IOException e) {
@@ -882,7 +951,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                     if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Information_Source.png"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Information_Source.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Information_Source.png"), 500, 2000);
                         } catch (IOException e) {
@@ -891,7 +959,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                     if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Leftwards_Black_Arrow.png"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Leftwards_Black_Arrow.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Leftwards_Black_Arrow.png"), 500, 2000);
                         } catch (IOException e) {
@@ -900,7 +967,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                     if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Male_Sign.png"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Male_Sign.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Male_Sign.png"), 500, 2000);
                         } catch (IOException e) {
@@ -909,7 +975,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                     if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Memo.png"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Memo.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Memo.png"), 500, 2000);
                         } catch (IOException e) {
@@ -918,7 +983,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                     if (!Arrays.stream(emojisFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Page_Facing_Up.png"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Emojis/Page_Facing_Up.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/Page_Facing_Up.png"), 500, 2000);
                         } catch (IOException e) {
@@ -927,7 +991,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                 } else {
-                    recoveryLabel.setVisible(true);
                     try {
                         //Creating the Glyphs/Emojis folder and downloading all the files that should be in it
                         Files.createDirectories(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Emojis/"));
@@ -956,7 +1019,6 @@ public class Main extends Application implements Initializable {
                 if (miscellaneousFolder.exists()) {
                     //Checking if each file that should exist here does exist, and if not, trying to download it
                     if (!Arrays.stream(miscellaneousFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-confirmation.png"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/alert-confirmation.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-confirmation.png"), 500, 2000);
                         } catch (IOException e) {
@@ -965,7 +1027,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                     if (!Arrays.stream(miscellaneousFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-error.png"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/alert-error.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-error.png"), 500, 2000);
                         } catch (IOException e) {
@@ -974,7 +1035,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                     if (!Arrays.stream(miscellaneousFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-information.png"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/alert-information.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/alert-information.png"), 500, 2000);
                         } catch (IOException e) {
@@ -983,7 +1043,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                     if (!Arrays.stream(miscellaneousFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon.png"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/AppIcon.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon.png"), 500, 2000);
                         } catch (IOException e) {
@@ -992,7 +1051,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                     if (!Arrays.stream(miscellaneousFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon-Dark.png"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/AppIcon-Dark.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon-Dark.png"), 500, 2000);
                         } catch (IOException e) {
@@ -1001,7 +1059,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                     if (!Arrays.stream(miscellaneousFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/ExchangeRate-API-Logo-Dark.png"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/ExchangeRate-API-Logo-Dark.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/ExchangeRate-API-Logo-Dark.png"), 500, 2000);
                         } catch (IOException e) {
@@ -1010,7 +1067,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                     if (!Arrays.stream(miscellaneousFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/ExchangeRate-API-Logo-Light.png"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/ExchangeRate-API-Logo-Light.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/ExchangeRate-API-Logo-Light.png"), 500, 2000);
                         } catch (IOException e) {
@@ -1019,7 +1075,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                     if (!Arrays.stream(miscellaneousFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/loading-Dark.gif"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/loading-Dark.gif").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/loading-Dark.gif"), 500, 2000);
                         } catch (IOException e) {
@@ -1028,7 +1083,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                     if (!Arrays.stream(miscellaneousFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/loading-Light.gif"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/loading-Light.gif").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/loading-Light.gif"), 500, 2000);
                         } catch (IOException e) {
@@ -1037,7 +1091,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                     if (!Arrays.stream(miscellaneousFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/US-Dept-of-Labor-Logo.png"))) {
-                        recoveryLabel.setVisible(true);
                         try {
                             FileUtils.copyURLToFile(URI.create(githubRoot + "Glyphs/Miscellaneous/US-Dept-of-Labor-Logo.png").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/US-Dept-of-Labor-Logo.png"), 500, 2000);
                         } catch (IOException e) {
@@ -1046,7 +1099,6 @@ public class Main extends Application implements Initializable {
                         }
                     }
                 } else {
-                    recoveryLabel.setVisible(true);
                     try {
                         //Creating the Glyphs/Miscellaneous folder and downloading all the files that should be in it
                         Files.createDirectories(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous"));
@@ -1066,7 +1118,6 @@ public class Main extends Application implements Initializable {
                     }
                 }
             } else {
-                recoveryLabel.setVisible(true);
                 try {
                     //Creating the Glyphs and the Miscellaneous folder and downloading all the files that should be in it
                     Files.createDirectories(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous"));
@@ -1106,31 +1157,43 @@ public class Main extends Application implements Initializable {
             File stylesheetsFolder = new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets");
             if (stylesheetsFolder.exists()) {
                 //Checking if each file that should exist here does exist, and if not, trying to download it
-                if (!Arrays.stream(stylesheetsFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets/DarkMode.css"))) {
-                    recoveryLabel.setVisible(true);
+                if (!Arrays.stream(stylesheetsFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets/DarkMode.css")) || !new File("target/classes/com/gendergapanalyser/gendergapanalyser/Stylesheets/DarkMode.css").exists()) {
                     try {
                         FileUtils.copyURLToFile(URI.create(githubRoot + "Stylesheets/DarkMode.css").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets/DarkMode.css"), 500, 2000);
+                        if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/Stylesheets/DarkMode.css").exists()) {
+                            if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/Stylesheets").exists())
+                                Files.createDirectories(Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/Stylesheets"));
+                            Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets/DarkMode.css"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/Stylesheets/DarkMode.css"));
+                        }
                     } catch (IOException e) {
                         if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
                         return false;
                     }
                 }
-                if (!Arrays.stream(stylesheetsFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets/LightMode.css"))) {
-                    recoveryLabel.setVisible(true);
+                if (!Arrays.stream(stylesheetsFolder.listFiles()).toList().contains(new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets/LightMode.css")) || !new File("target/classes/com/gendergapanalyser/gendergapanalyser/Stylesheets/LightMode.css").exists()) {
                     try {
                         FileUtils.copyURLToFile(URI.create(githubRoot + "Stylesheets/LightMode.css").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets/LightMode.css"), 500, 2000);
+                        if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/Stylesheets/LightMode.css").exists()) {
+                            if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/Stylesheets/").exists())
+                                Files.createDirectories(Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/Stylesheets"));
+                            Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets/LightMode.css"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/Stylesheets/LightMode.css"));
+                        }
                     } catch (IOException e) {
                         if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
                         return false;
                     }
                 }
             } else {
-                recoveryLabel.setVisible(true);
                 try {
                     //Creating the Stylesheets folder and downloading all the files that should be in it
                     Files.createDirectories(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets"));
+                    Files.createDirectories(Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/Stylesheets"));
                     FileUtils.copyURLToFile(URI.create(githubRoot + "Stylesheets/DarkMode.css").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets/DarkMode.css"), 500, 2000);
+                    if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/Stylesheets/DarkMode.css").exists())
+                        Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets/DarkMode.css"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/Stylesheets/DarkMode.css"));
                     FileUtils.copyURLToFile(URI.create(githubRoot + "Stylesheets/LightMode.css").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Stylesheets/LightMode.css"), 500, 2000);
+                    if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/Stylesheets/LightMode.css").exists())
+                        Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets/LightMode.css"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/Stylesheets/LightMode.css"));
                 } catch (IOException e) {
                     if (e instanceof FileNotFoundException) fileNotFoundOnGit = true;
                     return false;
@@ -1139,7 +1202,6 @@ public class Main extends Application implements Initializable {
 
             //Checking if the fallback dataset CSV file exists, and if not, trying to download it
             if (!new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/FallbackDataset.csv").exists()) {
-                recoveryLabel.setVisible(true);
                 try {
                     FileUtils.copyURLToFile(URI.create(githubRoot + "FallbackDataset.csv").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/FallbackDataset.csv"), 500, 10000);
                 } catch (IOException e) {
@@ -1218,8 +1280,7 @@ public class Main extends Application implements Initializable {
                         as.of(Main.getCurrentStage().getScene().getRoot());
                         try {
                             as.setChild(new FXMLLoader(getClass().getResource("AppScreens/MainMenu-" + Main.language + ".fxml")).load());
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        } catch (IOException ignored) {
                         }
                         getCurrentStage().setScene(scene);
                         switchTheme = new AnimatedThemeSwitcher(getCurrentStage().getScene(), new Animation(new FadeOut()).setSpeed(2.5));
@@ -1233,6 +1294,7 @@ public class Main extends Application implements Initializable {
                         Alert applicationError = new Alert(Alert.AlertType.ERROR);
                         applicationError.setTitle("Application Error");
                         applicationError.setHeaderText("Severe Application Error!");
+                        getCurrentStage().close();
                         if (!new File("src/main/resources/com/gendergapanalyser/gendergapanalyser").exists() || fileNotFoundOnGit) {
                             ButtonType goToGitHub = new ButtonType("Go to GitHub", ButtonBar.ButtonData.LEFT);
                             applicationError.setContentText("The application cannot start because one or more files required for it to run are missing and online recovery is impossible because " + (fileNotFoundOnGit ? "the missing files were not found on GitHub" : "the application's internal folder structure is broken") + ".\nPlease click the \"Go to GitHub\" button below to download the app again and get back on track.");
@@ -1241,7 +1303,7 @@ public class Main extends Application implements Initializable {
                             Optional<ButtonType> choice = applicationError.showAndWait();
                             if (choice.isPresent() && choice.get() == goToGitHub) {
                                 try {
-                                    Desktop.getDesktop().browse(new URI("https://github.com/Alin63992/GenderGapAnalyser"));
+                                    openProjectGitHubPage();
                                 } catch (IOException | URISyntaxException ignored) {
                                 }
                             }
@@ -1306,17 +1368,32 @@ public class Main extends Application implements Initializable {
 
             //Opening the window
             getCurrentStage().show();
+            new Thread(appLoad).start();
         }
-        catch (IOException e) {
+        catch (IllegalStateException e) {
+            //An FXML file was not found
             if (new File("src/main/resources/com/gendergapanalyser/gendergapanalyser").exists()) {
                 try {
                     //String variable where the root of the GitHub link is stored for easier download
                     String githubRoot = "https://raw.githubusercontent.com/Alin63992/GenderGapAnalyser/master/src/main/resources/com/gendergapanalyser/gendergapanalyser/";
                     //Creating the App Screens folder and downloading all the files that should be in it
                     Files.createDirectories(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens"));
-                    FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/SplashScreen-EN.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-EN.fxml"), 500, 2000);
-                    FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/SplashScreen-FR.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-FR.fxml"), 500, 2000);
-                    FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/SplashScreen-RO.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-RO.fxml"), 500, 2000);
+                    Files.createDirectories(Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens"));
+                    if (!new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-EN.fxml").exists() || !new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-EN.fxml").exists()) {
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/SplashScreen-EN.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-EN.fxml"), 500, 2000);
+                        if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-EN.fxml").exists())
+                            Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-EN.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-EN.fxml"));
+                    }
+                    if (!new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-FR.fxml").exists() || !new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-FR.fxml").exists()) {
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/SplashScreen-FR.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-FR.fxml"), 500, 2000);
+                        if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-FR.fxml").exists())
+                            Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-FR.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-FR.fxml"));
+                    }
+                    if (!new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-RO.fxml").exists() || !new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-RO.fxml").exists()) {
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "AppScreens/SplashScreen-RO.fxml").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-RO.fxml"), 500, 2000);
+                        if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-RO.fxml").exists())
+                            Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-RO.fxml"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/SplashScreen-RO.fxml"));
+                    }
 
                     //Setting the splash screen to be shown on the application window
                     getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("AppScreens/SplashScreen-" + language + ".fxml")).load()));
@@ -1331,14 +1408,14 @@ public class Main extends Application implements Initializable {
 
                     //Opening the window
                     getCurrentStage().show();
-
-                    recoveryLabel.setVisible(true);
+                    new Thread(appLoad).start();
                 }
                 catch (IOException f) {
                     Alert applicationError = new Alert(Alert.AlertType.ERROR);
                     applicationError.setTitle("Application Error");
                     applicationError.setHeaderText("Severe Application Error!");
-                    if (f instanceof FileNotFoundException) {
+                    getCurrentStage().close();
+                    if (!new File("src/main/resources/com/gendergapanalyser/gendergapanalyser").exists() || f instanceof FileNotFoundException) {
                         ButtonType goToGitHub = new ButtonType("Go to GitHub", ButtonBar.ButtonData.LEFT);
                         applicationError.setContentText("The application cannot start because one or more files required for it to run are missing and online recovery is impossible because " + (fileNotFoundOnGit ? "the missing files were not found on GitHub" : "the application's internal folder structure is broken") + ".\nPlease click the \"Go to GitHub\" button below to download the app again and get back on track.");
                         applicationError.getButtonTypes().add(goToGitHub);
@@ -1346,7 +1423,7 @@ public class Main extends Application implements Initializable {
                         Optional<ButtonType> choice = applicationError.showAndWait();
                         if (choice.isPresent() && choice.get() == goToGitHub) {
                             try {
-                                Desktop.getDesktop().browse(new URI("https://github.com/Alin63992/GenderGapAnalyser"));
+                                openProjectGitHubPage();
                             } catch (IOException | URISyntaxException ignored) {
                             }
                         }
@@ -1357,9 +1434,100 @@ public class Main extends Application implements Initializable {
                     }
                 }
             }
-            e.printStackTrace();
+            else {
+                Alert applicationError = new Alert(Alert.AlertType.ERROR);
+                applicationError.setTitle("Application Error");
+                applicationError.setHeaderText("Severe Application Error!");
+                ButtonType goToGitHub = new ButtonType("Go to GitHub", ButtonBar.ButtonData.LEFT);
+                applicationError.setContentText("The application cannot start because one or more files required for it to run are missing and online recovery is impossible because the application's internal folder structure is broken.\nPlease click the \"Go to GitHub\" button below to download the app again and get back on track.");
+                applicationError.getButtonTypes().add(goToGitHub);
+                applicationError.getDialogPane().setMaxWidth(750);
+                getCurrentStage().close();
+                Optional<ButtonType> choice = applicationError.showAndWait();
+                if (choice.isPresent() && choice.get() == goToGitHub) {
+                    try {
+                        openProjectGitHubPage();
+                    } catch (IOException | URISyntaxException ignored) {}
+                }
+            }
         }
-        new Thread(appLoad).start();
+        catch (NullPointerException e) {
+            //A CSS file was not found
+            if (new File("src/main/resources/com/gendergapanalyser/gendergapanalyser").exists()) {
+                try {
+                    //String variable where the root of the GitHub link is stored for easier download
+                    String githubRoot = "https://raw.githubusercontent.com/Alin63992/GenderGapAnalyser/master/src/main/resources/com/gendergapanalyser/gendergapanalyser/";
+                    //Creating the App Screens folder and downloading all the files that should be in it
+                    Files.createDirectories(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets"));
+                    Files.createDirectories(Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/Stylesheets"));
+                    if (!new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets/DarkMode.css").exists() || !new File("target/classes/com/gendergapanalyser/gendergapanalyser/Stylesheets/DarkMode.css").exists()) {
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Stylesheets/DarkMode.css").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets/DarkMode.css"), 500, 2000);
+                        if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/Stylesheets/DarkMode.css").exists())
+                            Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets/DarkMode.css"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/Stylesheets/DarkMode.css"));
+                    }
+                    if (!new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets/LightMode.css").exists() || !new File("target/classes/com/gendergapanalyser/gendergapanalyser/Stylesheets/LightMode.css").exists()) {
+                        FileUtils.copyURLToFile(URI.create(githubRoot + "Stylesheets/LightMode.css").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets/LightMode.css"), 500, 2000);
+                        if (!new File("target/classes/com/gendergapanalyser/gendergapanalyser/Stylesheets/LightMode.css").exists())
+                            Files.copy(Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/Stylesheets/LightMode.css"), Path.of("target/classes/com/gendergapanalyser/gendergapanalyser/Stylesheets/LightMode.css"));
+                    }
+
+                    //Setting the splash screen to be shown on the application window
+                    getCurrentStage().setScene(new Scene(new FXMLLoader(getClass().getResource("AppScreens/SplashScreen-" + language + ".fxml")).load()));
+                    getCurrentStage().getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + displayMode + "Mode.css")).toExternalForm());
+
+                    //Setting the app icon that's going to be shown on the taskbar to the Gender Fluid free icon created by Vitaly Gorbachev, published on the flaticon website (https://www.flaticon.com/free-icon/gender-fluid_3369089?term=gender&related_id=3369089)
+                    getCurrentStage().getIcons().add(new Image(new FileInputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Glyphs/Miscellaneous/AppIcon.png")));
+                    getCurrentStage().centerOnScreen();
+
+                    //Setting the window to be not resizable
+                    getCurrentStage().setResizable(false);
+
+                    //Opening the window
+                    getCurrentStage().show();
+                    new Thread(appLoad).start();
+                }
+                catch (IOException f) {
+                    Alert applicationError = new Alert(Alert.AlertType.ERROR);
+                    applicationError.setTitle("Application Error");
+                    applicationError.setHeaderText("Severe Application Error!");
+                    getCurrentStage().close();
+                    if (!new File("src/main/resources/com/gendergapanalyser/gendergapanalyser").exists() || f instanceof FileNotFoundException) {
+                        ButtonType goToGitHub = new ButtonType("Go to GitHub", ButtonBar.ButtonData.LEFT);
+                        applicationError.setContentText("The application cannot start because one or more files required for it to run are missing and online recovery is impossible because " + (fileNotFoundOnGit ? "the missing files were not found on GitHub" : "the application's internal folder structure is broken") + ".\nPlease click the \"Go to GitHub\" button below to download the app again and get back on track.");
+                        applicationError.getButtonTypes().add(goToGitHub);
+                        applicationError.getDialogPane().setMaxWidth(750);
+                        Optional<ButtonType> choice = applicationError.showAndWait();
+                        if (choice.isPresent() && choice.get() == goToGitHub) {
+                            try {
+                                openProjectGitHubPage();
+                            } catch (IOException | URISyntaxException ignored) {
+                            }
+                        }
+                    }
+                    else {
+                        applicationError.setContentText("The application cannot start because one or more files required for it to run are missing and they couldn't be downloaded right now.\nPlease check that you're connected to the internet or wait for a few minutes and start the application again.");
+                        applicationError.show();
+                    }
+                }
+            }
+            else {
+                Alert applicationError = new Alert(Alert.AlertType.ERROR);
+                applicationError.setTitle("Application Error");
+                applicationError.setHeaderText("Severe Application Error!");
+                ButtonType goToGitHub = new ButtonType("Go to GitHub", ButtonBar.ButtonData.LEFT);
+                applicationError.setContentText("The application cannot start because one or more files required for it to run are missing and online recovery is impossible because the application's internal folder structure is broken.\nPlease click the \"Go to GitHub\" button below to download the app again and get back on track.");
+                applicationError.getButtonTypes().add(goToGitHub);
+                applicationError.getDialogPane().setMaxWidth(750);
+                getCurrentStage().close();
+                Optional<ButtonType> choice = applicationError.showAndWait();
+                if (choice.isPresent() && choice.get() == goToGitHub) {
+                    try {
+                        openProjectGitHubPage();
+                    } catch (IOException | URISyntaxException ignored) {}
+                }
+            }
+        }
+        catch (IOException ignored) {}
     }
 
     @Override
