@@ -1,4 +1,4 @@
-#Gender Gap Analyser  
+<u>Gender Gap Analyser</u>  
 A program
 written in Java for my bachelor's degree thesis
 that downloads a dataset of men's and women's salaries from the United States,
