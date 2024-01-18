@@ -6,6 +6,13 @@
     -fx-fill: #0000001A;
 }
 
+#menu-bar:hover {
+    -fx-cursor: open_hand;
+}
+#menu-bar:pressed {
+    -fx-cursor: closed_hand;
+}
+
 .hyperlink:visited {
     -fx-text-fill: #0096c9;
 }
@@ -105,11 +112,23 @@
     -fx-border-color: white;
     -fx-text-fill: black;
 }
-#infoBoxScrollPane {
+.mainMenuPromptsScrollPanes {
     -fx-padding: 10;
     -fx-background: white;
     -fx-border-color: white;
     -fx-text-fill: black;
+}
+.scroll-bar:vertical {
+     -fx-background-color: transparent;
+ }
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #cec9ce;
+}
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+.scroll-bar:horizontal .thumb {
+    -fx-background-color: #cec9ce;
 }
 
 .scroll-bar:vertical {
@@ -130,6 +149,46 @@
     -fx-background-color: #d7d7d7;
     -fx-text-fill: black;
     -fx-cursor: hand;
+}
+
+.split-menu-button {
+    -fx-background-color: #f3f3f3;
+}
+.split-menu-button .label {
+    -fx-background-color: #f3f3f3;
+    -fx-text-fill: black;
+    -fx-cursor: hand;
+}
+.split-menu-button .label:hover {
+    -fx-background-color: #d7d7d7;
+}
+.split-menu-button .label:focused {
+    -fx-background-color: #d7d7d7;
+}
+.split-menu-button .arrow-button {
+    -fx-background-color: #f3f3f3;
+    -fx-text-fill: black;
+    -fx-cursor: hand;
+}
+.split-menu-button .arrow-button:hover {
+    -fx-background-color: #d7d7d7;
+}
+.split-menu-button .label:focused {
+    -fx-background-color: #d7d7d7;
+}
+.split-menu-button .menu-item {
+    -fx-background-color: #f3f3f3;
+    -fx-cursor: hand;
+}
+.split-menu-button .menu-item:hover {
+    -fx-background-color: #0096c9;
+}
+.split-menu-button .menu-item:hover .label {
+    -fx-background-color: #0096c9;
+    -fx-text-fill: white;
+}
+.split-menu-button .context-menu {
+    -fx-background-color: #f3f3f3;
 }
 
 .informationToggles {

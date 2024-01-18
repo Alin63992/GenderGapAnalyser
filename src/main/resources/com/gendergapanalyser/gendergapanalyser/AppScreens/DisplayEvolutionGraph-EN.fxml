@@ -24,7 +24,7 @@
             <Font size="1.0" />
          </font>
       </Hyperlink>
-      <AnchorPane fx:id="titleBar">
+      <AnchorPane id="menu-bar" fx:id="titleBar">
          <children>
             <Rectangle id="top-bar" arcHeight="5.0" arcWidth="5.0" fill="#0000001a" height="100.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="1300.0" />
             <Text id="title" layoutX="14.0" layoutY="43.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Here are the evolution graphs for men's and women's wages, and for the wage gap.">

@@ -1,15 +1,24 @@
 package com.gendergapanalyser.gendergapanalyser;
 
-import com.itextpdf.text.Font;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.io.font.constants.StandardFonts;
+import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Image;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.UnitValue;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 import java.awt.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
@@ -306,7 +315,7 @@ public class DataProcessing {
         for (int i = 0; i < years.size(); i++) {
             //Checking for women
             //If the current salary is bigger than the last salary added to the array that stores women's evolution periods' salaries
-            if (womenSalaries.get(i) > risingSalariesWomen.get(risingSalariesWomen.size() - 1)) {
+            if (womenSalaries.get(i) > risingSalariesWomen.getLast()) {
                 //We add the current salary to the array that stores women's evolution periods' salaries
                 risingSalariesWomen.add(womenSalaries.get(i));
                 //We add the current year to the array that stores women's evolution periods
@@ -315,17 +324,17 @@ public class DataProcessing {
                 countRisingYearsWomen++;
             }
             //If the current salary is smaller than the last salary added to the array that stores women's evolution periods' salaries and the current evolution period is of 3 or more years, then we end the current evolution period by adding the end marker (that being -1) and resetting the counter that counts how long the current women's evolution period is
-            else if (womenSalaries.get(i) < risingSalariesWomen.get(risingSalariesWomen.size() - 1) && countRisingYearsWomen >= 3) {
+            else if (womenSalaries.get(i) < risingSalariesWomen.getLast() && countRisingYearsWomen >= 3) {
                 risingSalariesWomen.add(-1.0);
                 risingYearsWomen.add(-1);
                 countRisingYearsWomen = 0;
             }
             //If the current salary is smaller than the last salary added to the array that stores women's evolution periods' salaries and the current evolution period is not of 3 or more years
-            else if (womenSalaries.get(i) < risingSalariesWomen.get(risingSalariesWomen.size() - 1) && countRisingYearsWomen < 3) {
+            else if (womenSalaries.get(i) < risingSalariesWomen.getLast() && countRisingYearsWomen < 3) {
                 //Removing the one or 2 salaries and years that were added in the rising salaries and years arrays, until we find the initial -1 or the -1 that marks the end of the last rising period
-                while (risingYearsWomen.get(risingYearsWomen.size() - 1) != -1) {
-                    risingYearsWomen.remove(risingYearsWomen.size() - 1);
-                    risingSalariesWomen.remove(risingSalariesWomen.size() - 1);
+                while (risingYearsWomen.getLast() != -1) {
+                    risingYearsWomen.removeLast();
+                    risingSalariesWomen.removeLast();
                 }
                 //We add the current salary and year, and we set the counter that counts how long the current evolution period is to 1 since we started a new evolution period that currently contains one year and one salary
                 risingSalariesWomen.add(womenSalaries.get(i));
@@ -335,19 +344,19 @@ public class DataProcessing {
 
             //Doing the same operations as above for men's and wage gap's evolutions, but using their respective arrays and counters
             //Checking for men
-            if (menSalaries.get(i) > risingSalariesMen.get(risingSalariesMen.size() - 1)) {
+            if (menSalaries.get(i) > risingSalariesMen.getLast()) {
                 risingSalariesMen.add(menSalaries.get(i));
                 risingYearsMen.add(years.get(i));
                 countRisingYearsMen++;
-            } else if (menSalaries.get(i) < risingSalariesMen.get(risingSalariesMen.size() - 1) && countRisingYearsMen >= 3) {
+            } else if (menSalaries.get(i) < risingSalariesMen.getLast() && countRisingYearsMen >= 3) {
                 risingSalariesMen.add(-1.0);
                 risingYearsMen.add(-1);
                 countRisingYearsMen = 0;
-            } else if (menSalaries.get(i) < risingSalariesMen.get(risingSalariesMen.size() - 1) && countRisingYearsMen < 3) {
+            } else if (menSalaries.get(i) < risingSalariesMen.getLast() && countRisingYearsMen < 3) {
                 //Removing the one or 2 salaries and years that were added in the rising salaries and years arrays, until we find the initial -1 or the -1 that marks the end of the last rising period
-                while (risingYearsMen.get(risingYearsMen.size() - 1) != -1) {
-                    risingYearsMen.remove(risingYearsMen.size() - 1);
-                    risingSalariesMen.remove(risingSalariesMen.size() - 1);
+                while (risingYearsMen.getLast() != -1) {
+                    risingYearsMen.removeLast();
+                    risingSalariesMen.removeLast();
                 }
                 risingSalariesMen.add(menSalaries.get(i));
                 risingYearsMen.add(years.get(i));
@@ -355,19 +364,19 @@ public class DataProcessing {
             }
 
             //Checking for pay gap
-            if (payGapsArray.get(i) < dippingSumsPayGap.get(dippingSumsPayGap.size() - 1)) {
+            if (payGapsArray.get(i) < dippingSumsPayGap.getLast()) {
                 dippingSumsPayGap.add(payGapsArray.get(i));
                 dippingYearsPayGap.add(years.get(i));
                 countDippingYearsPayGap++;
-            } else if (payGapsArray.get(i) > dippingSumsPayGap.get(dippingSumsPayGap.size() - 1) && countDippingYearsPayGap >= 3) {
+            } else if (payGapsArray.get(i) > dippingSumsPayGap.getLast() && countDippingYearsPayGap >= 3) {
                 dippingSumsPayGap.add(-1.0);
                 dippingYearsPayGap.add(-1);
                 countDippingYearsPayGap = 0;
-            } else if (payGapsArray.get(i) > dippingSumsPayGap.get(dippingSumsPayGap.size() - 1) && countDippingYearsPayGap < 3) {
+            } else if (payGapsArray.get(i) > dippingSumsPayGap.getLast() && countDippingYearsPayGap < 3) {
                 //Removing the one or 2 salaries and years that were added in the rising salaries and years arrays, until we find the initial -1 or the -1 that marks the end of the last rising period
-                while (dippingYearsPayGap.get(dippingYearsPayGap.size() - 1) != -1) {
-                    dippingYearsPayGap.remove(dippingYearsPayGap.size() - 1);
-                    dippingSumsPayGap.remove(dippingSumsPayGap.size() - 1);
+                while (dippingYearsPayGap.getLast() != -1) {
+                    dippingYearsPayGap.removeLast();
+                    dippingSumsPayGap.removeLast();
                 }
                 dippingSumsPayGap.add(payGapsArray.get(i));
                 dippingYearsPayGap.add(years.get(i));
@@ -376,39 +385,39 @@ public class DataProcessing {
         }
 
         //Removing the first -1s from the rising arrays since they're no longer needed and will pose problems later on
-        risingYearsWomen.remove(0);
-        risingYearsMen.remove(0);
-        dippingYearsPayGap.remove(0);
-        risingSalariesWomen.remove(0);
-        risingSalariesMen.remove(0);
-        dippingSumsPayGap.remove(0);
+        risingYearsWomen.removeFirst();
+        risingYearsMen.removeFirst();
+        dippingYearsPayGap.removeFirst();
+        risingSalariesWomen.removeFirst();
+        risingSalariesMen.removeFirst();
+        dippingSumsPayGap.removeFirst();
 
         //Cleaning the incomplete evolution periods in the rising and dipping arrays, if there are any, or completing them if the iterations are done before the end marker being added
         if (countRisingYearsWomen >= 3) {
             risingYearsWomen.add(-1);
             risingSalariesWomen.add(-1.0);
         } else {
-            while (risingYearsWomen.get(risingYearsWomen.size() - 1) != -1) {
-                risingYearsWomen.remove(risingYearsWomen.size() - 1);
-                risingSalariesWomen.remove(risingSalariesWomen.size() - 1);
+            while (risingYearsWomen.getLast() != -1) {
+                risingYearsWomen.removeLast();
+                risingSalariesWomen.removeLast();
             }
         }
         if (countRisingYearsMen >= 3) {
             risingYearsMen.add(-1);
             risingSalariesMen.add(-1.0);
         } else {
-            while (risingYearsMen.get(risingYearsMen.size() - 1) != -1) {
-                risingYearsMen.remove(risingYearsMen.size() - 1);
-                risingSalariesMen.remove(risingSalariesMen.size() - 1);
+            while (risingYearsMen.getLast() != -1) {
+                risingYearsMen.removeLast();
+                risingSalariesMen.removeLast();
             }
         }
         if (countDippingYearsPayGap >= 3) {
             dippingYearsPayGap.add(-1);
             dippingSumsPayGap.add(-1.0);
         } else {
-            while (dippingYearsPayGap.get(dippingYearsPayGap.size() - 1) != -1) {
-                dippingYearsPayGap.remove(dippingYearsPayGap.size() - 1);
-                dippingSumsPayGap.remove(dippingSumsPayGap.size() - 1);
+            while (dippingYearsPayGap.getLast() != -1) {
+                dippingYearsPayGap.removeLast();
+                dippingSumsPayGap.removeLast();
             }
         }
 
@@ -675,7 +684,7 @@ public class DataProcessing {
     }
 
     //Function that predicts the evolutions of the salaries using simple linear regression analysis, and computes the differences between predicted salaries
-    public void predictEvolutions(int numberOfYears) throws IOException {
+    public void predictEvolutions(int numberOfYears) {
         //Initializing the array
         datasetWithPredictions = new String[dataset.length + numberOfYears * 2][3];
         genderPayGapWithPredictions = new String[genderPayGap.length + numberOfYears][2];
@@ -1087,20 +1096,19 @@ public class DataProcessing {
     }
 
     //Function that creates a PDF containing the graph with all the genders, pay gap and predictions (if it's the case), interpretations, dataset with or without predictions and the yearly pay gaps
-    public void createPDF() throws IOException, DocumentException {
-        //Creating a PDF document
-        Document pdf = new Document();
-        PdfWriter.getInstance(pdf, new FileOutputStream("src/main/resources/com/gendergapanalyser/gendergapanalyser/Analysis.pdf"));
-
-        //Opening it for writing
-        pdf.open();
+    public void createPDF() throws IOException {
+        PdfDocument pdf = new PdfDocument(new PdfWriter("src/main/resources/com/gendergapanalyser/gendergapanalyser/Analysis.pdf"));
+        Document document = new Document(pdf);
 
         //Creating the title of the PDF that contains the range of years it covers (1960 to the last year of the dataset or the last predicted year), centering it on the line then adding it to the PDF
-        Paragraph title = new Paragraph((Main.language.equals("EN") ? "Gender Equality in the United States, since the year " + dataset[0][1] + " to " : Main.language.equals("FR") ? "Égalité entre les Genres dans les États Unis, depuis l'année " + dataset[0][1] + " jusqu'à " : "Egalitatea intre Genuri in Statele Unite, din anul " + dataset[0][1] + " pana in ") + (predictionsGenerated ? datasetWithPredictions[datasetWithPredictions.length - 1][1] : dataset[dataset.length - 1][1]), new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD, BaseColor.BLUE));
-        title.setAlignment(Element.ALIGN_CENTER);
-        pdf.add(title);
+        Paragraph title = new Paragraph((Main.language.equals("EN") ? "Gender Equality in the United States, since the year " + dataset[0][1] + " to " : Main.language.equals("FR") ? "Égalité entre les Genres dans les États Unis, depuis l'année " + dataset[0][1] + " jusqu'à " : "Egalitatea intre Genuri in Statele Unite, din anul " + dataset[0][1] + " pana in ") + (predictionsGenerated ? datasetWithPredictions[datasetWithPredictions.length - 1][1] : dataset[dataset.length - 1][1]));
+        title.setBold();
+        title.setFontSize(18);
+        title.setTextAlignment(TextAlignment.CENTER);
+        document.add(title);
 
-        //Checking  what the app's display mode has been set to, so that we can generate a light graph if the app is set to dark mode
+        //Checking what the app's display mode has been set to,
+        // so that we can generate a light graph if the app is set to dark mode
         Image graph;
         if (Main.displayMode.equals("Dark")) {
             //Temporarily setting the displayMode variable to Light so we can generate light backgrounds to be set on light pages
@@ -1113,7 +1121,7 @@ public class DataProcessing {
                 createSalaryGraphForEverybody();
             }
             //Creating an image containing the graph with all the genders and the pay gap, with or without predictions
-            graph = Image.getInstance(predictionsGenerated ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap-prediction.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap.png");
+            graph = new Image(ImageDataFactory.create(predictionsGenerated ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap-prediction.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap.png"));
             //Setting the displayMode variable back to dark
             Main.displayMode = "Dark";
             //Regenerating graphs to be dark to be displayed in the app
@@ -1126,51 +1134,42 @@ public class DataProcessing {
         }
         else {
             //Creating an image containing the graph with all the genders and the pay gap, with or without predictions, scaling it so it fits the entire width of the page minus the left and right margins, and the height being the width - 150, then adding it to the PDF
-            graph = Image.getInstance(predictionsGenerated ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap-prediction.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap.png");
+            graph = new Image(ImageDataFactory.create(predictionsGenerated ? "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap-prediction.png" : "src/main/resources/com/gendergapanalyser/gendergapanalyser/Graphs/all_genders-wageGap.png"));
         }
-        //Scaling the graph so it fits the entire width of the page minus the left and right margins, and the height being the width - 150, then adding it to the PDF
-        graph.scaleAbsoluteWidth(pdf.getPageSize().getWidth() - pdf.leftMargin() - pdf.rightMargin());
-        graph.scaleAbsoluteHeight(graph.getScaledWidth() - 150);
-        pdf.add(graph);
+        document.add(graph);
+        document.add(new Paragraph("\n"));
 
         //Creating a paragraph as a subtitle for the women's evolution interpretation, a paragraph for the interpretation and a new line to separate it from the rest of the document, then adding them to the PDF
         //Removing diacritics if the app language is set to Romanian since itextpdf cannot write Romanian diacritics
-        pdf.add(new Paragraph(Main.language.equals("EN") ? "How did women's salaries evolve?" : Main.language.equals("FR") ? "Comment ont évolué les salaires des femmes ?" : "Cum au evoluat salariile femeilor?", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLDITALIC)));
-        pdf.add(new Paragraph(Main.language.equals("RO") ? Normalizer.normalize(predictionsGenerated ? womenAnalysisWithPredictions : womenAnalysis, Normalizer.Form.NFKD).replaceAll("\\p{M}", "") : predictionsGenerated ? womenAnalysisWithPredictions : womenAnalysis, new Font(Font.FontFamily.HELVETICA, 14)));
-        pdf.add(new Paragraph("\n", new Font(Font.FontFamily.HELVETICA, 18)));
+        document.add(new Paragraph(Main.language.equals("EN") ? "How did women's salaries evolve?" : Main.language.equals("FR") ? "Comment ont évolué les salaires des femmes ?" : "Cum au evoluat salariile femeilor?").setItalic().setBold().setFontSize(14));
+        document.add(new Paragraph(Main.language.equals("RO") ? Normalizer.normalize(predictionsGenerated ? womenAnalysisWithPredictions : womenAnalysis, Normalizer.Form.NFKD).replaceAll("\\p{M}", "") : predictionsGenerated ? womenAnalysisWithPredictions : womenAnalysis).setFontSize(14));
+        document.add(new Paragraph("\n"));
 
         //Creating a paragraph as a subtitle for the men's evolution interpretation, a paragraph for the interpretation and a new line to separate it from the rest of the document, then adding them to the PDF
-        pdf.add(new Paragraph(Main.language.equals("EN") ? "How did men's salaries evolve?" : Main.language.equals("FR") ? "Comment ont évolué les salaires d'hommes ?" : "Cum au evoluat salariile barbatilor?", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLDITALIC)));
-        pdf.add(new Paragraph(Main.language.equals("RO") ? Normalizer.normalize(predictionsGenerated ? menAnalysisWithPredictions : menAnalysis, Normalizer.Form.NFKD).replaceAll("\\p{M}", "") : predictionsGenerated ? menAnalysisWithPredictions : menAnalysis, new Font(Font.FontFamily.HELVETICA, 14)));
-        pdf.add(new Paragraph("\n", new Font(Font.FontFamily.HELVETICA, 18)));
+        document.add(new Paragraph(Main.language.equals("EN") ? "How did men's salaries evolve?" : Main.language.equals("FR") ? "Comment ont évolué les salaires d'hommes ?" : "Cum au evoluat salariile barbatilor?").setItalic().setBold().setFontSize(14));
+        document.add(new Paragraph(Main.language.equals("RO") ? Normalizer.normalize(predictionsGenerated ? menAnalysisWithPredictions : menAnalysis, Normalizer.Form.NFKD).replaceAll("\\p{M}", "") : predictionsGenerated ? menAnalysisWithPredictions : menAnalysis).setFontSize(14));
+        document.add(new Paragraph("\n"));
 
         //Creating a paragraph as a subtitle for the wage gap's evolution interpretation, a paragraph for the interpretation and a new line to separate it from the rest of the document, then adding them to the PDF
-        pdf.add(new Paragraph(Main.language.equals("EN") ? "How did the pay gap evolve?" : Main.language.equals("FR") ? "Comment a évolué la différence de la paye ?" : "Cum a evoluat diferenta intre salarii?", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLDITALIC)));
-        pdf.add(new Paragraph(Main.language.equals("RO") ? Normalizer.normalize(predictionsGenerated ? wageGapAnalysisWithPredictions : wageGapAnalysis, Normalizer.Form.NFKD).replaceAll("\\p{M}", "") : predictionsGenerated ? wageGapAnalysisWithPredictions : wageGapAnalysis, new Font(Font.FontFamily.HELVETICA, 14)));
-        pdf.add(new Paragraph("\n", new Font(Font.FontFamily.HELVETICA, 18)));
+        document.add(new Paragraph(Main.language.equals("EN") ? "How did the pay gap evolve?" : Main.language.equals("FR") ? "Comment a évolué la différence de la paye ?" : "Cum a evoluat diferenta intre salarii?").setItalic().setBold().setFontSize(14));
+        document.add(new Paragraph(Main.language.equals("RO") ? Normalizer.normalize(predictionsGenerated ? wageGapAnalysisWithPredictions : wageGapAnalysis, Normalizer.Form.NFKD).replaceAll("\\p{M}", "") : predictionsGenerated ? wageGapAnalysisWithPredictions : wageGapAnalysis).setFontSize(14));
+        document.add(new Paragraph("\n"));
 
         //Creating a paragraph as a subtitle for the dataset and a new line to create a bit of space between the subtitle and the dataset table, then adding them to the PDF
-        pdf.add(new Paragraph(Main.language.equals("EN") ? "Data used" : Main.language.equals("FR") ? "Données utilisés" : "Date utilizate", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLDITALIC)));
-        pdf.add(new Paragraph("\n", new Font(Font.FontFamily.HELVETICA, 18)));
+        document.add(new Paragraph(Main.language.equals("EN") ? "Data used" : Main.language.equals("FR") ? "Données utilisés" : "Date utilizate").setItalic().setBold().setFontSize(14));
+        document.add(new Paragraph("\n"));
 
         //Creating the table which will contain the dataset and the yearly pay gaps
-        PdfPTable datasetTablePDF = new PdfPTable(4);
+        Table datasetTablePDF = new Table(4);
+        datasetTablePDF.setWidth(UnitValue.createPercentValue(100));
 
-        //Creating 4 cells to be used as headers, setting their background color and adding them to the table
-        PdfPCell yearHeader = new PdfPCell(new Phrase(Main.language.equals("EN") ? "Year" : "An"));
-        yearHeader.setBackgroundColor(BaseColor.LIGHT_GRAY);
-        datasetTablePDF.addCell(yearHeader);
-        PdfPCell womenHeader = new PdfPCell(new Phrase(Main.language.equals("EN") ? "Women's Salary" : Main.language.equals("FR") ? "Salaire des Femmes" : "Salariul Femeilor"));
-        womenHeader.setBackgroundColor(BaseColor.LIGHT_GRAY);
-        datasetTablePDF.addCell(womenHeader);
-        PdfPCell menHeader = new PdfPCell(new Phrase(Main.language.equals("EN") ? "Men's Salary" : Main.language.equals("FR") ? "Salaire d'Hommes" : "Salariul Barbatilor"));
-        menHeader.setBackgroundColor(BaseColor.LIGHT_GRAY);
-        datasetTablePDF.addCell(menHeader);
-        PdfPCell gapHeader = new PdfPCell(new Phrase(Main.language.equals("EN") ? "Pay Gap" : Main.language.equals("FR") ? "Différence de la Paye" : "Diferenta intre Salarii"));
-        gapHeader.setBackgroundColor(BaseColor.LIGHT_GRAY);
-        datasetTablePDF.addCell(gapHeader);
+        //Creating four cells to be used as headers, setting their background colour and adding them to the table
+        datasetTablePDF.addHeaderCell(new Paragraph(Main.language.equals("EN") ? "Year" : "An").setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)).setTextAlignment(TextAlignment.CENTER));
+        datasetTablePDF.addHeaderCell(new Paragraph(Main.language.equals("EN") ? "Women's Salary" : Main.language.equals("FR") ? "Salaire des Femmes" : "Salariul Femeilor").setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)).setTextAlignment(TextAlignment.CENTER));
+        datasetTablePDF.addHeaderCell(new Paragraph(Main.language.equals("EN") ? "Men's Salary" : Main.language.equals("FR") ? "Salaire d'Hommes" : "Salariul Barbatilor").setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)).setTextAlignment(TextAlignment.CENTER));
+        datasetTablePDF.addHeaderCell(new Paragraph(Main.language.equals("EN") ? "Pay Gap" : Main.language.equals("FR") ? "Différence de la Paye" : "Diferenta intre Salarii").setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD)).setTextAlignment(TextAlignment.CENTER));
 
-        //Creating 4 variables where each year and the respective salaries and wage gap will be stored
+        //Creating four variables where each year and the respective salaries and wage gap will be stored
         String year = "";
         String womanSalary = "";
         String manSalary = "";
@@ -1178,15 +1177,13 @@ public class DataProcessing {
 
         //Iterating over the dataset that includes or not the predictions, depending on the case
         for (String[] statistic : predictionsGenerated ? datasetWithPredictions : dataset) {
-            //If we have something set in the 4 string variables above
+            //If we have something set in the 4-string variables above
             if (!year.isEmpty() && !womanSalary.isEmpty() && !manSalary.isEmpty() && !payGap.isEmpty()) {
                 //We create a cell for each, containing what each string variable contains
-                PdfPCell yearCell = new PdfPCell(new Phrase(year));
-                //We only set the year's cell background to be different
-                yearCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
-                PdfPCell womanSalaryCell = new PdfPCell(new Phrase(womanSalary));
-                PdfPCell manSalaryCell = new PdfPCell(new Phrase(manSalary));
-                PdfPCell payGapCell = new PdfPCell(new Phrase(payGap));
+                Cell yearCell = new Cell().add(new Paragraph(year));
+                Cell womanSalaryCell = new Cell().add(new Paragraph(womanSalary));
+                Cell manSalaryCell = new Cell().add(new Paragraph(manSalary));
+                Cell payGapCell = new Cell().add(new Paragraph(payGap));
 
                 //We add the cells to the table
                 datasetTablePDF.addCell(yearCell);
@@ -1220,12 +1217,10 @@ public class DataProcessing {
 
         //Because iterating the dataset finishes before adding the last year to the PDF table, we add it now
         //We create a cell for each, containing what each string variable contains
-        PdfPCell yearCell = new PdfPCell(new Phrase(year));
-        //We only set the year's cell background to be different
-        yearCell.setBackgroundColor(BaseColor.LIGHT_GRAY);
-        PdfPCell womanSalaryCell = new PdfPCell(new Phrase(womanSalary));
-        PdfPCell manSalaryCell = new PdfPCell(new Phrase(manSalary));
-        PdfPCell payGapCell = new PdfPCell(new Phrase(payGap));
+        Cell yearCell = new Cell().add(new Paragraph(year));
+        Cell womanSalaryCell = new Cell().add(new Paragraph(womanSalary));
+        Cell manSalaryCell = new Cell().add(new Paragraph(manSalary));
+        Cell payGapCell = new Cell().add(new Paragraph(payGap));
 
         //We add the cells to the table
         datasetTablePDF.addCell(yearCell);
@@ -1234,10 +1229,10 @@ public class DataProcessing {
         datasetTablePDF.addCell(payGapCell);
 
         //We add the created table to the PDF
-        pdf.add(datasetTablePDF);
+        document.add(datasetTablePDF);
 
         //We finish editing the PDF
-        pdf.close();
+        document.close();
 
         PDFGeneratedWithPredictions = predictionsGenerated;
         Main.changedLanguage = false;

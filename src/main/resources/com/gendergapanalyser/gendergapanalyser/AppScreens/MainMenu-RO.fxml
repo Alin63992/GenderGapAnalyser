@@ -6,16 +6,20 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitMenuButton?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.shape.Rectangle?>
@@ -29,10 +33,10 @@
             <Font size="1.0" />
          </font>
       </Hyperlink>
-      <AnchorPane fx:id="titleBar">
+      <AnchorPane id="menu-bar" fx:id="titleBar">
          <children>
             <Rectangle id="top-bar" arcHeight="5.0" arcWidth="5.0" fill="#0000001a" height="100.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="1100.0" />
-            <Text id="title" layoutX="14.0" layoutY="43.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Bună! Alege ce vrei să faci!">
+            <Text id="title" layoutX="14.0" layoutY="43.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Bună! Alege ce vrei să faci! ">
                <font>
                   <Font name="Calibri" size="20.0" />
                </font>
@@ -56,6 +60,11 @@
                </font>
             </Text>
             <ChoiceBox fx:id="currencyPicker" layoutX="787.0" layoutY="50.0" prefWidth="75.0" styleClass="promptButtons" />
+            <Hyperlink fx:id="updateLink" layoutX="236.0" layoutY="24.0" onAction="#toggleUpdatePrompt" style="-fx-padding: 0;" text="Actualizare disponibilă!" textFill="RED" visible="false">
+               <font>
+                  <Font name="Calibri" size="20.0" />
+               </font>
+            </Hyperlink>
          </children>
       </AnchorPane>
       <Text layoutX="265.0" layoutY="143.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Vezi statisticile actuale ">
@@ -185,22 +194,26 @@
                   <Font name="Calibri" size="15.0" />
                </font>
             </Text>
-            <Button layoutX="401.0" layoutY="484.0" mnemonicParsing="false" onAction="#togglePredictionPrompt" styleClass="promptButtons" text="❌ Anulează">
-               <font>
-                  <Font name="Calibri" size="20.0" />
-               </font>
-               <cursor>
-                  <Cursor fx:constant="HAND" />
-               </cursor>
-            </Button>
-            <Button layoutX="575.0" layoutY="484.0" mnemonicParsing="false" onAction="#attemptPrediction" prefHeight="37.0" prefWidth="125.0" styleClass="promptButtons" text="✅ Prezice">
-               <font>
-                  <Font name="Calibri" size="20.0" />
-               </font>
-               <cursor>
-                  <Cursor fx:constant="HAND" />
-               </cursor>
-            </Button>
+            <HBox layoutX="371.0" layoutY="484.0" prefWidth="360.0">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#togglePredictionPrompt" prefWidth="180.0" styleClass="promptButtons" text="❌ Anulează">
+                     <font>
+                        <Font name="Calibri" size="20.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button mnemonicParsing="false" onAction="#attemptPrediction" prefHeight="37.0" prefWidth="180.0" styleClass="promptButtons" text="✅ Prezice">
+                     <font>
+                        <Font name="Calibri" size="20.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+               </children>
+            </HBox>
          </children>
       </AnchorPane>
       <AnchorPane fx:id="discardConfirmation" prefHeight="790.0" prefWidth="1100.0" visible="false">
@@ -246,16 +259,20 @@
                   <Font name="Calibri" size="15.0" />
                </font>
             </Text>
-            <Button layoutX="409.0" layoutY="432.0" mnemonicParsing="false" onAction="#toggleEmailPrompt" styleClass="promptButtons" text="❌ Anulare">
-               <font>
-                  <Font name="Calibri" size="20.0" />
-               </font>
-            </Button>
-            <Button layoutX="553.0" layoutY="432.0" mnemonicParsing="false" onAction="#attemptSendMail" styleClass="promptButtons" text="✅ Trimitere">
-               <font>
-                  <Font name="Calibri" size="20.0" />
-               </font>
-            </Button>
+            <HBox layoutX="371.0" layoutY="432.0" prefWidth="360.0">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#toggleEmailPrompt" prefWidth="180.0" styleClass="promptButtons" text="❌ Anulare">
+                     <font>
+                        <Font name="Calibri" size="20.0" />
+                     </font>
+                  </Button>
+                  <Button mnemonicParsing="false" onAction="#attemptSendMail" prefWidth="180.0" styleClass="promptButtons" text="✅ Trimitere">
+                     <font>
+                        <Font name="Calibri" size="20.0" />
+                     </font>
+                  </Button>
+               </children>
+            </HBox>
          </children>
       </AnchorPane>
       <AnchorPane fx:id="missingOutgoingCredentialsPrompt" prefHeight="790.0" prefWidth="1100.0" visible="false">
@@ -273,34 +290,42 @@
                   <Font name="Calibri" size="15.0" />
                </font>
             </Text>
-            <Button layoutX="416.0" layoutY="494.0" mnemonicParsing="false" onAction="#toggleEmailPrompt" styleClass="promptButtons" text="❌ Anulare">
-               <font>
-                  <Font name="Calibri" size="20.0" />
-               </font>
-            </Button>
-            <Button layoutX="560.0" layoutY="494.0" mnemonicParsing="false" onAction="#attemptSendMail" styleClass="promptButtons" text="✅ Trimitere">
-               <font>
-                  <Font name="Calibri" size="20.0" />
-               </font>
-            </Button>
+            <HBox layoutX="370.0" layoutY="494.0" prefWidth="360.0">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#toggleEmailPrompt" prefWidth="180.0" styleClass="promptButtons" text="❌ Anulare">
+                     <font>
+                        <Font name="Calibri" size="20.0" />
+                     </font>
+                  </Button>
+                  <Button mnemonicParsing="false" onAction="#attemptSendMail" prefWidth="180.0" styleClass="promptButtons" text="✅ Trimitere">
+                     <font>
+                        <Font name="Calibri" size="20.0" />
+                     </font>
+                  </Button>
+               </children>
+            </HBox>
          </children>
       </AnchorPane>
       <AnchorPane fx:id="dataSources" prefHeight="790.0" prefWidth="1100.0" visible="false">
          <children>
             <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="570.0" layoutX="301.0" layoutY="105.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="prompts" width="500.0" />
-            <ToggleButton fx:id="sourcesToggle" layoutX="320.0" layoutY="119.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="230.0" selected="true" styleClass="informationToggles" text="Surse de Date" AnchorPane.topAnchor="119.0">
-               <font>
-                  <Font name="Calibri" size="20.0" />
-               </font>
-               <toggleGroup>
-                  <ToggleGroup fx:id="informationButtons" />
-               </toggleGroup>
-            </ToggleButton>
-            <ToggleButton fx:id="creditsToggle" layoutX="550.0" layoutY="119.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="230.0" styleClass="informationToggles" text="Credite" toggleGroup="$informationButtons">
-               <font>
-                  <Font name="Calibri" size="20.0" />
-               </font>
-            </ToggleButton>
+            <HBox alignment="CENTER" layoutX="320.0" layoutY="119.0">
+               <children>
+                  <ToggleButton fx:id="sourcesToggle" mnemonicParsing="false" prefHeight="37.0" prefWidth="230.0" selected="true" styleClass="informationToggles" text="Surse de Date">
+                     <font>
+                        <Font name="Calibri" size="20.0" />
+                     </font>
+                     <toggleGroup>
+                        <ToggleGroup fx:id="informationButtons" />
+                     </toggleGroup>
+                  </ToggleButton>
+                  <ToggleButton fx:id="creditsToggle" mnemonicParsing="false" prefHeight="37.0" prefWidth="230.0" styleClass="informationToggles" text="Credite" toggleGroup="$informationButtons">
+                     <font>
+                        <Font name="Calibri" size="20.0" />
+                     </font>
+                  </ToggleButton>
+               </children>
+            </HBox>
             <AnchorPane fx:id="contentSources" layoutX="320.0" layoutY="165.0" prefHeight="460.0" prefWidth="460.0">
                <children>
                   <ImageView fitHeight="126.0" fitWidth="138.0" layoutX="7.0" layoutY="58.0" pickOnBounds="true" preserveRatio="true">
@@ -329,6 +354,13 @@
                            </image>
                         </ImageView>
                      </graphic>
+                     <tooltip>
+                        <Tooltip text="Deschide site-ul web al Departamentului de Muncă al Statelor Unite în navigatorul dumneavoastră.">
+                           <font>
+                              <Font name="Calibri" size="13.0" />
+                           </font>
+                        </Tooltip>
+                     </tooltip>
                   </Hyperlink>
                   <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="148.0" layoutY="164.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -357,6 +389,13 @@
                            </image>
                         </ImageView>
                      </graphic>
+                     <tooltip>
+                        <Tooltip text="Deschide site-ul web al ExchangeRates-API în navigatorul dumneavoastră.">
+                           <font>
+                              <Font name="Calibri" size="13.0" />
+                           </font>
+                        </Tooltip>
+                     </tooltip>
                   </Hyperlink>
                   <ImageView fitHeight="40.0" fitWidth="40.0" layoutX="148.0" layoutY="383.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -375,11 +414,11 @@
                   </Label>
                </children>
             </AnchorPane>
-            <AnchorPane fx:id="contentCredits" layoutX="320.0" layoutY="165.0" prefHeight="460.0" prefWidth="460.0" visible="false">
+            <AnchorPane fx:id="contentCredits" layoutX="320.0" layoutY="165.0" prefHeight="450.0" prefWidth="460.0" visible="false">
                <children>
-                  <ScrollPane id="infoBoxScrollPane" prefHeight="450.0" prefWidth="460.0" style="-fx-padding: 10;">
+                  <ScrollPane prefHeight="450.0" prefWidth="460.0" styleClass="mainMenuPromptsScrollPanes">
                      <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="748.0" prefWidth="425.0">
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="786.0" prefWidth="425.0">
                            <children>
                               <ImageView fx:id="appIconCreditsImageView" fitHeight="150.0" fitWidth="200.0" layoutX="145.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -498,26 +537,31 @@
                                     </ImageView>
                                  </children>
                               </GridPane>
-                              <Text layoutX="-1.0" layoutY="603.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Iconițele de mai sus, afișate peste tot prin această aplicație, au fost desenate de Microsoft Corporation si obținute prin Emojipedia.com." textAlignment="JUSTIFY" wrappingWidth="425.0">
+                              <Text layoutY="603.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Iconițele de mai sus, afișate peste tot prin această aplicație, au fost desenate de Microsoft Corporation si obținute prin Emojipedia.com." textAlignment="JUSTIFY" wrappingWidth="425.0">
                                  <font>
                                     <Font name="Calibri" size="15.0" />
                                  </font>
                               </Text>
-                              <Hyperlink layoutX="-1.0" layoutY="625.0" onAction="#openMSEmojipediaPage" style="-fx-padding: 0;" text="Pagina Microsoft® pe Emojipedia®">
+                              <Hyperlink layoutY="625.0" onAction="#openMSEmojipediaPage" style="-fx-padding: 0;" text="Pagina Microsoft® pe Emojipedia®">
                                  <font>
                                     <Font name="Calibri" size="15.0" />
                                  </font>
                               </Hyperlink>
-                              <Text layoutX="-1.0" layoutY="675.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Această aplicație a fost dezvoltată de către Stănescu Alin-Lucian pentru examenul final de licență, bazată pe ideea profesorului coordonator Marin Iuliana." textAlignment="JUSTIFY" wrappingWidth="425.0">
+                              <Text layoutY="675.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Această aplicație a fost dezvoltată de către Stănescu Alin-Lucian pentru examenul final de licență, bazată pe ideea profesorului coordonator Marin Iuliana." textAlignment="JUSTIFY" wrappingWidth="425.0">
                                  <font>
                                     <Font name="Calibri" size="15.0" />
                                  </font>
                               </Text>
-                              <Hyperlink layoutX="-1.0" layoutY="715.0" onAction="#openProjectGitHubPage" style="-fx-padding: 0;" text="Deschideți pagina de GitHub a proiectului">
+                              <Hyperlink layoutY="715.0" onAction="#openProjectGitHubPage" style="-fx-padding: 0;" text="Deschideți pagina de GitHub a proiectului">
                                  <font>
                                     <Font name="Calibri" size="15.0" />
                                  </font>
                               </Hyperlink>
+                              <Text fx:id="versionText" layoutY="765.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Versiunea aplicației: ">
+                                 <font>
+                                    <Font name="Calibri" size="15.0" />
+                                 </font>
+                              </Text>
                            </children>
                         </AnchorPane>
                      </content>
@@ -532,6 +576,44 @@
                   <Cursor fx:constant="HAND" />
                </cursor>
             </Button>
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="updatePrompt" prefHeight="790.0" prefWidth="1100.0" visible="false">
+         <children>
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="428.0" layoutX="343.0" layoutY="181.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="prompts" width="415.0" />
+            <Text layoutX="355.0" layoutY="211.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="O nouă actualizare este disponibilă!" textAlignment="CENTER" wrappingWidth="390.0">
+               <font>
+                  <Font name="Calibri Light" size="20.0" />
+               </font>
+            </Text>
+            <Text fx:id="updateReleasedOn" layoutX="356.0" layoutY="240.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Actualizarea a fost lansată pe: ">
+               <font>
+                  <Font name="Calibri" size="15.0" />
+               </font>
+            </Text>
+            <Text layoutX="356.0" layoutY="262.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="texts" text="Schimbări (în engleză): ">
+               <font>
+                  <Font name="Calibri" size="15.0" />
+               </font>
+            </Text>
+            <ScrollPane fx:id="changelogPane" layoutX="355.0" layoutY="272.0" prefHeight="273.0" prefWidth="390.0" style="-fx-padding: 10;" styleClass="mainMenuPromptsScrollPanes">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
+               </content>
+            </ScrollPane>
+            <Button layoutX="355.0" layoutY="558.0" mnemonicParsing="false" onAction="#toggleUpdatePrompt" prefHeight="37.0" prefWidth="195.0" styleClass="promptButtons" text="❌ Anulare">
+               <font>
+                  <Font name="Calibri" size="20.0" />
+               </font>
+            </Button>
+            <SplitMenuButton fx:id="performUpdateButton" alignment="CENTER" layoutX="550.0" layoutY="558.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="195.0" text="⬆ Actualizare">
+               <items>
+                  <MenuItem mnemonicParsing="false" onAction="#openProjectGitHubPage" text="Deschide pagina de GitHub a proiectului și descarcă manual" />
+               </items>
+               <font>
+                  <Font name="Calibri" size="20.0" />
+               </font>
+            </SplitMenuButton>
          </children>
       </AnchorPane>
       <AnimatedSwitcher fx:id="darkOverlayAnimator" />

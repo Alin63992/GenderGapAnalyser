@@ -8,10 +8,14 @@ module com.gendergapanalyser.gendergapanalyser {
     requires commons.validator;
     requires javafx.base;
     requires javafx.graphics;
-    requires itextpdf;
     requires org.controlsfx.controls;
     requires AnimateFX;
     requires eu.iamgio.animated;
+    requires kernel;
+    requires layout;
+    requires io;
+    requires json.simple;
+    requires one.jpro.platform.mdfx;
 
 
     opens com.gendergapanalyser.gendergapanalyser to javafx.fxml;

@@ -12,8 +12,15 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.9.1</junit.version>
-        <javafx.version>20.0.1</javafx.version>
+        <javafx.version>21</javafx.version>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>jpro - sandec repository</id>
+            <url>https://sandec.jfrog.io/artifactory/repo/</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
@@ -38,18 +45,33 @@
         </dependency>
         <dependency>
             <groupId>com.itextpdf</groupId>
-            <artifactId>itextpdf</artifactId>
-            <version>5.5.13.3</version>
+            <artifactId>kernel</artifactId>
+            <version>8.0.2</version>
         </dependency>
         <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.69</version>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>io</artifactId>
+            <version>8.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>layout</artifactId>
+            <version>8.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
+            <version>2.0.9</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.7</version>
+            <version>2.14.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -70,7 +92,17 @@
         <dependency>
             <groupId>eu.iamgio</groupId>
             <artifactId>animated</artifactId>
-            <version>1.0.1</version>
+            <version>1.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>one.jpro.platform</groupId>
+            <artifactId>jpro-mdfx</artifactId>
+            <version>0.2.7-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
@@ -81,8 +113,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.10.1</version>
                 <configuration>
-                    <source>18</source>
-                    <target>18</target>
+                    <source>21</source>
+                    <target>21</target>
                 </configuration>
             </plugin>
             <plugin>

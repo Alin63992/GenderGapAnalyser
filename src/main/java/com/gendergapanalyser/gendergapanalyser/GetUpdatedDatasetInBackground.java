@@ -24,13 +24,13 @@ public class GetUpdatedDatasetInBackground implements Runnable {
         //Trying to download the Median annual earnings by sex, race and Hispanic ethnicity dataset file from the U.S. Department of Labor server (https://www.dol.gov/agencies/wb/data/earnings/median-annual-sex-race-hispanic-ethnicity)
         try {
             //Downloading the file
-            FileUtils.copyURLToFile(URI.create("https://public.tableau.com/views/Earningsbysexraceethnicity/Table.csv?%3Adisplay_static_image=y&%3AbootstrapWhenNotified=true&%3Aembed=true&%3Alanguage=en-US&:embed=y&:showVizHome=n&:apiID=host0").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/0DownloadedDataset.csv"), 500, 10000);
+            FileUtils.copyURLToFile(URI.create("https://public.tableau.com/views/Earningsbysexraceethnicity/Table.csv?%3Adisplay_static_image=y&%3AbootstrapWhenNotified=true&%3Aembed=true&%3Alanguage=en-US&:embed=y&:showVizHome=n&:apiID=host0").toURL(), new File("src/main/resources/com/gendergapanalyser/gendergapanalyser/0DownloadedDataset.csv"), 1000, 15000);
 
             //Setting the downloaded dataset path
             Path downloadedDatasetPath = Path.of("src/main/resources/com/gendergapanalyser/gendergapanalyser/0DownloadedDataset.csv");
 
             //Checking  if this thread is interrupted and stopping it if it is
-            if (Thread.currentThread().isInterrupted()) {
+            if (Main.interruptThreads) {
                 Files.delete(downloadedDatasetPath);
                 return;
             }
@@ -48,7 +48,7 @@ public class GetUpdatedDatasetInBackground implements Runnable {
             } catch (IOException ignored) {}
 
             //Checking  if this thread is interrupted and stopping it if it is
-            if (Thread.currentThread().isInterrupted()) {
+            if (Main.interruptThreads) {
                 Files.delete(downloadedDatasetPath);
                 return;
             }
@@ -57,13 +57,13 @@ public class GetUpdatedDatasetInBackground implements Runnable {
             Main.processData = new DataProcessing();
             Main.processData.prepareData();
 
-            //Checking  if this thread is interrupted and stopping it if it is
-            if (Thread.currentThread().isInterrupted()) {
+            //Checking if this thread is interrupted and stopping it if it is
+            if (Main.interruptThreads) {
                 Files.delete(downloadedDatasetPath);
                 return;
             }
 
-            //Checking  if the currently open window is the main menu one
+            //Checking if the currently open window is the main menu one
             if (Main.getCurrentStage() != null && !Main.getCurrentStage().getTitle().equals(Main.language.equals("EN") ? "Main Menu" : Main.language.equals("FR") ? "Menu Principal" : "Meniu Principal") || predictionsGenerated || PDFGenerated) {
                 if (!Main.getCurrentStage().getTitle().equals("Gender Gap Analyser")) {
                     Platform.runLater(() -> {
@@ -85,8 +85,8 @@ public class GetUpdatedDatasetInBackground implements Runnable {
                         } catch (FileNotFoundException ignored) {
                         }
 
-                        //Checking  if this thread is interrupted and stopping it if it is
-                        if (Thread.currentThread().isInterrupted()) {
+                        //Checking if this thread is interrupted and stopping it if it is
+                        if (Main.interruptThreads) {
                             try {
                                 Files.delete(downloadedDatasetPath);
                             } catch (IOException ignored) {
@@ -101,8 +101,9 @@ public class GetUpdatedDatasetInBackground implements Runnable {
                         mainMenu.setTitle(Main.language == null || Main.language.equals("EN") ? "Main Menu" : Main.language.equals("FR") ? "Menu Principal" : "Meniu Principal");
                         try {
                             //Preparing the new window
-                            mainMenu.setScene(new Scene(new FXMLLoader(getClass().getResource("AppScreens/MainMenu-" + Main.language + ".fxml")).load()));
-                            mainMenu.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
+                            Scene mainScene = new Scene(new FXMLLoader(getClass().getResource("AppScreens/MainMenu-" + Main.language + ".fxml")).load());
+                            mainScene.getStylesheets().setAll(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
+                            mainMenu.setScene(mainScene);
                             //Making the new window not resizeable so that the user doesn't change the size of the window and the elements of the page won't look out of place
                             mainMenu.setResizable(false);
                             mainMenu.centerOnScreen();
@@ -136,7 +137,7 @@ public class GetUpdatedDatasetInBackground implements Runnable {
                     errorDownload.setHeaderText(Main.language.equals("FR") ? "On ne pouvait pas télécharger d'informations actualisées !" : "Nu am putut descărca informații actualizate!");
                     errorDownload.setContentText(Main.language.equals("FR") ? "Peut-être que le serveur est indisponible à ce moment, ou vous avez des problèmes des connexion a l'internet. Veuillez vérifier votre connexion internet, après redémarrez l'application pour réessayer le téléchargement." : "Se poate ca serverul să fie indisponibil momentan, sau să aveți probleme de conexiune la internet. Vă rugăm să verificați conexiunea dumneavoastră la internet, apoi sa reporniți aplicația pentru a reîncerca descărcarea.");
                 }
-                errorDownload.getDialogPane().setMaxWidth(750);
+                errorDownload.getDialogPane().setMaxWidth(370);
                 errorDownload.initStyle(StageStyle.UNDECORATED);
                 errorDownload.getDialogPane().getStylesheets().add(Objects.requireNonNull(getClass().getResource("Stylesheets/" + Main.displayMode + "Mode.css")).toExternalForm());
                 errorDownload.getDialogPane().getStyleClass().add("alerts");
