@@ -27,7 +27,7 @@ public class Updater {
     //Variable that holds the date this update will have been published
     protected static final GregorianCalendar appCurrentUpdateDate = new GregorianCalendar(2024, Calendar.JANUARY, 18);
     //Variable that holds the number of revisions that this update will have been published
-    private static final int dailyRevision = 1;
+    private static final int dailyRevision = 2;
     //Array that holds the update details
     private static final String[] updateDetails = {"", ""};
 
