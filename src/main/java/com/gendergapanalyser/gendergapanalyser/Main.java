@@ -783,8 +783,6 @@ public class Main extends Application implements Initializable {
 
     @FXML
     private boolean checkAndRecover() {
-        System.out.println("Beginning application integrity check...");
-
         //Continuing to check and recover the AppScreens folder
         if (!new File(appScreensFolder + "/MainMenu-EN.fxml").exists() || !new File("target/classes/com/gendergapanalyser/gendergapanalyser/AppScreens/MainMenu-EN.fxml").exists()) {
             if (performRecoveryByUpdating())
@@ -1223,7 +1221,6 @@ public class Main extends Application implements Initializable {
             try {
                 //Checking the app integrity
                 if (checkAndRecover()) {
-                    System.out.println("Application integrity check complete. Application is healthy, and it can start.");
                     //Trying to download the dataset file from the U.S. Department of Labor server
                     downloadDataset.start();
 
@@ -1342,7 +1339,6 @@ public class Main extends Application implements Initializable {
                     });
                 } else {
                     if (!updateRouteSelectedOrRecoveryAborted) {
-                        System.out.println("Application integrity check complete. Application is missing essential files! Startup aborted!");
                         Platform.runLater(() -> {
                             Alert applicationError = new Alert(Alert.AlertType.ERROR);
                             applicationError.setTitle("Application Error");

@@ -10,6 +10,8 @@ It uses JavaFX to have a GUI that's not cluttered and that's easy and pleasant t
 ### Changelog
 
 * 23.09.2023 - Happy new year update!
+  - **Revision 3**: removed the integrity check messages from the console that appeared during the app integrity check.
+  - **Revision 2**: updated the fallback dataset to be the latest one provided by the US Department of Labor, which also includes statistics for 2022.
   - Git specific: renamed branch "master" to "main". Please update your development environments to use the new branch name by using the following commands:
   ```
   git branch -m master main
